@@ -83,7 +83,7 @@ export default function Testimonials() {
         gsap.from(".test-header", {
           scrollTrigger: { trigger: ".test-header", start: "top 90%" },
           immediateRender: false,
-          opacity: 0, y: 40, duration: 0.8, ease: "power3.out",
+          opacity: 0, y: 40, filter: "blur(10px)", duration: 0.9, ease: "power3.out",
         });
         gsap.from(".test-card", {
           scrollTrigger: { trigger: ".test-card", start: "top 90%" },

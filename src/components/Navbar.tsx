@@ -13,12 +13,34 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* ── Active section tracker ─────────────────────── */
+  useEffect(() => {
+    const sectionIds = links.map((l) => l.href.replace("#", ""));
+    const observers: IntersectionObserver[] = [];
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveSection(id);
+        },
+        { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
 
   const handleNavClick = (href: string) => {
@@ -59,16 +81,30 @@ export default function Navbar() {
 
           {/* Desktop links */}
           <ul className="hidden md:flex items-center gap-8">
-            {links.map((l) => (
-              <li key={l.label}>
-                <button
-                  onClick={() => handleNavClick(l.href)}
-                  className="text-sm text-white/70 hover:text-white transition-colors duration-200 tracking-wide"
-                >
-                  {l.label}
-                </button>
-              </li>
-            ))}
+            {links.map((l) => {
+              const isActive = activeSection === l.href.replace("#", "");
+              return (
+                <li key={l.label}>
+                  <button
+                    onClick={() => handleNavClick(l.href)}
+                    className="nav-link text-sm transition-colors duration-300 tracking-wide relative"
+                    style={{ color: isActive ? "#0aad92" : "rgba(255,255,255,0.65)" }}
+                  >
+                    {l.label}
+                    {/* Active dot */}
+                    <span
+                      className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full transition-all duration-300"
+                      style={{
+                        width: isActive ? "4px" : "0px",
+                        height: isActive ? "4px" : "0px",
+                        background: "#0aad92",
+                        opacity: isActive ? 1 : 0,
+                      }}
+                    />
+                  </button>
+                </li>
+              );
+            })}
           </ul>
 
           {/* CTA */}

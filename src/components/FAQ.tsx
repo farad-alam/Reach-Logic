@@ -44,7 +44,8 @@ export default function FAQ() {
     elements.forEach((el, i) => {
       el.style.opacity = "0";
       el.style.transform = "translateY(30px)";
-      el.style.transition = `opacity 0.6s ease ${i * 0.07}s, transform 0.6s ease ${i * 0.07}s`;
+      el.style.filter = "blur(8px)";
+      el.style.transition = `opacity 0.7s ease ${i * 0.07}s, transform 0.7s ease ${i * 0.07}s, filter 0.7s ease ${i * 0.07}s`;
     });
 
     const observer = new IntersectionObserver(
@@ -53,6 +54,7 @@ export default function FAQ() {
           if (entry.isIntersecting) {
             (entry.target as HTMLElement).style.opacity = "1";
             (entry.target as HTMLElement).style.transform = "translateY(0)";
+            (entry.target as HTMLElement).style.filter = "blur(0px)";
             observer.unobserve(entry.target);
           }
         });

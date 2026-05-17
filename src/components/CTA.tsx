@@ -5,6 +5,29 @@ import { useEffect, useRef } from "react";
 export default function CTA() {
   const sectionRef = useRef<HTMLElement>(null);
 
+  // Magnetic buttons
+  useEffect(() => {
+    let cleanup: (() => void) | null = null;
+    const init = async () => {
+      const { gsap } = await import("gsap");
+      const buttons = sectionRef.current?.querySelectorAll<HTMLElement>(".magnetic-btn") ?? [];
+      const off: Array<() => void> = [];
+      buttons.forEach((btn) => {
+        const onMove = (e: MouseEvent) => {
+          const r = btn.getBoundingClientRect();
+          gsap.to(btn, { x: (e.clientX - (r.left + r.width / 2)) * 0.22, y: (e.clientY - (r.top + r.height / 2)) * 0.22, duration: 0.35, ease: "power2.out" });
+        };
+        const onLeave = () => gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1,0.4)" });
+        btn.addEventListener("mousemove", onMove);
+        btn.addEventListener("mouseleave", onLeave);
+        off.push(() => { btn.removeEventListener("mousemove", onMove); btn.removeEventListener("mouseleave", onLeave); });
+      });
+      cleanup = () => off.forEach((f) => f());
+    };
+    init();
+    return () => cleanup?.();
+  }, []);
+
   useEffect(() => {
     let ctx: { revert: () => void } | null = null;
     const init = async () => {
@@ -15,7 +38,7 @@ export default function CTA() {
         gsap.from(".cta-content", {
           scrollTrigger: { trigger: ".cta-content", start: "top 90%" },
           immediateRender: false,
-          opacity: 0, y: 50, duration: 1, ease: "power3.out",
+          opacity: 0, y: 50, filter: "blur(12px)", duration: 1.1, ease: "power3.out",
         });
       }, sectionRef);
     };
@@ -77,7 +100,7 @@ export default function CTA() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="mailto:hello@reachlogic.co"
-            className="group px-8 py-4 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 pulse-glow"
+            className="magnetic-btn group px-8 py-4 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 pulse-glow"
             style={{
               background: "linear-gradient(135deg,#fff 0%,#e8fdf9 100%)",
               color: "#085e51",

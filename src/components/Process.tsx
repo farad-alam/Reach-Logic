@@ -46,7 +46,7 @@ export default function Process() {
         gsap.from(".process-header", {
           scrollTrigger: { trigger: ".process-header", start: "top 90%" },
           immediateRender: false,
-          opacity: 0, y: 40, duration: 0.8, ease: "power3.out",
+          opacity: 0, y: 40, filter: "blur(10px)", duration: 0.9, ease: "power3.out",
         });
         gsap.from(".process-step", {
           scrollTrigger: { trigger: ".process-steps", start: "top 85%" },

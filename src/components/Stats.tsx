@@ -56,7 +56,7 @@ export default function Stats() {
         gsap.from(".stats-label", {
           scrollTrigger: { trigger: ".stats-label", start: "top 90%" },
           immediateRender: false,
-          opacity: 0, y: 30, duration: 0.8, ease: "power3.out",
+          opacity: 0, y: 30, filter: "blur(10px)", duration: 0.9, ease: "power3.out",
         });
       }, sectionRef);
     };

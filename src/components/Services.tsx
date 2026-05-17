@@ -51,8 +51,8 @@ export default function Services() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const headerRef = useRef<HTMLDivElement>(null);
 
+  /* ── Scroll reveal ──────────────────────────────── */
   useEffect(() => {
-    /* Use IntersectionObserver so visibility never depends on async GSAP timing */
     const elements = [
       headerRef.current,
       ...cardRefs.current.filter(Boolean),
@@ -61,7 +61,8 @@ export default function Services() {
     elements.forEach((el, i) => {
       (el as HTMLElement).style.opacity = "0";
       (el as HTMLElement).style.transform = "translateY(50px)";
-      (el as HTMLElement).style.transition = `opacity 0.7s ease ${i * 0.08}s, transform 0.7s ease ${i * 0.08}s`;
+      (el as HTMLElement).style.filter = "blur(10px)";
+      (el as HTMLElement).style.transition = `opacity 0.75s ease ${i * 0.08}s, transform 0.75s ease ${i * 0.08}s, filter 0.75s ease ${i * 0.08}s`;
     });
 
     const observer = new IntersectionObserver(
@@ -70,6 +71,7 @@ export default function Services() {
           if (entry.isIntersecting) {
             (entry.target as HTMLElement).style.opacity = "1";
             (entry.target as HTMLElement).style.transform = "translateY(0)";
+            (entry.target as HTMLElement).style.filter = "blur(0px)";
             observer.unobserve(entry.target);
           }
         });
@@ -79,6 +81,40 @@ export default function Services() {
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
+  }, []);
+
+  /* ── 3D tilt on service cards ───────────────────── */
+  useEffect(() => {
+    const cards = cardRefs.current.slice(0, services.length);
+    const cleanups: Array<() => void> = [];
+
+    cards.forEach((card) => {
+      if (!card) return;
+
+      const onMove = (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+        const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+        const rotY = x * 9;
+        const rotX = -y * 6;
+        card.style.transform = `perspective(900px) rotateY(${rotY}deg) rotateX(${rotX}deg) translateY(-4px) scale(1.01)`;
+        card.style.transition = "transform 0.12s ease";
+      };
+
+      const onLeave = () => {
+        card.style.transform = "perspective(900px) rotateY(0deg) rotateX(0deg) translateY(0) scale(1)";
+        card.style.transition = "transform 0.55s cubic-bezier(0.23,1,0.32,1)";
+      };
+
+      card.addEventListener("mousemove", onMove);
+      card.addEventListener("mouseleave", onLeave);
+      cleanups.push(() => {
+        card.removeEventListener("mousemove", onMove);
+        card.removeEventListener("mouseleave", onLeave);
+      });
+    });
+
+    return () => cleanups.forEach((fn) => fn());
   }, []);
 
   return (
@@ -126,8 +162,8 @@ export default function Services() {
                 border: hovered === i
                   ? "1px solid rgba(10,173,146,0.4)"
                   : "1px solid rgba(255,255,255,0.07)",
-                transform: hovered === i ? "translateY(-4px)" : "none",
                 boxShadow: hovered === i ? "0 20px 60px rgba(10,173,146,0.12)" : "none",
+                transformStyle: "preserve-3d",
               }}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
