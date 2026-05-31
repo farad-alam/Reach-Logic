@@ -51,6 +51,8 @@ export default function ContactPage() {
                 <option value="ads">Paid Advertising</option>
                 <option value="web">Web Design & Development</option>
                 <option value="strategy">Organic Growth Strategy</option>
+                <option value="video">Video Editing & AI Video Production</option>
+                <option value="seo">Search Engine Optimization (SEO)</option>
               </select>
             </div>
             <div>

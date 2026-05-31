@@ -43,6 +43,22 @@ const services = [
     metric: "90-day custom roadmap",
     tag: "Strategy",
   },
+  {
+    icon: "🎥",
+    title: "Video Editing and AI Video Production",
+    short: "Sleek, high-converting video assets at the speed of social.",
+    detail: "Combining expert professional editing with state-of-the-art AI workflows. We deliver high-impact video creative optimized for organic reach and paid channels.",
+    metric: "+320% average video views",
+    tag: "Creative",
+  },
+  {
+    icon: "🔍",
+    title: "Search Engine Optimization (SEO)",
+    short: "Dominate search rankings and capture high-intent buyers.",
+    detail: "From technical audits and fast load times to high-level content strategy and authoritative backlinks. We capture compounding organic traffic that lowers CAC.",
+    metric: "+150% growth in search traffic",
+    tag: "SEO",
+  },
 ];
 
 export default function Services() {

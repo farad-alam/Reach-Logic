@@ -5,6 +5,8 @@ const row1 = [
   "Paid Advertising",
   "Web Design & Development",
   "Organic Growth Strategy",
+  "Video Editing & AI Production",
+  "Search Engine Optimization (SEO)",
   "Facebook · TikTok · Google Ads",
   "Global Clients",
   "Results-Driven",

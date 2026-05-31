@@ -8,6 +8,8 @@ const services = [
   "Paid Advertising",
   "Web Design & Development",
   "Organic Growth Strategy",
+  "Video Editing & AI Production",
+  "Search Engine Optimization (SEO)",
 ];
 
 const company = [
@@ -78,7 +80,7 @@ export default function Footer() {
               and web design — built to convert globally.
             </p>
             {/* Socials */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 mb-6">
               {socials.map((s) => (
                 <a
                   key={s.label}
@@ -104,6 +106,12 @@ export default function Footer() {
                   {s.icon}
                 </a>
               ))}
+            </div>
+            {/* Address */}
+            <div className="text-sm leading-relaxed max-w-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
+              1st Floor, Afroza Tower,<br />
+              Uposhohor Newmarket,<br />
+              Rajshahi-6202, Bangladesh
             </div>
           </div>
 
@@ -158,16 +166,11 @@ export default function Footer() {
               </div>
               <a
                 href="mailto:hello@reachlogic.co"
-                className="text-sm hover:text-white transition-colors block mb-4"
+                className="text-sm hover:text-white transition-colors"
                 style={{ color: "rgba(255,255,255,0.4)" }}
               >
                 hello@reachlogic.co
               </a>
-              <div className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
-                1st Floor, Afroza Tower,<br />
-                Uposhohor Newmarket,<br />
-                Rajshahi-6202, Bangladesh
-              </div>
             </div>
 
             {/* Legal */}
