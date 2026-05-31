@@ -319,30 +319,6 @@ export default function Hero() {
 
       {/* ── Content ── */}
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-        {/* Chips */}
-        <div className="hero-chip inline-flex items-center gap-2 mb-8 flex-wrap justify-center">
-          <span
-            className="px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase"
-            style={{
-              background: "rgba(10,173,146,0.12)",
-              border: "1px solid rgba(10,173,146,0.3)",
-              color: "#0aad92",
-            }}
-          >
-            Global Digital Agency
-          </span>
-          <span
-            className="px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase"
-            style={{
-              background: "rgba(10,173,146,0.12)",
-              border: "1px solid rgba(10,173,146,0.3)",
-              color: "#0aad92",
-            }}
-          >
-            Results-Driven Growth
-          </span>
-        </div>
-
         {/* Headline — clipped line reveals */}
         <h1
           className="font-extrabold leading-none mb-6"
