@@ -330,13 +330,13 @@ export default function Hero() {
           {/* Line 1 — white */}
           <span className="hero-clip" style={{ color: "#ffffff" }}>
             <span className="hero-line-inner" style={{ display: "block" }}>
-              Scale Smarter.
+              Reach Isn't Luck.
             </span>
           </span>
           {/* Line 2 — gradient */}
           <span className="hero-clip">
             <span className="hero-line-inner text-gradient" style={{ display: "block" }}>
-              Reach Further.
+              It's Logic.
             </span>
           </span>
         </h1>
@@ -349,8 +349,7 @@ export default function Hero() {
             maxWidth: "540px",
           }}
         >
-          Social automation, paid advertising, and web design — built for brands
-          ready to dominate the digital world.
+          Strategy, content, organic growth, paid ads, and web — everything your brand needs to dominate online.
         </p>
 
         {/* CTAs */}
