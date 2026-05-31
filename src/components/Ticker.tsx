@@ -4,7 +4,7 @@ const row1 = [
   "Social Media Management",
   "Paid Advertising",
   "Web Design & Development",
-  "Digital Growth Strategy",
+  "Organic Growth Strategy",
   "Facebook · TikTok · Google Ads",
   "Global Clients",
   "Results-Driven",

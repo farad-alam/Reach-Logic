@@ -7,7 +7,7 @@ const services = [
   "Social Media Marketing",
   "Paid Advertising",
   "Web Design & Development",
-  "Digital Growth Strategy",
+  "Organic Growth Strategy",
 ];
 
 const company = [
@@ -158,11 +158,16 @@ export default function Footer() {
               </div>
               <a
                 href="mailto:hello@reachlogic.co"
-                className="text-sm hover:text-white transition-colors"
+                className="text-sm hover:text-white transition-colors block mb-4"
                 style={{ color: "rgba(255,255,255,0.4)" }}
               >
                 hello@reachlogic.co
               </a>
+              <div className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+                1st Floor, Afroza Tower,<br />
+                Uposhohor Newmarket,<br />
+                Rajshahi-6202, Bangladesh
+              </div>
             </div>
 
             {/* Legal */}

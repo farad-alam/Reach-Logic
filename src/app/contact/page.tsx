@@ -25,7 +25,11 @@ export default function ContactPage() {
             </div>
             <div>
               <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">Location</div>
-              <p className="text-xl">Global Remote</p>
+              <p className="text-lg">
+                1st Floor, Afroza Tower,<br />
+                Uposhohor Newmarket,<br />
+                Rajshahi-6202, Bangladesh
+              </p>
             </div>
           </div>
         </div>
@@ -46,7 +50,7 @@ export default function ContactPage() {
                 <option value="social">Social Media Management</option>
                 <option value="ads">Paid Advertising</option>
                 <option value="web">Web Design & Development</option>
-                <option value="strategy">Digital Growth Strategy</option>
+                <option value="strategy">Organic Growth Strategy</option>
               </select>
             </div>
             <div>

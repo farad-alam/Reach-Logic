@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -37,7 +37,7 @@ const services = [
   },
   {
     icon: "📈",
-    title: "Digital Growth Strategy",
+    title: "Organic Growth Strategy",
     short: "No generic playbooks. Your growth, your roadmap.",
     detail: "We audit your current digital ecosystem, identify the highest-leverage opportunities, and build a custom 90-day growth plan — then execute it with you, not for you.",
     metric: "90-day custom roadmap",
