@@ -1,4 +1,6 @@
-﻿"use client";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
 
 const services = [
   "Social Media Management",
@@ -9,10 +11,15 @@ const services = [
 ];
 
 const company = [
-  { label: "Our Work", href: "#work" },
-  { label: "Process", href: "#process" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Our Work", href: "/work" },
+  { label: "Process", href: "/#process" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
+const legal = [
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms of Service", href: "/terms-of-service" },
 ];
 
 const socials = [
@@ -23,9 +30,21 @@ const socials = [
 ];
 
 export default function Footer() {
-  const scrollTo = (href: string) => {
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleNavClick = (href: string) => {
+    if (href.startsWith("/#")) {
+      const hash = href.substring(1);
+      if (pathname === "/") {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        router.push(href);
+      }
+    } else {
+      router.push(href);
+    }
   };
 
   return (
@@ -122,7 +141,7 @@ export default function Footer() {
               {company.map((c) => (
                 <li key={c.label}>
                   <button
-                    onClick={() => scrollTo(c.href)}
+                    onClick={() => handleNavClick(c.href)}
                     className="text-sm transition-colors duration-200 hover:text-white"
                     style={{ color: "rgba(255,255,255,0.4)" }}
                   >
@@ -144,6 +163,26 @@ export default function Footer() {
               >
                 hello@reachlogic.co
               </a>
+            </div>
+
+            {/* Legal */}
+            <div className="mt-8">
+              <div className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#0aad92" }}>
+                Legal
+              </div>
+              <ul className="space-y-3">
+                {legal.map((l) => (
+                  <li key={l.label}>
+                    <button
+                      onClick={() => handleNavClick(l.href)}
+                      className="text-sm transition-colors duration-200 hover:text-white"
+                      style={{ color: "rgba(255,255,255,0.4)" }}
+                    >
+                      {l.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

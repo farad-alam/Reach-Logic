@@ -1,13 +1,14 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 const links = [
-  { label: "Services", href: "#services" },
-  { label: "Work", href: "#work" },
-  { label: "Process", href: "#process" },
-  { label: "About", href: "#about" },
+  { label: "Services", href: "/services" },
+  { label: "Work", href: "/work" },
+  { label: "Process", href: "/#process" },
+  { label: "About", href: "/about" },
 ];
 
 export default function Navbar() {
@@ -15,6 +16,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -24,7 +27,15 @@ export default function Navbar() {
 
   /* ── Active section tracker ─────────────────────── */
   useEffect(() => {
-    const sectionIds = links.map((l) => l.href.replace("#", ""));
+    // If we are on an inner page, just set active based on pathname
+    if (pathname !== "/") {
+      setActiveSection(pathname);
+      return;
+    }
+
+    // On homepage, track scroll position for homepage sections that match the links
+    // (We look for ids without the leading / or /#)
+    const sectionIds = links.map((l) => l.href.replace("/#", "").replace("/", ""));
     const observers: IntersectionObserver[] = [];
 
     sectionIds.forEach((id) => {
@@ -32,7 +43,7 @@ export default function Navbar() {
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) setActiveSection(id);
+          if (entry.isIntersecting) setActiveSection("/" + (id === "process" ? "#process" : id));
         },
         { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
       );
@@ -41,12 +52,21 @@ export default function Navbar() {
     });
 
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  }, [pathname]);
 
   const handleNavClick = (href: string) => {
     setMenuOpen(false);
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (href.startsWith("/#")) {
+      const hash = href.substring(1); // e.g. "#process"
+      if (pathname === "/") {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        router.push(href);
+      }
+    } else {
+      router.push(href);
+    }
   };
 
   return (
@@ -82,7 +102,7 @@ export default function Navbar() {
           {/* Desktop links */}
           <ul className="hidden md:flex items-center gap-8">
             {links.map((l) => {
-              const isActive = activeSection === l.href.replace("#", "");
+              const isActive = activeSection === l.href;
               return (
                 <li key={l.label}>
                   <button
@@ -110,7 +130,7 @@ export default function Navbar() {
           {/* CTA */}
           <div className="hidden md:block">
             <button
-              onClick={() => handleNavClick("#contact")}
+              onClick={() => handleNavClick("/contact")}
               className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105"
               style={{
                 background: "linear-gradient(135deg, #085e51, #0aad92)",
@@ -176,7 +196,7 @@ export default function Navbar() {
           </button>
         ))}
         <button
-          onClick={() => handleNavClick("#contact")}
+          onClick={() => handleNavClick("/contact")}
           className="mt-4 px-8 py-3 rounded-full text-base font-semibold"
           style={{ background: "linear-gradient(135deg, #085e51, #0aad92)", color: "#fff" }}
         >
