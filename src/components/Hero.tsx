@@ -327,16 +327,10 @@ export default function Hero() {
             fontSize: "clamp(3rem, 8.5vw, 7.5rem)",
           }}
         >
-          {/* Line 1 — white */}
+          {/* Single line headline */}
           <span className="hero-clip" style={{ color: "#ffffff" }}>
             <span className="hero-line-inner" style={{ display: "block" }}>
-              Reach Isn't Luck.
-            </span>
-          </span>
-          {/* Line 2 — gradient */}
-          <span className="hero-clip">
-            <span className="hero-line-inner text-gradient" style={{ display: "block" }}>
-              It's Logic.
+              Strategy That Moves Brands Forward
             </span>
           </span>
         </h1>
