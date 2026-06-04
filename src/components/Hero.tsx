@@ -321,10 +321,10 @@ export default function Hero() {
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
         {/* Headline — clipped line reveals */}
         <h1
-          className="font-extrabold leading-none mb-6"
+          className="font-extrabold leading-none mb-6 whitespace-nowrap"
           style={{
             fontFamily: "var(--font-fraunces)",
-            fontSize: "clamp(3rem, 8.5vw, 7.5rem)",
+            fontSize: "clamp(1rem, 4.5vw, 4.5rem)",
           }}
         >
           {/* Single line headline */}
