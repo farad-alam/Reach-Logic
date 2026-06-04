@@ -60,7 +60,7 @@ export default function Footer() {
           <div className="xl:col-span-2">
             <div className="flex items-center mb-5">
               <img
-                src="/logo.jfif"
+                src="/logo.png"
                 alt="Reach Logic"
                 className="h-9 w-auto object-contain"
               />

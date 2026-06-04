@@ -86,7 +86,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center group">
             <img
-              src="/logo.jfif"
+              src="/logo.png"
               alt="Reach Logic"
               className="h-8 md:h-9 w-auto object-contain"
             />
