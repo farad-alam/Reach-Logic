@@ -84,19 +84,12 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 xl:px-12 flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <span
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: "linear-gradient(135deg, #085e51, #0aad92)" }}
-            >
-              RL
-            </span>
-            <span
-              className="text-white font-bold text-lg tracking-tight"
-              style={{ fontFamily: "var(--font-fraunces)" }}
-            >
-              Reach Logic
-            </span>
+          <Link href="/" className="flex items-center group">
+            <img
+              src="/logo.jfif"
+              alt="Reach Logic"
+              className="h-8 md:h-9 w-auto object-contain"
+            />
           </Link>
 
           {/* Desktop links */}

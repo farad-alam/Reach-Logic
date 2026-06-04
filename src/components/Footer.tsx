@@ -58,19 +58,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-12 mb-14">
           {/* Brand */}
           <div className="xl:col-span-2">
-            <div className="flex items-center gap-2 mb-5">
-              <span
-                className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white"
-                style={{ background: "linear-gradient(135deg,#085e51,#0aad92)" }}
-              >
-                RL
-              </span>
-              <span
-                className="text-xl font-bold text-white"
-                style={{ fontFamily: "var(--font-fraunces)" }}
-              >
-                Reach Logic
-              </span>
+            <div className="flex items-center mb-5">
+              <img
+                src="/logo.jfif"
+                alt="Reach Logic"
+                className="h-9 w-auto object-contain"
+              />
             </div>
             <p
               className="text-sm leading-relaxed mb-6 max-w-sm"
