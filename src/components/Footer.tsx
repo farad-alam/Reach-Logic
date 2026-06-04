@@ -25,10 +25,9 @@ const legal = [
 ];
 
 const socials = [
-  { label: "Instagram", href: "#", icon: "IG" },
-  { label: "Facebook", href: "#", icon: "FB" },
-  { label: "TikTok", href: "#", icon: "TT" },
-  { label: "LinkedIn", href: "#", icon: "LI" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/reach-logic/", icon: "LI" },
+  { label: "Facebook", href: "https://www.facebook.com/ReachLogic", icon: "FB" },
+  { label: "Instagram", href: "https://www.instagram.com/reach.logic", icon: "IG" },
 ];
 
 export default function Footer() {
@@ -69,8 +68,7 @@ export default function Footer() {
               className="text-sm leading-relaxed mb-6 max-w-sm"
               style={{ color: "rgba(255,255,255,0.4)" }}
             >
-              We help brands scale smarter through social media management, paid advertising,
-              and web design — built to convert globally.
+              Full-service digital marketing agency helping brands grow smarter online. Strategy, social media, organic growth, SEO, paid ads, and web design — built to convert.
             </p>
             {/* Socials */}
             <div className="flex gap-3 mb-6">
