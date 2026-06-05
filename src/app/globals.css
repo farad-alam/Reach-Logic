@@ -140,7 +140,9 @@ body {
 .hero-clip {
   display: block;
   overflow: hidden;
-  line-height: 1.05;
+  line-height: 1.1;
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
 }
 
 /* ── Nav link underline ──────────────────────────────── */

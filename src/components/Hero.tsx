@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { BufferAttribute } from "three";
 
 export default function Hero() {
@@ -269,6 +269,23 @@ export default function Hero() {
     };
   }, []);
 
+  /* ── Cycling words ───────────────────────────────── */
+  const words = ["Logically.", "Organically.", "Strategically.", "Intelligently."];
+  const [wordIndex, setWordIndex] = useState(0);
+  const [wordVisible, setWordVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordVisible(false);
+      setTimeout(() => {
+        setWordIndex((i) => (i + 1) % words.length);
+        setWordVisible(true);
+      }, 700);
+    }, 3000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <section
       ref={containerRef}
@@ -319,32 +336,76 @@ export default function Hero() {
 
       {/* ── Content ── */}
       <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-        {/* Headline — clipped line reveals */}
-        <h1
-          className="font-extrabold leading-none mb-6 whitespace-nowrap"
+
+        {/* Eyebrow chip */}
+        <div
+          className="hero-chip inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
           style={{
-            fontFamily: "var(--font-fraunces)",
-            fontSize: "clamp(1rem, 4.5vw, 4.5rem)",
+            background: "rgba(10,173,146,0.1)",
+            border: "1px solid rgba(10,173,146,0.25)",
+            color: "#0aad92",
           }}
         >
-          {/* Single line headline */}
-          <span className="hero-clip" style={{ color: "#ffffff" }}>
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ background: "#0aad92", boxShadow: "0 0 6px #0aad92" }}
+          />
+          Full-Service Digital Growth Agency
+        </div>
+
+        {/* Headline — two clipped lines */}
+        <h1
+          className="font-extrabold leading-tight mb-6"
+          style={{
+            fontFamily: "var(--font-fraunces)",
+            fontSize: "clamp(2rem, 5.5vw, 5.5rem)",
+          }}
+        >
+          {/* Line 1 */}
+          <span className="hero-clip block" style={{ color: "#ffffff" }}>
             <span className="hero-line-inner" style={{ display: "block" }}>
-              Strategy That Moves Brands Forward
+              Strategy That Moves
+            </span>
+          </span>
+          {/* Line 2 */}
+          <span className="hero-clip block" style={{ color: "#ffffff" }}>
+            <span className="hero-line-inner" style={{ display: "block" }}>
+              Brands Forward.
             </span>
           </span>
         </h1>
 
-        {/* Subtext */}
-        <p
-          className="hero-sub text-white/60 mb-10 mx-auto leading-relaxed"
-          style={{
-            fontSize: "clamp(1rem, 2vw, 1.2rem)",
-            maxWidth: "540px",
-          }}
+        {/* Cycling tagline */}
+        <div
+          className="hero-sub mb-10 flex flex-col items-center gap-1"
         >
-          Strategy, content, organic growth, paid ads, and web — everything your brand needs to dominate online.
-        </p>
+          <span
+            className="text-white/45"
+            style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", letterSpacing: "0.01em" }}
+          >
+            Reach Your Right Audience
+          </span>
+          {/* Animated cycling word */}
+          <div className="overflow-hidden">
+            <span
+              className="block font-extrabold text-gradient"
+              style={{
+                fontFamily: "var(--font-fraunces)",
+                fontSize: "clamp(1.5rem, 3.5vw, 3rem)",
+                lineHeight: 1.1,
+                paddingBottom: "0.2em",
+                marginBottom: "-0.2em",
+                transform: wordVisible ? "translateY(0%)" : "translateY(-100%)",
+                opacity: wordVisible ? 1 : 0,
+                transition: "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease",
+                display: "block",
+                willChange: "transform, opacity",
+              }}
+            >
+              {words[wordIndex]}
+            </span>
+          </div>
+        </div>
 
         {/* CTAs */}
         <div className="hero-ctas flex flex-col sm:flex-row items-center justify-center gap-4">
