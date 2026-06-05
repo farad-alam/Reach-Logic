@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
+import SmoothScroll from "@/components/SmoothScroll";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import TawkToChat from "@/components/TawkToChat";
+import { RootJsonLd } from "@/components/JsonLd";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,21 +22,62 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Reach Logic — Scale Smarter. Reach Further.",
+  metadataBase: new URL("https://www.reachlogic.net"),
+
+  title: {
+    default: "Reach Logic — Scale Smarter. Reach Further.",
+    template: "%s | Reach Logic",
+  },
   description:
-    "Reach Logic is a full-service digital growth agency offering social media management, paid advertising, and web design for brands ready to scale globally.",
-  keywords: "digital marketing agency, social media management, paid advertising, web design, growth strategy",
+    "Reach Logic is a full-service digital growth agency offering social media management, paid advertising, SEO, and web design for brands ready to scale globally.",
+  keywords: [
+    "digital marketing agency",
+    "social media management",
+    "paid advertising agency",
+    "SEO agency",
+    "web design agency",
+    "growth marketing",
+    "social media automation",
+    "Reach Logic",
+  ],
+
+  alternates: {
+    canonical: "https://www.reachlogic.net",
+  },
+
   openGraph: {
     title: "Reach Logic — Scale Smarter. Reach Further.",
-    description: "Full-service digital growth agency. Social automation, paid ads, web design — built to convert globally.",
+    description:
+      "Full-service digital growth agency. Social automation, paid ads, SEO, web design — built to convert globally.",
+    url: "https://www.reachlogic.net",
+    siteName: "Reach Logic",
+    locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Reach Logic — Scale Smarter. Reach Further.",
+      },
+    ],
   },
-};
 
-import SmoothScroll from "@/components/SmoothScroll";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import TawkToChat from "@/components/TawkToChat";
+  twitter: {
+    card: "summary_large_image",
+    title: "Reach Logic — Scale Smarter. Reach Further.",
+    description:
+      "Full-service digital growth agency. Paid ads, social, SEO & web design — built to convert.",
+    images: ["/og-image.png"],
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
+
+  manifest: "/site.webmanifest",
+};
 
 export default function RootLayout({
   children,
@@ -42,6 +88,7 @@ export default function RootLayout({
         style={{ fontFamily: "var(--font-inter), sans-serif" }}
         className="min-h-screen antialiased"
       >
+        <RootJsonLd />
         <ClientProviders />
         <SmoothScroll>
           <Navbar />

@@ -1,0 +1,21 @@
+{
+  "name": "Reach Logic",
+  "short_name": "ReachLogic",
+  "description": "Full-service digital growth agency. Social media, paid ads, SEO & web design — built to convert globally.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#042f28",
+  "theme_color": "#042f28",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

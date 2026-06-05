@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
 import InnerPageHero from "@/components/InnerPageHero";
+
 import Stats from "@/components/Stats";
 import Testimonials from "@/components/Testimonials";
 import CTA from "@/components/CTA";
+
+
+export const metadata: Metadata = {
+  title: "About Us — Our Story & Mission",
+  description:
+    "Meet the Reach Logic team — data-driven creatives and growth engineers helping brands dominate digital globally. Built for brands ready to dominate.",
+  alternates: { canonical: "https://www.reachlogic.net/about" },
+  openGraph: {
+    title: "About Reach Logic — Our Story & Mission",
+    description:
+      "Meet the team behind Reach Logic. Data-driven creatives and growth engineers helping brands dominate digital globally.",
+    url: "https://www.reachlogic.net/about",
+  },
+};
 
 export default function AboutPage() {
   return (

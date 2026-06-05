@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import InnerPageHero from "@/components/InnerPageHero";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  robots: { index: false, follow: false },
+};
+
 
 export default function TermsOfServicePage() {
   return (

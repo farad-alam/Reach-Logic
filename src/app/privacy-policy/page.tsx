@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import InnerPageHero from "@/components/InnerPageHero";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  robots: { index: false, follow: false },
+};
 
 export default function PrivacyPolicyPage() {
   return (

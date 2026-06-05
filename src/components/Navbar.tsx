@@ -73,6 +73,8 @@ export default function Navbar() {
     <>
       <nav
         ref={navRef}
+        role="navigation"
+        aria-label="Main navigation"
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
         style={{
           background: scrolled

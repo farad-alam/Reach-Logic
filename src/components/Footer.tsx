@@ -49,7 +49,7 @@ export default function Footer() {
   };
 
   return (
-    <footer style={{ background: "#020f0c", borderTop: "1px solid rgba(10,173,146,0.1)" }}>
+    <footer role="contentinfo" style={{ background: "#020f0c", borderTop: "1px solid rgba(10,173,146,0.1)" }}>
       {/* Top gradient line */}
       <div style={{ height: "2px", background: "linear-gradient(90deg, transparent, #085e51, #0aad92, #085e51, transparent)" }} />
 
@@ -117,12 +117,13 @@ export default function Footer() {
             <ul className="space-y-3">
               {services.map((s) => (
                 <li key={s}>
-                  <span
-                    className="text-sm transition-colors duration-200 cursor-default"
+                  <a
+                    href="/services"
+                    className="text-sm transition-colors duration-200 hover:text-[#0aad92]"
                     style={{ color: "rgba(255,255,255,0.4)" }}
                   >
                     {s}
-                  </span>
+                  </a>
                 </li>
               ))}
             </ul>
