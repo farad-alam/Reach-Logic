@@ -270,7 +270,7 @@ export default function Hero() {
   }, []);
 
   /* ── Cycling words ───────────────────────────────── */
-  const words = ["Logically.", "Organically.", "Strategically.", "Intelligently."];
+  const words = ["Logically.", "Organically.", "Strategically."];
   const [wordIndex, setWordIndex] = useState(0);
   const [wordVisible, setWordVisible] = useState(true);
 
