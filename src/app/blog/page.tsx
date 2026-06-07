@@ -239,18 +239,9 @@ export default function BlogPage() {
           {rest.map((post, i) => (
             <Link href="#" key={i} className="group">
               <article
-                className="rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1"
+                className="rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1 border border-[rgba(255,255,255,0.06)] hover:border-[rgba(10,173,146,0.25)] hover:shadow-[0_20px_60px_rgba(10,173,146,0.08)]"
                 style={{
                   background: "#020f0c",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(10,173,146,0.25)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 20px 60px rgba(10,173,146,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.06)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
                 }}
               >
                 {/* Image */}
@@ -376,19 +367,7 @@ export default function BlogPage() {
               <Link
                 key={topic.label}
                 href="#"
-                className="group flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300"
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(10,173,146,0.08)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(10,173,146,0.2)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
-                }}
+                className="group flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.07)] hover:bg-[rgba(10,173,146,0.08)] hover:border-[rgba(10,173,146,0.2)]"
               >
                 <span className="text-sm font-semibold text-white/75 group-hover:text-white transition-colors">
                   {topic.label}
