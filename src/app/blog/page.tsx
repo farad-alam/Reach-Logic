@@ -26,7 +26,7 @@ const posts = [
     date: "Oct 12, 2026",
     dateTime: "2026-10-12",
     readTime: "7 min read",
-    image: "/blog-social-media.png",
+    image: "/blog-social-media.jpg",
     featured: true,
   },
   {
@@ -37,7 +37,7 @@ const posts = [
     date: "Sep 28, 2026",
     dateTime: "2026-09-28",
     readTime: "5 min read",
-    image: "/blog-paid-ads.png",
+    image: "/blog-paid-ads.jpg",
     featured: false,
   },
   {
@@ -48,7 +48,7 @@ const posts = [
     date: "Sep 15, 2026",
     dateTime: "2026-09-15",
     readTime: "6 min read",
-    image: "/blog-seo-web.png",
+    image: "/blog-seo-web.jpg",
     featured: false,
   },
   {
@@ -59,7 +59,7 @@ const posts = [
     date: "Aug 30, 2026",
     dateTime: "2026-08-30",
     readTime: "9 min read",
-    image: "/blog-strategy.png",
+    image: "/blog-strategy.jpg",
     featured: false,
   },
 ];
