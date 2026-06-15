@@ -64,24 +64,24 @@ export default function ContactPage() {
             <div>
               <label htmlFor="contact-service" className="block text-sm text-white/60 mb-2">Service Interest*</label>
               <select id="contact-service" required defaultValue="" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors appearance-none">
-                <option value="" disabled>Select a service</option>
-                <option value="social-management">Social Media Management</option>
-                <option value="social-marketing">Social Media Marketing</option>
-                <option value="ads">Paid Advertising</option>
-                <option value="web">Web Design & Development</option>
-                <option value="strategy">Organic Growth Strategy</option>
-                <option value="video">Video Editing & AI Production</option>
-                <option value="seo">Search Engine Optimization (SEO)</option>
+                <option value="" disabled className="bg-[#020f0c] text-white">Select a service</option>
+                <option value="social-management" className="bg-[#020f0c] text-white">Social Media Management</option>
+                <option value="social-marketing" className="bg-[#020f0c] text-white">Social Media Marketing</option>
+                <option value="ads" className="bg-[#020f0c] text-white">Paid Advertising</option>
+                <option value="web" className="bg-[#020f0c] text-white">Web Design & Development</option>
+                <option value="strategy" className="bg-[#020f0c] text-white">Organic Growth Strategy</option>
+                <option value="video" className="bg-[#020f0c] text-white">Video Editing & AI Production</option>
+                <option value="seo" className="bg-[#020f0c] text-white">Search Engine Optimization (SEO)</option>
               </select>
             </div>
             <div>
               <label htmlFor="contact-budget" className="block text-sm text-white/60 mb-2">Your Budget*</label>
               <select id="contact-budget" required defaultValue="" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors appearance-none">
-                <option value="" disabled>Select a budget</option>
-                <option value="300-500">$300 - $500</option>
-                <option value="500-1000">$500 – $1,000</option>
-                <option value="1000-3000">$1,000 – $3,000</option>
-                <option value="3000+">$3,000+</option>
+                <option value="" disabled className="bg-[#020f0c] text-white">Select a budget</option>
+                <option value="300-500" className="bg-[#020f0c] text-white">$300 - $500</option>
+                <option value="500-1000" className="bg-[#020f0c] text-white">$500 – $1,000</option>
+                <option value="1000-3000" className="bg-[#020f0c] text-white">$1,000 – $3,000</option>
+                <option value="3000+" className="bg-[#020f0c] text-white">$3,000+</option>
               </select>
             </div>
             <div>
