@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
           <p>In no event shall Reach Logic, nor any of its officers, directors and employees, shall be held liable for anything arising out of or in any way connected with your use of this website whether such liability is under contract. Reach Logic, including its officers, directors and employees shall not be held liable for any indirect, consequential or special liability arising out of or in any way related to your use of this website.</p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4" style={{ fontFamily: "var(--font-fraunces)" }}>5. Contact Us</h2>
-          <p>If you have any questions about these Terms, please contact us at: <a href="mailto:hello@reachlogic.net" className="text-[#0aad92] hover:underline">hello@reachlogic.net</a>.</p>
+          <p>If you have any questions about these Terms, please contact us at: <a href="mailto:hello@reachlogic.co" className="text-[#0aad92] hover:underline">hello@reachlogic.co</a>.</p>
         </div>
       </section>
     </>

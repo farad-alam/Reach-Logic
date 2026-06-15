@@ -143,7 +143,7 @@ export default function FAQ() {
             Still have questions?
           </p>
           <a
-            href="mailto:hello@reachlogic.net"
+            href="mailto:hello@reachlogic.co"
             className="inline-flex items-center gap-2 text-sm font-semibold hover:gap-4 transition-all duration-300"
             style={{ color: "#0aad92" }}
           >

@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
           </ul>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4" style={{ fontFamily: "var(--font-fraunces)" }}>4. Contact Us</h2>
-          <p>If you have any questions about this privacy policy or our privacy practices, please contact us at: <a href="mailto:hello@reachlogic.net" className="text-[#0aad92] hover:underline">hello@reachlogic.net</a>.</p>
+          <p>If you have any questions about this privacy policy or our privacy practices, please contact us at: <a href="mailto:hello@reachlogic.co" className="text-[#0aad92] hover:underline">hello@reachlogic.co</a>.</p>
         </div>
       </section>
     </>
