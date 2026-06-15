@@ -21,7 +21,7 @@ export default function ContactPage() {
     <>
       <ContactJsonLd />
       <InnerPageHero
-        title="Let's Talk Growth"
+        title="Let's Talk"
         description="Ready to scale? Book a discovery call or send us a message below."
         tag="Contact Us"
       />

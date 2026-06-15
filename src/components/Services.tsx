@@ -159,7 +159,7 @@ export default function Services() {
               <span className="text-gradient">your growth.</span>
             </h2>
           </div>
-          <p className="text-sm leading-relaxed max-w-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
+          <p className="text-base md:text-lg leading-relaxed max-w-md" style={{ color: "rgba(255,255,255,0.45)" }}>
             We don't offer packages. We build custom solutions around your brand, audience, and ambitions.
           </p>
         </div>
