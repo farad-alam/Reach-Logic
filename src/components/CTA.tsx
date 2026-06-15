@@ -99,7 +99,7 @@ export default function CTA() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
-            href="mailto:hello@reachlogic.co"
+            href="mailto:hello@reachlogic.net"
             className="magnetic-btn group px-8 py-4 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 pulse-glow"
             style={{
               background: "linear-gradient(135deg,#fff 0%,#e8fdf9 100%)",

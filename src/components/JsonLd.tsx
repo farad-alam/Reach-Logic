@@ -23,7 +23,7 @@ const localBusinessSchema = {
   image: `${BASE_URL}/og-image.png`,
   description:
     "Reach Logic is a full-service digital growth agency offering social media management automation, paid advertising, SEO, web design, and organic growth strategy for brands ready to scale globally.",
-  email: "hello@reachlogic.co",
+  email: "hello@reachlogic.net",
   address: {
     "@type": "PostalAddress",
     streetAddress: "1st Floor, Afroza Tower, Uposhohor Newmarket",
@@ -231,7 +231,7 @@ export function ContactJsonLd() {
     mainEntity: {
       "@type": "MarketingAgency",
       name: "Reach Logic",
-      email: "hello@reachlogic.co",
+      email: "hello@reachlogic.net",
       url: BASE_URL,
       address: {
         "@type": "PostalAddress",
