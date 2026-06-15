@@ -1,12 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef } from "react";
 
 const stats = [
-  { value: 500, suffix: "+", label: "Campaigns Launched", desc: "Across social, paid & organic" },
+  { value: 700, suffix: "+", label: "Campaigns Launched", desc: "Across social, paid & organic" },
   { value: 3.8, suffix: "×", label: "Average ROAS", desc: "Delivered within 90 days" },
-  { value: 12, suffix: "+", label: "Countries Served", desc: "Global clients, local insights" },
-  { value: 97, suffix: "%", label: "Client Retention", desc: "Because results speak louder" },
+  { value: 10, suffix: "+", label: "Countries Served", desc: "Global clients, local insights" },
 ];
 
 export default function Stats() {
@@ -95,7 +94,7 @@ export default function Stats() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((s, i) => (
             <div
               key={i}
