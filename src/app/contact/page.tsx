@@ -27,7 +27,7 @@ export default function ContactPage() {
         className="pt-28 pb-12 md:pt-32 md:pb-16"
       />
 
-      <section className="px-6 pb-24 md:px-12 md:pb-32 xl:px-0 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 pt-4 md:pt-8">
+      <section className="px-6 pb-24 md:px-12 md:pb-32 xl:px-0 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[3fr_7fr] gap-12 md:gap-16 pt-4 md:pt-8">
         <div>
           <h2 className="text-3xl font-bold mb-6" style={{ fontFamily: "var(--font-fraunces)" }}>
             Direct Contact
