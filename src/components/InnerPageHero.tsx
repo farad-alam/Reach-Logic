@@ -6,9 +6,10 @@ interface InnerPageHeroProps {
   title: string;
   description?: string;
   tag?: string;
+  className?: string;
 }
 
-export default function InnerPageHero({ title, description, tag }: InnerPageHeroProps) {
+export default function InnerPageHero({ title, description, tag, className }: InnerPageHeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function InnerPageHero({ title, description, tag }: InnerPageHero
   return (
     <section
       ref={containerRef}
-      className="relative pt-32 pb-20 md:pt-40 md:pb-24 overflow-hidden"
+      className={`relative overflow-hidden ${className || "pt-32 pb-20 md:pt-40 md:pb-24"}`}
       style={{
         background: "linear-gradient(160deg, #042f28 0%, #061a16 60%, #020f0c 100%)",
       }}

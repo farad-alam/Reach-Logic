@@ -24,6 +24,7 @@ export default function ContactPage() {
         title="Let's Talk"
         description="Ready to scale? Book a discovery call or send us a message below."
         tag="Contact Us"
+        className="pt-28 pb-12 md:pt-32 md:pb-16"
       />
 
       <section className="px-6 pb-24 md:px-12 md:pb-32 xl:px-0 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 pt-4 md:pt-8">
