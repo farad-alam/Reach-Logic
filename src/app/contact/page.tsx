@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import InnerPageHero from "@/components/InnerPageHero";
 import FAQ from "@/components/FAQ";
 import { ContactJsonLd } from "@/components/JsonLd";
+import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact Us — Book a Free Strategy Call",
@@ -52,69 +53,7 @@ export default function ContactPage() {
         </div>
 
         <div className="bg-[#020f0c] p-8 rounded-2xl border border-[rgba(10,173,146,0.1)]">
-          <form className="space-y-6" aria-label="Contact form">
-            <div>
-              <label htmlFor="contact-name" className="block text-sm text-white/60 mb-2">Name*</label>
-              <input id="contact-name" type="text" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="John Doe" />
-            </div>
-            <div>
-              <label htmlFor="contact-email" className="block text-sm text-white/60 mb-2">Email*</label>
-              <input id="contact-email" type="email" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="john@example.com" />
-            </div>
-            <div>
-              <label htmlFor="contact-service" className="block text-sm text-white/60 mb-2">Service Interest*</label>
-              <select id="contact-service" required defaultValue="" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors appearance-none">
-                <option value="" disabled className="bg-[#020f0c] text-white">Select a service</option>
-                <option value="social-management" className="bg-[#020f0c] text-white">Social Media Management</option>
-                <option value="social-marketing" className="bg-[#020f0c] text-white">Social Media Marketing</option>
-                <option value="ads" className="bg-[#020f0c] text-white">Paid Advertising</option>
-                <option value="web" className="bg-[#020f0c] text-white">Web Design & Development</option>
-                <option value="strategy" className="bg-[#020f0c] text-white">Organic Growth Strategy</option>
-                <option value="video" className="bg-[#020f0c] text-white">Video Editing & AI Production</option>
-                <option value="seo" className="bg-[#020f0c] text-white">Search Engine Optimization (SEO)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-white/60 mb-3">Your Budget*</label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="cursor-pointer relative">
-                  <input type="radio" name="budget" value="300-500" className="peer sr-only" required />
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-                    $300 - $500
-                  </div>
-                </label>
-                <label className="cursor-pointer relative">
-                  <input type="radio" name="budget" value="500-1000" className="peer sr-only" required />
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-                    $500 – $1,000
-                  </div>
-                </label>
-                <label className="cursor-pointer relative">
-                  <input type="radio" name="budget" value="1000-3000" className="peer sr-only" required />
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-                    $1,000 – $3,000
-                  </div>
-                </label>
-                <label className="cursor-pointer relative">
-                  <input type="radio" name="budget" value="3000+" className="peer sr-only" required />
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-                    $3,000+
-                  </div>
-                </label>
-              </div>
-            </div>
-            <div>
-              <label htmlFor="contact-url" className="block text-sm text-white/60 mb-2">Website/Social Media URL</label>
-              <input id="contact-url" type="url" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="https://example.com" />
-            </div>
-            <div>
-              <label htmlFor="contact-message" className="block text-sm text-white/60 mb-2">Message*</label>
-              <textarea id="contact-message" required rows={4} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="Tell us about your goals..."></textarea>
-            </div>
-            <button type="submit" className="w-full py-4 rounded-xl font-semibold text-white transition-all duration-300 hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #085e51, #0aad92)" }}>
-              Send Message
-            </button>
-          </form>
+          <ContactForm />
         </div>
       </section>
 
