@@ -158,11 +158,11 @@ export default function Footer() {
                 Contact
               </div>
               <a
-                href="mailto:hello@reachlogic.co"
+                href="mailto:hello@reachlogic.net"
                 className="text-sm hover:text-white transition-colors"
                 style={{ color: "rgba(255,255,255,0.4)" }}
               >
-                hello@reachlogic.co
+                hello@reachlogic.net
               </a>
             </div>
 

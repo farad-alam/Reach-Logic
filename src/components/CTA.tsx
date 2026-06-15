@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { useEffect, useRef } from "react";
 
@@ -94,12 +94,12 @@ export default function CTA() {
 
         <p className="text-base mb-10 mx-auto" style={{ color: "rgba(255,255,255,0.55)", maxWidth: "520px" }}>
           Book a free 30-minute growth audit. We'll identify your biggest digital opportunities
-          and show you exactly how to act on them â€” no pitch, just clarity.
+          and show you exactly how to act on them — no pitch, just clarity.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
-            href="mailto:hello@reachlogic.co"
+            href="mailto:hello@reachlogic.net"
             className="magnetic-btn group px-8 py-4 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 pulse-glow"
             style={{
               background: "linear-gradient(135deg,#fff 0%,#e8fdf9 100%)",
@@ -109,7 +109,7 @@ export default function CTA() {
             }}
           >
             Schedule My Free Audit{" "}
-            <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">â†’</span>
+            <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">?</span>
           </a>
           <a
             href="#services"
@@ -127,7 +127,7 @@ export default function CTA() {
 
         {/* Trust micro-copy */}
         <p className="mt-8 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-          No commitment required Â· Response within 24 hours Â· Available across time zones
+          No commitment required · Response within 24 hours · Available across time zones
         </p>
       </div>
     </section>
