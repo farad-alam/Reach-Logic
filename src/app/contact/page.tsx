@@ -54,27 +54,43 @@ export default function ContactPage() {
         <div className="bg-[#020f0c] p-8 rounded-2xl border border-[rgba(10,173,146,0.1)]">
           <form className="space-y-6" aria-label="Contact form">
             <div>
-              <label htmlFor="contact-name" className="block text-sm text-white/60 mb-2">Name</label>
-              <input id="contact-name" type="text" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="John Doe" />
+              <label htmlFor="contact-name" className="block text-sm text-white/60 mb-2">Name*</label>
+              <input id="contact-name" type="text" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="John Doe" />
             </div>
             <div>
-              <label htmlFor="contact-email" className="block text-sm text-white/60 mb-2">Email</label>
-              <input id="contact-email" type="email" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="john@example.com" />
+              <label htmlFor="contact-email" className="block text-sm text-white/60 mb-2">Email*</label>
+              <input id="contact-email" type="email" required className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="john@example.com" />
             </div>
             <div>
-              <label htmlFor="contact-service" className="block text-sm text-white/60 mb-2">Service Interest</label>
-              <select id="contact-service" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors appearance-none">
-                <option value="social">Social Media Management</option>
+              <label htmlFor="contact-service" className="block text-sm text-white/60 mb-2">Service Interest*</label>
+              <select id="contact-service" required defaultValue="" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors appearance-none">
+                <option value="" disabled>Select a service</option>
+                <option value="social-management">Social Media Management</option>
+                <option value="social-marketing">Social Media Marketing</option>
                 <option value="ads">Paid Advertising</option>
                 <option value="web">Web Design & Development</option>
                 <option value="strategy">Organic Growth Strategy</option>
-                <option value="video">Video Editing & AI Video Production</option>
+                <option value="video">Video Editing & AI Production</option>
                 <option value="seo">Search Engine Optimization (SEO)</option>
               </select>
             </div>
             <div>
-              <label htmlFor="contact-message" className="block text-sm text-white/60 mb-2">Message</label>
-              <textarea id="contact-message" rows={4} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="Tell us about your goals..."></textarea>
+              <label htmlFor="contact-budget" className="block text-sm text-white/60 mb-2">Your Budget*</label>
+              <select id="contact-budget" required defaultValue="" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors appearance-none">
+                <option value="" disabled>Select a budget</option>
+                <option value="300-500">$300 - $500</option>
+                <option value="500-1000">$500 – $1,000</option>
+                <option value="1000-3000">$1,000 – $3,000</option>
+                <option value="3000+">$3,000+</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="contact-url" className="block text-sm text-white/60 mb-2">Website/Social Media URL</label>
+              <input id="contact-url" type="url" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="https://example.com" />
+            </div>
+            <div>
+              <label htmlFor="contact-message" className="block text-sm text-white/60 mb-2">Message*</label>
+              <textarea id="contact-message" required rows={4} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors" placeholder="Tell us about your goals..."></textarea>
             </div>
             <button type="submit" className="w-full py-4 rounded-xl font-semibold text-white transition-all duration-300 hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #085e51, #0aad92)" }}>
               Send Message
