@@ -39,11 +39,11 @@ export default function ContactPage() {
           <div className="space-y-6">
             <div>
               <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">Email</div>
-              <a href="mailto:hello@reachlogic.net" className="text-xl hover:text-[#0aad92] transition-colors">hello@reachlogic.net</a>
+              <a href="mailto:hello@reachlogic.net" className="text-base text-white/80 hover:text-[#0aad92] transition-colors">hello@reachlogic.net</a>
             </div>
             <div>
               <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">Location</div>
-              <address className="text-lg not-italic">
+              <address className="text-base text-white/80 not-italic">
                 1st Floor, Afroza Tower,<br />
                 Uposhohor Newmarket,<br />
                 Rajshahi-6202, Bangladesh

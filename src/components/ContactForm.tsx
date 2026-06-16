@@ -49,33 +49,34 @@ export default function ContactForm() {
           <option value="strategy" className="bg-[#020f0c] text-white">Organic Growth Strategy</option>
           <option value="video" className="bg-[#020f0c] text-white">Video Editing & AI Production</option>
           <option value="seo" className="bg-[#020f0c] text-white">Search Engine Optimization (SEO)</option>
+          <option value="other" className="bg-[#020f0c] text-white">Other Service or General Inquiry</option>
         </select>
       </div>
       <div>
         <label className="block text-sm text-white/60 mb-3">Your Budget*</label>
         <div className="grid grid-cols-2 gap-3">
           <label className="cursor-pointer relative">
-            <input type="radio" name="budget" value="300-500" className="peer sr-only" required />
-            <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $300 - $500
-            </div>
-          </label>
-          <label className="cursor-pointer relative">
             <input type="radio" name="budget" value="500-1000" className="peer sr-only" required />
             <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $500 – $1,000
+              $500 - $1,000
             </div>
           </label>
           <label className="cursor-pointer relative">
             <input type="radio" name="budget" value="1000-3000" className="peer sr-only" required />
             <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $1,000 – $3,000
+              $1,000 - $3,000
             </div>
           </label>
           <label className="cursor-pointer relative">
-            <input type="radio" name="budget" value="3000+" className="peer sr-only" required />
+            <input type="radio" name="budget" value="3000-5000" className="peer sr-only" required />
             <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $3,000+
+              $3,000 - $5,000
+            </div>
+          </label>
+          <label className="cursor-pointer relative">
+            <input type="radio" name="budget" value="5000+" className="peer sr-only" required />
+            <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
+              $5,000+
             </div>
           </label>
         </div>
