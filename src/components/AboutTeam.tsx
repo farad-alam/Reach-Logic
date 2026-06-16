@@ -60,16 +60,23 @@ export default function AboutTeam() {
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
+      const cards = sectionRef.current?.querySelectorAll(".team-card");
+      if (!cards || cards.length === 0) return;
+
+      // Set initial invisible state right before animating
+      gsap.set(cards, { opacity: 0, y: 40 });
+
       ctx = gsap.context(() => {
-        gsap.from(".team-card", {
-          opacity: 0,
-          y: 40,
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
           duration: 0.6,
           stagger: 0.1,
           ease: "power3.out",
           scrollTrigger: {
-            trigger: ".team-grid",
-            start: "top 80%",
+            trigger: sectionRef.current,
+            start: "top 85%",
+            once: true,
           },
         });
       }, sectionRef);
