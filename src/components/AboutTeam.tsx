@@ -42,8 +42,8 @@ const team = [
   {
     name: "Farad Alam Foisal",
     title: "Senior Web Developer",
-    experience: "Several Years of Experience",
-    skills: "Python, React, Next.js",
+    experience: "5+ Years of Experience",
+    skills: "Ai, Python, React, Next.js",
     initials: "FF",
     imageSrc: null as string | null,
     imagePosition: "center",
