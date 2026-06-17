@@ -120,7 +120,7 @@ export default function AboutTeam() {
           >
             {/* Top photo area */}
             <div
-              className="relative w-full h-56 flex items-center justify-center overflow-hidden"
+              className="relative w-full h-80 flex items-center justify-center overflow-hidden"
               style={{
                 background: "linear-gradient(135deg, rgba(10,173,146,0.15) 0%, rgba(6,26,22,0.8) 100%)",
               }}
