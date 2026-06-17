@@ -10,6 +10,7 @@ const team = [
     skills: "Social Media & SEO",
     initials: "AH",
     imageSrc: "/images/abul-hasan.jpg",
+    imagePosition: "center 15%",
   },
   {
     name: "Iqbal Bari Shuvo",
@@ -17,8 +18,8 @@ const team = [
     experience: "13+ Years Experience",
     skills: "PHP, JavaScript, Ruby",
     initials: "IB",
-    // REPLACE: No image provided — using initials placeholder
     imageSrc: null as string | null,
+    imagePosition: "center",
   },
   {
     name: "Kazi Abdullah Al Maruf",
@@ -27,6 +28,7 @@ const team = [
     skills: "Google & Social Media Ads",
     initials: "KA",
     imageSrc: "/images/kazi-maruf.jpg",
+    imagePosition: "center 15%",
   },
   {
     name: "Mizanur Rahman",
@@ -35,6 +37,7 @@ const team = [
     skills: "SEO & Affiliate Marketing",
     initials: "MR",
     imageSrc: "/images/mizanur-rahman.jpg",
+    imagePosition: "center 10%",
   },
   {
     name: "Farad Alam Foisal",
@@ -42,8 +45,8 @@ const team = [
     experience: "Several Years of Experience",
     skills: "Python, React, Next.js",
     initials: "FF",
-    // REPLACE: No image provided — using initials placeholder
     imageSrc: null as string | null,
+    imagePosition: "center",
   },
 ];
 
@@ -130,13 +133,14 @@ export default function AboutTeam() {
                 <img
                   src={member.imageSrc}
                   alt={member.name}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: member.imagePosition }}
                 />
               ) : (
                 /* Initials avatar placeholder */
                 <div className="flex flex-col items-center gap-3">
                   <div
-                    className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white"
+                    className="w-32 h-32 rounded-full flex items-center justify-center text-4xl font-bold text-white"
                     style={{
                       background: "linear-gradient(135deg, #085e51, #0aad92)",
                     }}
