@@ -44,7 +44,7 @@ export default function AboutPage() {
               background: "linear-gradient(135deg, rgba(10,173,146,0.18) 0%, rgba(6,26,22,0.95) 100%)",
             }}
           >
-            <img src="/images/abul-hasan.jpg" alt="Abul Hasan" className="w-full h-full object-cover object-top" />
+            <img src="/images/abul-hasan.jpg" alt="Abul Hasan" className="w-full h-full object-cover object-center" />
 
             {/* Glow accent */}
             <div

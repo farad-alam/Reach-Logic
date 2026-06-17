@@ -130,7 +130,7 @@ export default function AboutTeam() {
                 <img
                   src={member.imageSrc}
                   alt={member.name}
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-center"
                 />
               ) : (
                 /* Initials avatar placeholder */
