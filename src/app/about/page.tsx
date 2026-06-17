@@ -44,24 +44,7 @@ export default function AboutPage() {
               background: "linear-gradient(135deg, rgba(10,173,146,0.18) 0%, rgba(6,26,22,0.95) 100%)",
             }}
           >
-            {/* REPLACE: Swap the initials block below with:
-                <img src="/images/abul-hasan.jpg" alt="Abul Hasan" className="w-full h-full object-cover object-top" />
-                once image is placed in /public/images/
-            */}
-            <div className="flex flex-col items-center gap-4 p-10">
-              <div
-                className="w-32 h-32 rounded-full flex items-center justify-center text-4xl font-bold text-white"
-                style={{ background: "linear-gradient(135deg, #085e51, #0aad92)" }}
-              >
-                AH
-              </div>
-              <div className="text-center">
-                <p className="text-white font-semibold text-lg" style={{ fontFamily: "var(--font-fraunces)" }}>
-                  Abul Hasan
-                </p>
-                <p className="text-[#0aad92] text-sm">Founder & CEO</p>
-              </div>
-            </div>
+            <img src="/images/abul-hasan.jpg" alt="Abul Hasan" className="w-full h-full object-cover object-top" />
 
             {/* Glow accent */}
             <div
@@ -295,20 +278,7 @@ export default function AboutPage() {
             className="rounded-2xl overflow-hidden group"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            {/* REPLACE: <img src="/images/basis-award.jpg" alt="BASIS Outsourcing Award 2021" className="w-full h-64 object-cover" /> */}
-            <div
-              className="w-full h-64 flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, rgba(10,173,146,0.15) 0%, rgba(6,26,22,0.9) 100%)",
-              }}
-            >
-              <div className="flex flex-col items-center gap-3 text-center px-6">
-                <svg className="w-12 h-12 text-[#0aad92]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-                <p className="text-white/40 text-xs">Image Placeholder — Upload to /public/images/basis-award.jpg</p>
-              </div>
-            </div>
+            <img src="/images/basis-award.jpg" alt="BASIS Outsourcing Award 2021" className="w-full h-64 object-cover" />
             <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
                 BASIS Outsourcing Award 2021
@@ -322,20 +292,7 @@ export default function AboutPage() {
             className="rounded-2xl overflow-hidden group"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            {/* REPLACE: <img src="/images/upwork-profile.jpg" alt="Upwork Personal Profile" className="w-full h-64 object-cover" /> */}
-            <div
-              className="w-full h-64 flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, rgba(10,173,146,0.15) 0%, rgba(6,26,22,0.9) 100%)",
-              }}
-            >
-              <div className="flex flex-col items-center gap-3 text-center px-6">
-                <svg className="w-12 h-12 text-[#0aad92]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <p className="text-white/40 text-xs">Image Placeholder — Upload to /public/images/upwork-profile.jpg</p>
-              </div>
-            </div>
+            <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-64 object-cover" />
             <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
                 Upwork Profile

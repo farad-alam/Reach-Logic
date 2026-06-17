@@ -9,8 +9,7 @@ const team = [
     experience: "13+ Years Experience",
     skills: "Social Media & SEO",
     initials: "AH",
-    // REPLACE: Set imageSrc to the actual image path once uploaded to /public
-    imageSrc: null as string | null,
+    imageSrc: "/images/abul-hasan.jpg",
   },
   {
     name: "Iqbal Bari Shuvo",
@@ -27,8 +26,7 @@ const team = [
     experience: "7+ Years Experience",
     skills: "Google & Social Media Ads",
     initials: "KA",
-    // REPLACE: Set imageSrc to the actual image path once uploaded to /public
-    imageSrc: null as string | null,
+    imageSrc: "/images/kazi-maruf.jpg",
   },
   {
     name: "Mizanur Rahman",
@@ -36,8 +34,7 @@ const team = [
     experience: "11+ Years Experience",
     skills: "SEO & Affiliate Marketing",
     initials: "MR",
-    // REPLACE: Set imageSrc to the actual image path once uploaded to /public
-    imageSrc: null as string | null,
+    imageSrc: "/images/mizanur-rahman.jpg",
   },
   {
     name: "Farad Alam Foisal",
