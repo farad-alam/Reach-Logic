@@ -34,7 +34,7 @@ export default function AboutPage() {
         aria-label="Founder quote"
       >
         <div
-          className="rounded-3xl overflow-hidden grid grid-cols-1 md:grid-cols-[1fr_1.6fr] gap-0"
+          className="rounded-3xl overflow-hidden grid grid-cols-1 md:grid-cols-[1fr_2.25fr] gap-0"
           style={{ border: "1px solid rgba(10,173,146,0.15)" }}
         >
           {/* Photo panel */}
