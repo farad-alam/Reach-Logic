@@ -55,7 +55,7 @@ const team = [
     skills: "Social Media Strategy",
     initials: "NA",
     imageSrc: "/images/nahid-aktar.jpg",
-    imagePosition: "center 20%",
+    imagePosition: "center 80%",
   },
 ];
 
