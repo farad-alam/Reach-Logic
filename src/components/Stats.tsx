@@ -4,7 +4,9 @@ import { useEffect, useRef } from "react";
 
 const stats = [
   { value: 700, suffix: "+", label: "Campaigns Launched", desc: "Across social, paid & organic" },
+  { value: 400, suffix: "+", label: "Clients Served", desc: "And counting" },
   { value: 3.8, suffix: "×", label: "Average ROAS", desc: "Delivered within 90 days" },
+  { value: 87, suffix: "K+", label: "Hours Worked", desc: "Delivered for clients" },
   { value: 10, suffix: "+", label: "Countries Served", desc: "Global clients, local insights" },
 ];
 
@@ -94,7 +96,7 @@ export default function Stats() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {stats.map((s, i) => (
             <div
               key={i}
