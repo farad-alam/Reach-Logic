@@ -45,7 +45,7 @@ const team = [
     experience: "5+ Years of Experience",
     skills: "Ai, Python, React, Next.js",
     initials: "FF",
-    imageSrc: null as string | null,
+    imageSrc: "/images/farad-alam.jpg",
     imagePosition: "center",
   },
   {
@@ -54,8 +54,8 @@ const team = [
     experience: "Several Years of Experience",
     skills: "Social Media Strategy",
     initials: "NA",
-    imageSrc: null as string | null,
-    imagePosition: "center",
+    imageSrc: "/images/nahid-aktar.jpg",
+    imagePosition: "center 20%",
   },
 ];
 
