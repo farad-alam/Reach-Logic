@@ -62,7 +62,7 @@ const faqSchema = {
       name: "Do you work with clients from any country?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes — we work with clients globally. Our team is fully remote and serves brands across Europe, North America, Southeast Asia, the Middle East, and beyond. We adapt to your timezone for calls and check-ins, wherever you are.",
+        text: "Yes — we work with clients globally. Our team is fully remote and serves brands across Europe, America, Canada, Southeast Asia, the Middle East, and beyond. We adapt to your timezone for calls and check-ins, wherever you are.",
       },
     },
     {
@@ -227,7 +227,7 @@ export function ContactJsonLd() {
     name: "Contact Reach Logic",
     url: `${BASE_URL}/contact`,
     description:
-      "Contact Reach Logic to book a free strategy discovery call. We serve clients across Europe, North America, Southeast Asia, and beyond.",
+      "Contact Reach Logic to book a free strategy discovery call. We serve clients across Europe, America, Canada, Southeast Asia, the Middle East, and beyond.",
     mainEntity: {
       "@type": "MarketingAgency",
       name: "Reach Logic",
