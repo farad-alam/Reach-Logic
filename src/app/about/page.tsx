@@ -68,7 +68,7 @@ export default function AboutPage() {
             <div>
               {/* Large decorative quote mark */}
               <div
-                className="text-8xl font-bold leading-none mb-4 -mt-4"
+                className="text-8xl font-bold leading-none -mb-4 -mt-4"
                 style={{ color: "rgba(10,173,146,0.25)", fontFamily: "Georgia, serif" }}
                 aria-hidden="true"
               >
