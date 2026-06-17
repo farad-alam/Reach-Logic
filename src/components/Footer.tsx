@@ -190,14 +190,11 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div
-          className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8"
+          className="flex items-center justify-center pt-8 text-center"
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
         >
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
-            © 2026 Reach Logic. All rights reserved.
-          </p>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
-            Scale Smarter. Reach Further.
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.2)" }}>
+            Copyright © 2026 Reach Logic. All rights reserved.
           </p>
         </div>
       </div>
