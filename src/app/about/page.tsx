@@ -114,16 +114,21 @@ export default function AboutPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[2.2fr_1fr] gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-8">
           {/* Award 1 — BASIS */}
           <div
             className="rounded-2xl overflow-hidden group flex flex-col"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            <div className="w-full h-80 md:h-96 flex items-center justify-center bg-black/20 p-4">
-              <img src="/images/basis-award.jpg" alt="BASIS Outsourcing Award 2021" className="w-full h-full object-contain rounded-xl" />
+            <div className="w-full h-80 flex items-center justify-center p-6" style={{ background: "rgba(10,173,146,0.02)" }}>
+              <img 
+                src="/images/basis-award.jpg" 
+                alt="BASIS Outsourcing Award 2021" 
+                className="max-w-full max-h-full rounded-xl object-contain shadow-md" 
+                style={{ border: "1px solid rgba(10,173,146,0.15)" }}
+              />
             </div>
-            <div className="p-6 flex-grow" style={{ background: "rgba(10,173,146,0.04)" }}>
+            <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
                 BASIS Outsourcing Award 2021
               </p>
@@ -133,12 +138,10 @@ export default function AboutPage() {
 
           {/* Award 2 — Upwork */}
           <div
-            className="rounded-2xl overflow-hidden group flex flex-col"
+            className="rounded-2xl overflow-hidden group"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            <div className="w-full h-80 md:h-96">
-              <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-full object-cover" />
-            </div>
+            <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-80 object-cover" />
             <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
                 Upwork Profile
