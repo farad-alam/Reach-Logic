@@ -120,8 +120,8 @@ export default function AboutPage() {
             className="rounded-2xl overflow-hidden group flex flex-col"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            <div className="w-full h-80 md:h-96 flex items-center justify-center bg-black/20">
-              <img src="/images/basis-award.jpg" alt="BASIS Outsourcing Award 2021" className="w-full h-full object-contain p-4" />
+            <div className="w-full h-80 md:h-96 flex items-center justify-center bg-black/20 p-4">
+              <img src="/images/basis-award.jpg" alt="BASIS Outsourcing Award 2021" className="w-full h-full object-contain rounded-xl" />
             </div>
             <div className="p-6 flex-grow" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
@@ -136,8 +136,8 @@ export default function AboutPage() {
             className="rounded-2xl overflow-hidden group flex flex-col"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            <div className="w-full h-80 md:h-96 flex items-center justify-center bg-black/20">
-              <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-full object-contain p-4" />
+            <div className="w-full h-80 md:h-96">
+              <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-full object-cover" />
             </div>
             <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
