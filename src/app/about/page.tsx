@@ -114,13 +114,13 @@ export default function AboutPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-8">
           {/* Award 1 — BASIS */}
           <div
             className="rounded-2xl overflow-hidden group"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            <img src="/images/basis-award.jpg" alt="BASIS Outsourcing Award 2021" className="w-full h-64 object-cover" />
+            <img src="/images/basis-award.jpg" alt="BASIS Outsourcing Award 2021" className="w-full h-80 object-cover" />
             <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
                 BASIS Outsourcing Award 2021
@@ -134,7 +134,7 @@ export default function AboutPage() {
             className="rounded-2xl overflow-hidden group"
             style={{ border: "1px solid rgba(10,173,146,0.12)" }}
           >
-            <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-64 object-cover" />
+            <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-80 object-cover" />
             <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
               <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
                 Upwork Profile
