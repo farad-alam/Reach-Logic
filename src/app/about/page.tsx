@@ -5,6 +5,7 @@ import CTA from "@/components/CTA";
 import AboutTimeline from "@/components/AboutTimeline";
 import AboutTeam from "@/components/AboutTeam";
 import AwardsRecognition from "@/components/AwardsRecognition";
+import Certification from "@/components/Certification";
 
 export const metadata: Metadata = {
   title: "About Us — Our Story, Mission & Team",
@@ -91,10 +92,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 3. STATS BAR ── */}
+      {/* ── 7. AWARDS & RECOGNITION ── */}
+      <AwardsRecognition />
+
+      {/* ── 8. STATS BAR ── */}
       <Stats />
 
-      {/* ── 4. OUR STORY ── */}
+      {/* ── 9. OUR STORY ── */}
       <section className="px-6 py-24 md:px-12 xl:px-0 max-w-5xl mx-auto" aria-label="Our story">
         <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-12 md:gap-20">
           {/* Sticky label */}
@@ -255,13 +259,13 @@ export default function AboutPage() {
       </section>
 
 
-      {/* ── 8. LEADERSHIP TEAM ── */}
+      {/* ── 11. LEADERSHIP TEAM ── */}
       <AboutTeam />
 
-      {/* ── 9. AWARDS & RECOGNITION ── */}
-      <AwardsRecognition />
+      {/* ── 12. CERTIFICATION ── */}
+      <Certification />
 
-      {/* ── 10. CTA ── */}
+      {/* ── 13. CTA ── */}
       <CTA />
     </>
   );
