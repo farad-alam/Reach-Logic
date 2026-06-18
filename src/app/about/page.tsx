@@ -114,7 +114,7 @@ export default function AboutPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-8">
           {/* Award 1 — BASIS */}
           <div
             className="rounded-2xl overflow-hidden group flex flex-col"
