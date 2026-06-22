@@ -23,18 +23,15 @@ export default function AwardsRecognition() {
       <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-8">
         {/* Award 1 — BASIS */}
         <div
-          className="rounded-2xl overflow-hidden group flex flex-col"
+          className="rounded-2xl overflow-hidden group flex flex-col h-full"
           style={{ border: "1px solid rgba(10,173,146,0.12)" }}
         >
-          <div className="w-full h-80 flex items-center justify-center p-6" style={{ background: "rgba(10,173,146,0.02)" }}>
-            <img 
-              src="/images/basis-award.jpg" 
-              alt="BASIS Outsourcing Award 2021" 
-              className="max-w-full max-h-full rounded-xl object-contain shadow-md" 
-              style={{ border: "1px solid rgba(10,173,146,0.15)" }}
-            />
-          </div>
-          <div className="p-6" style={{ background: "rgba(10,173,146,0.04)" }}>
+          <img 
+            src="/images/basis-award.jpg" 
+            alt="BASIS Outsourcing Award 2021" 
+            className="w-full h-auto"
+          />
+          <div className="p-6 mt-auto" style={{ background: "rgba(10,173,146,0.04)" }}>
             <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
               BASIS Outsourcing Award 2021
             </p>
