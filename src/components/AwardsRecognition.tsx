@@ -44,7 +44,7 @@ export default function AwardsRecognition() {
           className="rounded-2xl overflow-hidden group flex flex-col"
           style={{ border: "1px solid rgba(10,173,146,0.12)" }}
         >
-          <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-full object-cover" />
+          <img src="/images/upwork-profile.png" alt="Upwork Personal Profile" className="w-full h-full object-contain object-center bg-[#f4f7f6]" />
           <div className="p-6 mt-auto shrink-0" style={{ background: "rgba(10,173,146,0.04)" }}>
             <p className="text-white font-semibold mb-1" style={{ fontFamily: "var(--font-fraunces)" }}>
               Upwork Profile
