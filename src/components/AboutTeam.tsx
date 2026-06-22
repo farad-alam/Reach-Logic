@@ -18,7 +18,7 @@ const team = [
     experience: "13+ Years Experience",
     skills: "PHP, JavaScript, Ruby",
     initials: "IB",
-    imageSrc: null as string | null,
+    imageSrc: "/images/iqbal-bari.jpg",
     imagePosition: "center",
   },
   {
