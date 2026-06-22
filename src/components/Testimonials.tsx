@@ -4,49 +4,60 @@ import { useEffect, useRef, useState } from "react";
 
 const testimonials = [
   {
-    name: "Sophie Marchand",
-    role: "CEO",
-    company: "LuxeWear Co.",
-    country: "🇫🇷",
+    name: "Alex Witthoeft",
+    company: "@germanatorfit",
     rating: 5,
-    quote: "Reach Logic didn't just improve our numbers — they completely transformed how we think about digital. Within 60 days, our ROAS tripled and we finally stopped wasting money on ads that don't convert.",
-    avatar: "SM",
+    quote: "Hasan was the perfect fit for my job requirements. He is trustworthy and I was able to follow up on all his work. Somehow my instagram wasn't getting any traffic anymore. I let him take over my account and I couldn't be happier. If you need help with your Instagram, He is the man to hire. I highly recommend Hasan and will soon be working with him again.",
+    avatar: "AW",
   },
   {
-    name: "Daniel Osei",
-    role: "Head of Marketing",
-    company: "Stackr Analytics",
-    country: "🇬🇭",
+    name: "Aaron Perez",
+    company: "@highimpact_coaching",
     rating: 5,
-    quote: "We went from near-zero LinkedIn presence to 220 qualified leads in 90 days. The thought-leadership content program they built is now our #1 inbound channel. Absolute game-changers.",
-    avatar: "DO",
+    quote: "Monira helped me grow quality target audiences for my clients via Instagram and always performed at the highest level. Highly recommend her to anyone looking to engage and connect with their target audience on social media and especially Instagram.",
+    avatar: "AP",
   },
   {
-    name: "Priya Nair",
-    role: "Founder",
-    company: "Urban Brew Roasters",
-    country: "🇮🇳",
+    name: "Joanna Garzilli",
+    company: "@JoannaGarzilli",
     rating: 5,
-    quote: "I was skeptical — as a small café we had limited budget. But Reach Logic made every dollar count. We were fully booked on weekends within 45 days of working together. Best investment I've made.",
-    avatar: "PN",
+    quote: "Overall Hasan has been wonderful and we are grateful for the work he has done! There were only a couple of occasions where we made specific requests that were not adhered to however that could be because of misunderstanding in language barrier. If you are looking for support with Instagram engagement Hasan is a gem, one of the best out there!",
+    avatar: "JG",
   },
   {
-    name: "Marcus Henriksen",
-    role: "Marketing Director",
-    company: "NordFit",
-    country: "🇸🇪",
+    name: "David Liston",
+    company: "@bb360training",
     rating: 5,
-    quote: "The combination of paid ads expertise and content strategy is rare. Most agencies do one or the other. Reach Logic does both, and they do it exceptionally well. Our CAC dropped 40% in two months.",
-    avatar: "MH",
+    quote: "Hasan was fantastic! We hired him for 35 hours a week for 6 months. He helped us find Instagram followers that were directly related to our cause, which is special needs. He was very professional and I would highly recommend him. Our project has come to an end but I hope we can hire him again in the future.",
+    avatar: "DL",
   },
   {
-    name: "Aiko Tanaka",
-    role: "Co-founder",
-    company: "Minimo Tech",
-    country: "🇯🇵",
+    name: "Christina Nguyen",
+    company: "@bellagibeauty",
     rating: 5,
-    quote: "Communication is always professional and transparent. Weekly reports, instant responses, zero excuses. They delivered exactly what they promised — and then some. Highly recommend.",
-    avatar: "AT",
+    quote: "It was pleasure to work with Mst. Monira. She is an Instagram expert. She helped me to gain authentic followers and completed the project successfully on time. She is smart lady. The communication is clear and straightforward. I'd work with her again. Thank you",
+    avatar: "CN",
+  },
+  {
+    name: "Amy Luck",
+    company: "@gingermeglam",
+    rating: 5,
+    quote: "I have been working with these guys since years now! With lots of hard work and timely communication they made sure they delivered the best to me. Highly recommended!",
+    avatar: "AL",
+  },
+  {
+    name: "Sarah",
+    company: "@wifeychef",
+    rating: 5,
+    quote: "He did a great job and was very responsive, with good communication. He definitely helped build my Pinterest and Instagram following and take the burden off me (I have other things to focus on aside from doing social media). No complaints, just appreciation. I will use him again in the future!",
+    avatar: "S",
+  },
+  {
+    name: "Carla Watkins",
+    company: "@yogagreenbook",
+    rating: 5,
+    quote: "It was a pleasure working with Mst. Monira Khatun. She started work quickly, generated results as promised, and made adjustments based on my business' changing needs. Looking forward to working her again soon",
+    avatar: "CW",
   },
 ];
 
@@ -169,6 +180,11 @@ export default function Testimonials() {
               <div className="font-semibold text-white text-base flex items-center gap-2">
                 {t.name}
               </div>
+              {t.company && (
+                <div className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  {t.company}
+                </div>
+              )}
             </div>
           </div>
         </div>
