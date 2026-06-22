@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const faqs = [
   {
     q: "Do you work with clients from any country?",
-    a: "Yes — we work with clients globally. Our team is fully remote and serves brands across Europe, America, Canada, Southeast Asia, the Middle East, and beyond. We adapt to your timezone for calls and check-ins, wherever you are.",
+    a: "Yes. We work with clients worldwide and have experience serving businesses across Europe, America, Canada, Southeast Asia, the Middle East, and beyond. We adapt to your timezone for calls and check-ins, wherever you are.",
   },
   {
     q: "How quickly can I expect to see results?",

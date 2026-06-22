@@ -62,7 +62,7 @@ const faqSchema = {
       name: "Do you work with clients from any country?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes — we work with clients globally. Our team is fully remote and serves brands across Europe, America, Canada, Southeast Asia, the Middle East, and beyond. We adapt to your timezone for calls and check-ins, wherever you are.",
+        text: "Yes. We work with clients worldwide and have experience serving businesses across Europe, America, Canada, Southeast Asia, the Middle East, and beyond. We adapt to your timezone for calls and check-ins, wherever you are.",
       },
     },
     {
