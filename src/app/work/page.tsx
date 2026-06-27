@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import InnerPageHero from "@/components/InnerPageHero";
+import Stats from "@/components/Stats";
 import CaseStudies from "@/components/CaseStudies";
 import CTA from "@/components/CTA";
 
@@ -24,6 +25,7 @@ export default function WorkPage() {
         description="Explore how we've helped brands across the globe achieve exponential growth."
         tag="Case Studies"
       />
+      <Stats />
       <div className="pt-20">
         <CaseStudies />
       </div>
