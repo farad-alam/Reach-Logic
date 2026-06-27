@@ -1,5 +1,6 @@
-﻿"use client";
+"use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 
 const steps = [
@@ -161,13 +162,13 @@ export default function Process() {
               Book your free discovery call. No commitment, no pressure — just clarity.
             </p>
           </div>
-          <a
-            href="#contact"
+          <Link
+            href="/contact"
             className="shrink-0 px-7 py-3.5 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105"
             style={{ background: "linear-gradient(135deg,#085e51,#0aad92)", boxShadow: "0 0 30px rgba(10,173,146,0.3)" }}
           >
             Book Discovery Call →
-          </a>
+          </Link>
         </div>
       </div>
     </section>
