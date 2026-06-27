@@ -119,6 +119,21 @@ export default function Testimonials() {
     >
       <div className="max-w-7xl mx-auto px-6 relative flex flex-col items-center justify-center min-h-[450px] test-content">
         
+        {/* Header */}
+        <div className="test-header text-center mb-16">
+          <span className="inline-block text-xs font-medium tracking-widest uppercase mb-4" style={{ color: "#0aad92" }}>
+            Client Stories
+          </span>
+          <h2
+            className="font-extrabold text-white"
+            style={{ fontFamily: "var(--font-fraunces)", fontSize: "clamp(2rem,5vw,3.5rem)", lineHeight: 1.1 }}
+          >
+            Don't take our word.
+            <br />
+            <span className="text-gradient">Take theirs.</span>
+          </h2>
+        </div>
+        
         {/* Left Arrow */}
         <button
           onClick={handlePrev}
@@ -152,9 +167,9 @@ export default function Testimonials() {
           </div>
 
           {/* Stars */}
-          <div className="flex gap-1.5 mb-8">
+          <div className="flex gap-2 mb-8">
             {Array.from({ length: t.rating }).map((_, i) => (
-              <svg key={i} className="w-5 h-5" style={{ color: "#0aad92" }} viewBox="0 0 20 20" fill="currentColor">
+              <svg key={i} className="w-7 h-7" style={{ color: "#0aad92" }} viewBox="0 0 20 20" fill="currentColor">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             ))}
@@ -162,7 +177,7 @@ export default function Testimonials() {
 
           {/* Quote Text */}
           <blockquote
-            className="text-2xl md:text-3xl xl:text-4xl font-medium leading-snug md:leading-snug mb-12 text-white italic"
+            className="text-xl md:text-2xl xl:text-3xl font-medium leading-snug md:leading-snug mb-12 text-white italic"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
             &ldquo;{t.quote}&rdquo;
