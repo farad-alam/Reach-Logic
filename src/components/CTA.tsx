@@ -1,5 +1,6 @@
-﻿"use client";
+"use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 
 export default function CTA() {
@@ -98,19 +99,20 @@ export default function CTA() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="mailto:hello@reachlogic.net"
+          <Link
+            href="/contact"
             className="magnetic-btn group px-8 py-4 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 pulse-glow"
             style={{
               background: "linear-gradient(135deg,#fff 0%,#e8fdf9 100%)",
               color: "#085e51",
               fontSize: "0.95rem",
               minWidth: "220px",
+              display: "inline-block"
             }}
           >
             Schedule My Free Audit{" "}
             <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
-          </a>
+          </Link>
           <a
             href="#services"
             className="px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:bg-white/10"

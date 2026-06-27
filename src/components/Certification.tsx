@@ -30,10 +30,10 @@ export default function Certification() {
               className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight"
               style={{ fontFamily: "var(--font-fraunces)" }}
             >
-              BASIS Outsourcing Award 2021 — District Level Top Certification
+              Certificate of BASIS Outsourcing Award 2021
             </h3>
-            <p className="text-white/70 leading-relaxed text-sm md:text-base">
-              Recognized by <span className="text-white font-medium">BASIS</span> (Bangladesh Association of
+            <p className="text-white/70 leading-relaxed text-md md:text-xl">
+              Recognized by <span className="text-white font-medium">BASIS </span> (Bangladesh Association of
               Software and Information Services) as a top-performing outsourcing professional at the district
               level — one of the most prestigious honors in Bangladesh&apos;s IT and digital services industry.
             </p>
