@@ -19,7 +19,7 @@ const milestones = [
     year: "2021",
     title: "Agency Founded",
     description:
-      "Elevate Engage is officially launched as a boutique digital marketing agency. The same year, Abul Hasan is honored with the BASIS Outsourcing Award 2021 — district level top — recognizing his contribution to Bangladesh's outsourcing and digital industry.",
+      "Elevate Engage is officially launched as a boutique digital marketing agency. The same year, Abul Hasan is honored with the BASIS Outsourcing Award 2021, district level top, recognizing his contribution to Bangladesh's outsourcing and digital industry.",
   },
   {
     year: "2021–2025",

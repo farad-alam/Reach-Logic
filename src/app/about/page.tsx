@@ -8,12 +8,12 @@ import AwardsRecognition from "@/components/AwardsRecognition";
 import Certification from "@/components/Certification";
 
 export const metadata: Metadata = {
-  title: "About Us — Our Story, Mission & Team",
+  title: "About Us, Our Story, Mission & Team",
   description:
     "Meet the team behind Reach Logic LLC. 13+ years of combined expertise across social media, SEO, paid advertising and web development. Founded by Abul Hasan.",
   alternates: { canonical: "https://www.reachlogic.net/about" },
   openGraph: {
-    title: "About Reach Logic LLC — Our Story & Mission",
+    title: "About Reach Logic LLC, Our Story & Mission",
     description:
       "Meet the team behind Reach Logic LLC. 13+ years of expertise. 700+ campaigns. A full-service digital marketing agency built on strategy and results.",
     url: "https://www.reachlogic.net/about",
@@ -81,11 +81,11 @@ export default function AboutPage() {
                 style={{ fontFamily: "var(--font-fraunces)" }}
               >
                 Growth isn&apos;t accidental. It&apos;s engineered. Every brand I&apos;ve worked with taught me
-                something new — and everything I&apos;ve learned over the past 13+ years went into building
+                something new, and everything I&apos;ve learned over the past 13+ years went into building
                 Reach Logic LLC.
               </blockquote>
               <p className="mt-6 text-white/50 text-sm tracking-wide">
-                — Abul Hasan, Founder & CEO, Reach Logic LLC
+                Abul Hasan, Founder & CEO, Reach Logic LLC
               </p>
             </div>
           </div>
@@ -122,14 +122,14 @@ export default function AboutPage() {
               obsession with helping brands grow on social media.
             </p>
             <p>
-              In 2012, Abul Hasan began his journey as a Social Media Strategist — learning the craft from the
+              In 2012, Abul Hasan began his journey as a Social Media Strategist, learning the craft from the
               ground up, managing profiles, studying algorithms, and figuring out what actually moved the needle
               for real businesses. What started as freelance work quickly became a track record: brands growing,
               follower counts climbing, and clients coming back.
             </p>
             <p>
               By 2016, Abul Hasan had expanded his skill set far beyond social media. SEO, paid advertising, affiliate
-              marketing, blogging, and WordPress all became part of the toolkit — driven not by a business plan,
+              marketing, blogging, and WordPress all became part of the toolkit, driven not by a business plan,
               but by a simple desire to solve more problems for the people he worked with.
             </p>
             <p>
@@ -139,12 +139,12 @@ export default function AboutPage() {
               <span className="text-[#0aad92] font-medium">
                 BASIS Outsourcing Award at the district level
               </span>{" "}
-              — one of Bangladesh&apos;s most respected honors in the IT and digital services industry.
+              , one of Bangladesh&apos;s most respected honors in the IT and digital services industry.
             </p>
             <p>
               But as the team grew and the services expanded, it became clear that the brand needed to reflect the
               full picture. Elevate Engage became{" "}
-              <span className="text-white font-medium">Reach Logic LLC</span> — a name that says exactly what we do.
+              <span className="text-white font-medium">Reach Logic LLC</span>, a name that says exactly what we do.
               We help brands move forward with logic: strategy, data, and disciplined execution.
             </p>
             <p>
@@ -213,7 +213,7 @@ export default function AboutPage() {
                 Our Vision
               </h3>
               <p className="text-white/60 leading-relaxed">
-                We believe the best digital marketing doesn&apos;t shout — it connects. Our vision is a digital
+                We believe the best digital marketing doesn&apos;t shout, it connects. Our vision is a digital
                 landscape where every brand, regardless of size, has access to the kind of strategic thinking and
                 skilled execution that actually drives sustainable growth. We&apos;re building Reach Logic LLC to be
                 the agency that makes that possible.
@@ -249,7 +249,7 @@ export default function AboutPage() {
               </h3>
               <p className="text-white/60 leading-relaxed">
                 Our mission is simple: engineer growth for every client we work with. Not short-term spikes. Not
-                vanity metrics. Real, measurable results that compound over time — more reach, more engagement,
+                vanity metrics. Real, measurable results that compound over time, more reach, more engagement,
                 more revenue. We treat every brand&apos;s digital presence the way we&apos;d treat our own: with
                 strategy, care, and an unwavering focus on outcomes.
               </p>

@@ -35,7 +35,7 @@ export default function Certification() {
             <p className="text-white/70 leading-relaxed text-md md:text-xl">
               Recognized by <span className="text-white font-medium">BASIS </span> (Bangladesh Association of
               Software and Information Services) as a top-performing outsourcing professional at the district
-              level — one of the most prestigious honors in Bangladesh&apos;s IT and digital services industry.
+              level, one of the most prestigious honors in Bangladesh&apos;s IT and digital services industry.
             </p>
           </div>
         </div>

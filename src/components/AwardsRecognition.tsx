@@ -21,7 +21,7 @@ export default function AwardsRecognition() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-8">
-        {/* Award 1 — BASIS */}
+        {/* Award 1, BASIS */}
         <div
           className="rounded-2xl overflow-hidden group flex flex-col h-full"
           style={{ border: "1px solid rgba(10,173,146,0.12)" }}
@@ -39,7 +39,7 @@ export default function AwardsRecognition() {
           </div>
         </div>
 
-        {/* Award 2 — Upwork */}
+        {/* Award 2, Upwork */}
         <div
           className="rounded-2xl overflow-hidden group flex flex-col"
           style={{ border: "1px solid rgba(10,173,146,0.12)" }}
