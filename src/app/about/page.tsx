@@ -128,13 +128,13 @@ export default function AboutPage() {
               follower counts climbing, and clients coming back.
             </p>
             <p>
-              By 2016, Abul had expanded his skill set far beyond social media. SEO, paid advertising, affiliate
+              By 2016, Abul Hasan had expanded his skill set far beyond social media. SEO, paid advertising, affiliate
               marketing, blogging, and WordPress all became part of the toolkit — driven not by a business plan,
               but by a simple desire to solve more problems for the people he worked with.
             </p>
             <p>
               In 2021, that expertise got its first official home: a boutique agency called{" "}
-              <span className="text-white font-medium">Elevate Engage</span>. That same year, Abul was recognized
+              <span className="text-white font-medium">Elevate Engage</span>. That same year, Abul Hasan was recognized
               with the{" "}
               <span className="text-[#0aad92] font-medium">
                 BASIS Outsourcing Award at the district level

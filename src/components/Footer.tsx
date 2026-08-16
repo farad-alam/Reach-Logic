@@ -31,7 +31,7 @@ const legal = [
 const socials = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/reach-logic/", icon: "LI" },
   { label: "Facebook", href: "https://www.facebook.com/ReachLogic", icon: "FB" },
-  { label: "Instagram", href: "https://www.instagram.com/reach.logic", icon: "IG" },
+  { label: "Instagram", href: "https://www.instagram.com/reachlogicllc", icon: "IG" },
 ];
 
 export default function Footer() {

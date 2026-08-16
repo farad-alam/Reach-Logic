@@ -29,7 +29,7 @@ const milestones = [
   },
   {
     year: "2026",
-    title: "ReachLogic is Born",
+    title: "ReachLogic LLC is Born",
     description:
       "Elevate Engage is rebranded as ReachLogic to reflect the agency's full-service identity and the strategic thinking at its core. A new brand, a new name, and a clear mission: helping businesses expand their reach, attract the right audience, and drive sustainable growth through smart digital strategy.",
   },

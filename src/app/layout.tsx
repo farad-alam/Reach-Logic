@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.reachlogic.net"),
 
   title: {
-    default: "Reach Logic — Strategy That Moves Brands Forward.",
-    template: "%s | Reach Logic",
+    default: "Reach Logic LLC — Strategy That Moves Brands Forward.",
+    template: "%s | Reach Logic LLC",
   },
   description:
     "Reach Logic is a full-service digital growth agency offering social media management, paid advertising, SEO, and web design for brands ready to scale globally.",
@@ -46,11 +46,11 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Reach Logic — Strategy That Moves Brands Forward.",
+    title: "Reach Logic LLC — Strategy That Moves Brands Forward.",
     description:
       "Full-service digital growth agency. Social automation, paid ads, SEO, web design — built to convert globally.",
     url: "https://www.reachlogic.net",
-    siteName: "Reach Logic",
+    siteName: "Reach Logic LLC",
     locale: "en_US",
     type: "website",
     images: [
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Reach Logic — Strategy That Moves Brands Forward.",
+    title: "Reach Logic LLC — Strategy That Moves Brands Forward.",
     description:
       "Full-service digital growth agency. Paid ads, social, SEO & web design — built to convert.",
     images: ["/og-image.png"],
