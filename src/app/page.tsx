@@ -16,7 +16,7 @@ export default function Home() {
       <Problem />
       <Services />
       <Stats />
-      {/* <CaseStudies /> */}
+      <CaseStudies />
       <Process />
       <Testimonials />
       <CTA />
