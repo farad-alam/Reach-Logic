@@ -26,10 +26,11 @@ const localBusinessSchema = {
   email: "hello@reachlogic.net",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "1st Floor, Afroza Tower, Uposhohor Newmarket",
-    addressLocality: "Rajshahi",
-    postalCode: "6202",
-    addressCountry: "BD",
+    streetAddress: "30 N Gould St Ste R",
+    addressLocality: "Sheridan",
+    addressRegion: "WY",
+    postalCode: "82801",
+    addressCountry: "US",
   },
   areaServed: ["Worldwide"],
   sameAs: [
@@ -235,10 +236,11 @@ export function ContactJsonLd() {
       url: BASE_URL,
       address: {
         "@type": "PostalAddress",
-        streetAddress: "1st Floor, Afroza Tower, Uposhohor Newmarket",
-        addressLocality: "Rajshahi",
-        postalCode: "6202",
-        addressCountry: "BD",
+        streetAddress: "30 N Gould St Ste R",
+        addressLocality: "Sheridan",
+        addressRegion: "WY",
+        postalCode: "82801",
+        addressCountry: "US",
       },
     },
   };

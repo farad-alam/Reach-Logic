@@ -103,10 +103,19 @@ export default function Footer() {
               ))}
             </div>
             {/* Address */}
-            <div className="text-sm leading-relaxed max-w-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-              1st Floor, Afroza Tower,<br />
-              Uposhohor Newmarket,<br />
-              Rajshahi-6202, Bangladesh
+            <div className="text-sm leading-relaxed max-w-sm space-y-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+              <div>
+                <strong className="text-white/60 font-semibold block mb-1">Head Office:</strong>
+                30 N Gould St Ste R<br />
+                Sheridan, WY 82801<br />
+                United States
+              </div>
+              <div>
+                <strong className="text-white/60 font-semibold block mb-1">Operation Location:</strong>
+                1st Floor, Afroza Tower,<br />
+                Uposhohor Newmarket,<br />
+                Rajshahi-6202, Bangladesh
+              </div>
             </div>
           </div>
 

@@ -43,11 +43,20 @@ export default function ContactPage() {
             </div>
             <div>
               <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">Location</div>
-              <address className="text-base text-white/80 not-italic">
-                1st Floor, Afroza Tower,<br />
-                Uposhohor Newmarket,<br />
-                Rajshahi-6202, Bangladesh
-              </address>
+              <div className="space-y-4">
+                <address className="text-base text-white/80 not-italic">
+                  <strong className="block text-white/60 text-sm mb-1">Head Office:</strong>
+                  30 N Gould St Ste R<br />
+                  Sheridan, WY 82801<br />
+                  United States
+                </address>
+                <address className="text-base text-white/80 not-italic">
+                  <strong className="block text-white/60 text-sm mb-1">Operation Location:</strong>
+                  1st Floor, Afroza Tower,<br />
+                  Uposhohor Newmarket,<br />
+                  Rajshahi-6202, Bangladesh
+                </address>
+              </div>
             </div>
           </div>
         </div>
