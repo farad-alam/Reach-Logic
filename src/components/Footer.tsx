@@ -206,7 +206,7 @@ export default function Footer() {
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
         >
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.2)" }}>
-            Copyright © 2026 Reach Logic. All rights reserved.
+            Copyright © 2026 Reach Logic LLC. All rights reserved.
           </p>
         </div>
       </div>
