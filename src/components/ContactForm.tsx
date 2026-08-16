@@ -42,9 +42,11 @@ export default function ContactForm() {
         <label htmlFor="contact-service" className="block text-sm text-white/60 mb-2">Service Interest*</label>
         <select id="contact-service" name="service" required defaultValue="" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0aad92] transition-colors appearance-none">
           <option value="" disabled className="bg-[#020f0c] text-white">Select a service</option>
+          <option value="social-strategy" className="bg-[#020f0c] text-white">Social Media Strategy</option>
           <option value="social-management" className="bg-[#020f0c] text-white">Social Media Management</option>
-          <option value="social-marketing" className="bg-[#020f0c] text-white">Social Media Marketing</option>
+          <option value="engagement-strategy" className="bg-[#020f0c] text-white">Engagement Strategy</option>
           <option value="ads" className="bg-[#020f0c] text-white">Paid Advertising</option>
+          <option value="social-marketing" className="bg-[#020f0c] text-white">Social Media Marketing</option>
           <option value="web" className="bg-[#020f0c] text-white">Web Design & Development</option>
           <option value="strategy" className="bg-[#020f0c] text-white">Organic Growth Strategy</option>
           <option value="video" className="bg-[#020f0c] text-white">Video Editing & AI Production</option>

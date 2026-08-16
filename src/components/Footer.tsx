@@ -3,9 +3,11 @@
 import { usePathname, useRouter } from "next/navigation";
 
 const services = [
+  "Social Media Strategy",
   "Social Media Management",
-  "Social Media Marketing",
+  "Engagement Strategy",
   "Paid Advertising",
+  "Social Media Marketing",
   "Web Design & Development",
   "Organic Growth Strategy",
   "Video Editing & AI Production",
