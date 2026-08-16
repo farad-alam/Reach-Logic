@@ -20,12 +20,12 @@ const services = [
     tag: "Management",
   },
   {
-    icon: "📣",
-    title: "Social Media Marketing",
-    short: "Build audiences that actually buy — not just follow.",
-    detail: "Platform-native strategies for Instagram, Facebook, TikTok, and LinkedIn. We grow communities that convert through data-informed content and community management.",
-    metric: "+240% avg. organic reach",
-    tag: "Growth",
+    icon: "🤝",
+    title: "Engagement Strategy",
+    short: "Turn followers into loyal fans who talk about your brand.",
+    detail: "We design and execute engagement strategies that spark real conversations — through community management, interactive content, DM campaigns, and relationship-building tactics that deepen audience loyalty and drive word-of-mouth growth.",
+    metric: "+180% avg. engagement rate",
+    tag: "Engagement",
   },
   {
     icon: "🎯",
@@ -34,6 +34,14 @@ const services = [
     detail: "High-performance campaigns across Facebook, TikTok, and Google. We own the full funnel — creative, targeting, A/B testing, and optimization — all in-house.",
     metric: "3.8× average ROAS",
     tag: "Performance",
+  },
+  {
+    icon: "📣",
+    title: "Social Media Marketing",
+    short: "Build audiences that actually buy — not just follow.",
+    detail: "Platform-native strategies for Instagram, Facebook, TikTok, and LinkedIn. We grow communities that convert through data-informed content and community management.",
+    metric: "+240% avg. organic reach",
+    tag: "Growth",
   },
   {
     icon: "💻",
@@ -66,14 +74,6 @@ const services = [
     detail: "From technical audits and fast load times to high-level content strategy and authoritative backlinks. We capture compounding organic traffic that lowers CAC.",
     metric: "+150% growth in search traffic",
     tag: "SEO",
-  },
-  {
-    icon: "🤝",
-    title: "Engagement Strategy",
-    short: "Turn followers into loyal fans who talk about your brand.",
-    detail: "We design and execute engagement strategies that spark real conversations — through community management, interactive content, DM campaigns, and relationship-building tactics that deepen audience loyalty and drive word-of-mouth growth.",
-    metric: "+180% avg. engagement rate",
-    tag: "Engagement",
   },
 ];
 
