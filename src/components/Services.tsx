@@ -5,11 +5,11 @@ import { useEffect, useRef, useState } from "react";
 const services = [
   {
     icon: "⚡",
-    title: "Social Media Management Automation",
-    short: "Put your social presence on autopilot without losing authenticity.",
-    detail: "AI-powered scheduling, smart content repurposing, and analytics dashboards that free your team to focus on strategy — not repetitive tasks.",
+    title: "Social Media Management",
+    short: "We manage your social presence so you can focus on running your business.",
+    detail: "From daily posting and community management to scheduling and performance tracking — we handle your social channels end-to-end, keeping your brand active, consistent, and growing every day.",
     metric: "4× faster content output",
-    tag: "Automation",
+    tag: "Management",
   },
   {
     icon: "📣",
@@ -58,6 +58,22 @@ const services = [
     detail: "From technical audits and fast load times to high-level content strategy and authoritative backlinks. We capture compounding organic traffic that lowers CAC.",
     metric: "+150% growth in search traffic",
     tag: "SEO",
+  },
+  {
+    icon: "🗺️",
+    title: "Social Media Strategy",
+    short: "A clear roadmap to turn your social channels into a growth engine.",
+    detail: "We craft a custom social media strategy tailored to your brand's voice, goals, and audience — covering content pillars, posting cadence, platform selection, and competitive positioning to make every post count.",
+    metric: "Custom 90-day social roadmap",
+    tag: "Strategy",
+  },
+  {
+    icon: "🤝",
+    title: "Engagement Strategy",
+    short: "Turn followers into loyal fans who talk about your brand.",
+    detail: "We design and execute engagement strategies that spark real conversations — through community management, interactive content, DM campaigns, and relationship-building tactics that deepen audience loyalty and drive word-of-mouth growth.",
+    metric: "+180% avg. engagement rate",
+    tag: "Engagement",
   },
 ];
 
