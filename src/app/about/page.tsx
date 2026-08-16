@@ -10,12 +10,12 @@ import Certification from "@/components/Certification";
 export const metadata: Metadata = {
   title: "About Us — Our Story, Mission & Team",
   description:
-    "Meet the team behind ReachLogic. 13+ years of combined expertise across social media, SEO, paid advertising and web development. Founded by Abul Hasan.",
+    "Meet the team behind Reach Logic LLC. 13+ years of combined expertise across social media, SEO, paid advertising and web development. Founded by Abul Hasan.",
   alternates: { canonical: "https://www.reachlogic.net/about" },
   openGraph: {
-    title: "About ReachLogic — Our Story & Mission",
+    title: "About Reach Logic LLC — Our Story & Mission",
     description:
-      "Meet the team behind ReachLogic. 13+ years of expertise. 700+ campaigns. A full-service digital marketing agency built on strategy and results.",
+      "Meet the team behind Reach Logic LLC. 13+ years of expertise. 700+ campaigns. A full-service digital marketing agency built on strategy and results.",
     url: "https://www.reachlogic.net/about",
   },
 };
@@ -26,8 +26,8 @@ export default function AboutPage() {
       {/* ── 1. HERO ── */}
       <InnerPageHero
         title="We Engineer Growth"
-        description="ReachLogic is a full-service digital marketing agency built on 13+ years of real-world expertise, disciplined strategy, and an obsession with measurable results."
-        tag="About ReachLogic"
+        description="Reach Logic LLC is a full-service digital marketing agency built on 13+ years of real-world expertise, disciplined strategy, and an obsession with measurable results."
+        tag="About Reach Logic LLC"
       />
 
       {/* ── 2. FOUNDER QUOTE ── */}
@@ -82,10 +82,10 @@ export default function AboutPage() {
               >
                 Growth isn&apos;t accidental. It&apos;s engineered. Every brand I&apos;ve worked with taught me
                 something new — and everything I&apos;ve learned over the past 13+ years went into building
-                ReachLogic.
+                Reach Logic LLC.
               </blockquote>
               <p className="mt-6 text-white/50 text-sm tracking-wide">
-                — Abul Hasan, Founder & CEO, ReachLogic
+                — Abul Hasan, Founder & CEO, Reach Logic LLC
               </p>
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function AboutPage() {
           {/* Prose */}
           <div className="space-y-6 text-white/65 text-base md:text-lg leading-relaxed">
             <p>
-              ReachLogic didn&apos;t start as an agency. It started with one person, one laptop, and a genuine
+              Reach Logic LLC didn&apos;t start as an agency. It started with one person, one laptop, and a genuine
               obsession with helping brands grow on social media.
             </p>
             <p>
@@ -144,11 +144,11 @@ export default function AboutPage() {
             <p>
               But as the team grew and the services expanded, it became clear that the brand needed to reflect the
               full picture. Elevate Engage became{" "}
-              <span className="text-white font-medium">ReachLogic</span> — a name that says exactly what we do.
+              <span className="text-white font-medium">Reach Logic LLC</span> — a name that says exactly what we do.
               We help brands move forward with logic: strategy, data, and disciplined execution.
             </p>
             <p>
-              Today, ReachLogic is a full-service digital marketing agency with over 13 years of combined
+              Today, Reach Logic LLC is a full-service digital marketing agency with over 13 years of combined
               expertise, 700+ social media profiles managed, and 400+ clients served across social media, SEO,
               paid advertising, web development, and beyond.
             </p>
@@ -215,7 +215,7 @@ export default function AboutPage() {
               <p className="text-white/60 leading-relaxed">
                 We believe the best digital marketing doesn&apos;t shout — it connects. Our vision is a digital
                 landscape where every brand, regardless of size, has access to the kind of strategic thinking and
-                skilled execution that actually drives sustainable growth. We&apos;re building ReachLogic to be
+                skilled execution that actually drives sustainable growth. We&apos;re building Reach Logic LLC to be
                 the agency that makes that possible.
               </p>
             </div>
