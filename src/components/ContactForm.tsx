@@ -60,25 +60,25 @@ export default function ContactForm() {
           <label className="cursor-pointer relative">
             <input type="radio" name="budget" value="500-1000" className="peer sr-only" required />
             <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $500 - $1,000
+             $1,000 - $3,000
             </div>
           </label>
           <label className="cursor-pointer relative">
             <input type="radio" name="budget" value="1000-3000" className="peer sr-only" required />
             <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $1,000 - $3,000
+              $3,000 - $5,000
             </div>
           </label>
           <label className="cursor-pointer relative">
             <input type="radio" name="budget" value="3000-5000" className="peer sr-only" required />
             <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $3,000 - $5,000
+              $5,000 - $7,000
             </div>
           </label>
           <label className="cursor-pointer relative">
             <input type="radio" name="budget" value="5000+" className="peer sr-only" required />
             <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/80 transition-all hover:border-white/30 peer-checked:border-[#0aad92] peer-checked:text-white peer-checked:bg-[#0aad92]/10">
-              $5,000+
+              $7,000+
             </div>
           </label>
         </div>
