@@ -136,6 +136,23 @@ body {
   mix-blend-mode: overlay;
 }
 
+/* Disable grain overlay and heavy animations on mobile — saves continuous GPU compositor work */
+@media (max-width: 767px) {
+  .grain-overlay {
+    display: none;
+  }
+  .pulse-glow {
+    animation: none;
+    box-shadow: 0 0 20px rgba(10,173,146,0.3);
+  }
+  .float-slow {
+    animation: none;
+  }
+  .spin-slow {
+    animation: none;
+  }
+}
+
 /* ── Hero clip reveal ────────────────────────────────── */
 .hero-clip {
   display: block;

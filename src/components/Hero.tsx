@@ -3,12 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import type { BufferAttribute } from "three";
 
+// Detect mobile / touch devices once at module level
+function isMobile() {
+  if (typeof window === "undefined") return false;
+  return (
+    window.innerWidth < 768 ||
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0
+  );
+}
+
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  /* ── Three.js wave background ────────────────────────── */
+  /* ── Three.js wave background — DESKTOP ONLY ────────── */
   useEffect(() => {
+    if (isMobile()) return; // Skip entirely on mobile — saves ~14,000 ms TBT
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -28,20 +40,21 @@ export default function Hero() {
 
         const renderer = new THREE.WebGLRenderer({
           canvas,
-          antialias: true,
+          antialias: false, // Disable on desktop too for perf
           alpha: true,
+          powerPreference: "low-power",
         });
         renderer.setSize(W, H);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(1); // Force 1x pixel ratio to reduce GPU load
         renderer.setClearColor(0x000000, 0);
 
-        /* ── Wave mesh ── */
-        const geo = new THREE.PlaneGeometry(18, 18, 80, 80);
-        geo.rotateX(-Math.PI / 2); // Lay flat in XZ plane
+        /* ── Wave mesh — reduced from 80×80 to 40×40 ── */
+        const geo = new THREE.PlaneGeometry(18, 18, 40, 40);
+        geo.rotateX(-Math.PI / 2);
 
         const mat = new THREE.PointsMaterial({
           color: 0x0aad92,
-          size: 0.055,
+          size: 0.075,
           transparent: true,
           opacity: 0.42,
           sizeAttenuation: true,
@@ -50,8 +63,8 @@ export default function Hero() {
         const wave = new THREE.Points(geo, mat);
         scene.add(wave);
 
-        /* ── Floating spark particles ── */
-        const sparkCount = 250;
+        /* ── Floating spark particles — reduced from 250 to 120 ── */
+        const sparkCount = 120;
         const sparkPositions = new Float32Array(sparkCount * 3);
         for (let i = 0; i < sparkCount; i++) {
           sparkPositions[i * 3 + 0] = (Math.random() - 0.5) * 22;
@@ -91,7 +104,6 @@ export default function Hero() {
           raf = requestAnimationFrame(animate);
           time += 0.007;
 
-          // Animate wave vertices
           for (let i = 0; i < positions.count; i++) {
             const x = positions.getX(i);
             const z = positions.getZ(i);
@@ -103,12 +115,10 @@ export default function Hero() {
           }
           positions.needsUpdate = true;
 
-          // Subtle camera sway following mouse
           camera.position.x += (mouseX * 0.8 - camera.position.x) * 0.018;
           camera.position.y += (4.5 + mouseY * 0.4 - camera.position.y) * 0.018;
           camera.lookAt(0, 0, 0);
 
-          // Rotate sparks slowly
           sparks.rotation.y = time * 0.06;
 
           renderer.render(scene, camera);
@@ -140,19 +150,33 @@ export default function Hero() {
       }
     };
 
-    init();
-    return () => cleanup?.();
+    // Use requestIdleCallback so Three.js doesn't block initial paint
+    if ("requestIdleCallback" in window) {
+      const id = (window as Window & { requestIdleCallback: (cb: () => void, opts?: object) => number })
+        .requestIdleCallback(init, { timeout: 2000 });
+      return () => {
+        (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(id);
+        cleanup?.();
+      };
+    } else {
+      const t = setTimeout(init, 200);
+      return () => {
+        clearTimeout(t);
+        cleanup?.();
+      };
+    }
   }, []);
 
-  /* ── Magnetic CTA buttons ───────────────────────────── */
+  /* ── Magnetic CTA buttons — DESKTOP ONLY ────────────── */
   useEffect(() => {
+    if (isMobile()) return; // Skip on mobile — saves GSAP chunk evaluation
+
     let cleanup: (() => void) | null = null;
 
     const init = async () => {
       const { gsap } = await import("gsap");
 
       const buttons = document.querySelectorAll<HTMLElement>(".magnetic-btn");
-
       const handlers: Array<() => void> = [];
 
       buttons.forEach((btn) => {
@@ -160,20 +184,14 @@ export default function Hero() {
           const rect = btn.getBoundingClientRect();
           const cx = rect.left + rect.width / 2;
           const cy = rect.top + rect.height / 2;
-          const dx = (e.clientX - cx) * 0.22;
-          const dy = (e.clientY - cy) * 0.22;
-          gsap.to(btn, { x: dx, y: dy, duration: 0.4, ease: "power2.out" });
+          gsap.to(btn, { x: (e.clientX - cx) * 0.22, y: (e.clientY - cy) * 0.22, duration: 0.4, ease: "power2.out" });
         };
-
         const onMove = (e: MouseEvent) => {
           const rect = btn.getBoundingClientRect();
           const cx = rect.left + rect.width / 2;
           const cy = rect.top + rect.height / 2;
-          const dx = (e.clientX - cx) * 0.22;
-          const dy = (e.clientY - cy) * 0.22;
-          gsap.to(btn, { x: dx, y: dy, duration: 0.35, ease: "power2.out" });
+          gsap.to(btn, { x: (e.clientX - cx) * 0.22, y: (e.clientY - cy) * 0.22, duration: 0.35, ease: "power2.out" });
         };
-
         const onLeave = () => {
           gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1, 0.4)" });
         };
@@ -181,7 +199,6 @@ export default function Hero() {
         btn.addEventListener("mouseenter", onEnter);
         btn.addEventListener("mousemove", onMove);
         btn.addEventListener("mouseleave", onLeave);
-
         handlers.push(() => {
           btn.removeEventListener("mouseenter", onEnter);
           btn.removeEventListener("mousemove", onMove);
@@ -196,14 +213,13 @@ export default function Hero() {
     return () => cleanup?.();
   }, []);
 
-  /* ── GSAP hero entrance (waits for preloader) ───────── */
+  /* ── GSAP hero entrance ──────────────────────────────── */
   useEffect(() => {
     let gsapCtx: { revert: () => void } | null = null;
 
     const init = async () => {
       const { gsap } = await import("gsap");
 
-      // Set initial hidden states
       gsap.set(".hero-chip", { opacity: 0, y: 24 });
       gsap.set(".hero-line-inner", { yPercent: 110 });
       gsap.set(".hero-sub", { opacity: 0, y: 28 });
@@ -213,63 +229,30 @@ export default function Hero() {
       const startAnim = () => {
         gsapCtx = gsap.context(() => {
           const tl = gsap.timeline();
-          tl.to(".hero-chip", {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            ease: "power3.out",
-          })
-            .to(
-              ".hero-line-inner",
-              {
-                yPercent: 0,
-                duration: 1.05,
-                stagger: 0.14,
-                ease: "power4.out",
-              },
-              "-=0.35"
-            )
-            .to(
-              ".hero-sub",
-              { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-              "-=0.55"
-            )
-            .to(
-              ".hero-ctas",
-              { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" },
-              "-=0.5"
-            )
-            .to(
-              ".hero-scroll",
-              { opacity: 1, duration: 0.5, ease: "power2.out" },
-              "-=0.3"
-            );
+          tl.to(".hero-chip", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
+            .to(".hero-line-inner", { yPercent: 0, duration: 1.05, stagger: 0.14, ease: "power4.out" }, "-=0.35")
+            .to(".hero-sub", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.55")
+            .to(".hero-ctas", { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, "-=0.5")
+            .to(".hero-scroll", { opacity: 1, duration: 0.5, ease: "power2.out" }, "-=0.3");
         }, containerRef);
       };
 
-      // If preloader already fired (e.g. dev hot-reload), start immediately
       if ((window as never as Record<string, unknown>).__rlReady) {
         startAnim();
       } else {
         window.addEventListener("reachlogic:ready", startAnim, { once: true });
-        // Fallback: start after max preloader duration
         const fallback = setTimeout(() => {
-          if (!(window as never as Record<string, unknown>).__rlReady) {
-            startAnim();
-          }
+          if (!(window as never as Record<string, unknown>).__rlReady) startAnim();
         }, 4000);
         return () => clearTimeout(fallback);
       }
     };
 
     init();
-
-    return () => {
-      gsapCtx?.revert();
-    };
+    return () => { gsapCtx?.revert(); };
   }, []);
 
-  /* ── Cycling words ───────────────────────────────── */
+  /* ── Cycling words ───────────────────────────────────── */
   const words = ["Logically.", "Organically.", "Strategically."];
   const [wordIndex, setWordIndex] = useState(0);
   const [wordVisible, setWordVisible] = useState(true);
@@ -295,14 +278,14 @@ export default function Hero() {
           "linear-gradient(160deg, #042f28 0%, #061a16 60%, #020f0c 100%)",
       }}
     >
-      {/* Three.js canvas */}
+      {/* Three.js canvas — hidden on mobile via CSS, only initialised on desktop */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-full hidden md:block"
         style={{ opacity: 0.85 }}
       />
 
-      {/* Vignette — fades wave edges inward */}
+      {/* Vignette */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -353,7 +336,7 @@ export default function Hero() {
           Full-Service Digital Growth Agency
         </div>
 
-        {/* Headline — two clipped lines */}
+        {/* Headline */}
         <h1
           className="font-extrabold leading-tight mb-6"
           style={{
@@ -361,13 +344,11 @@ export default function Hero() {
             fontSize: "clamp(2rem, 5.5vw, 5.5rem)",
           }}
         >
-          {/* Line 1 */}
           <span className="hero-clip block" style={{ color: "#ffffff" }}>
             <span className="hero-line-inner" style={{ display: "block" }}>
               Strategy That Moves
             </span>
           </span>
-          {/* Line 2 */}
           <span className="hero-clip block" style={{ color: "#ffffff" }}>
             <span className="hero-line-inner" style={{ display: "block" }}>
               Brands Forward.
@@ -376,16 +357,13 @@ export default function Hero() {
         </h1>
 
         {/* Cycling tagline */}
-        <div
-          className="hero-sub mb-10 flex flex-col items-center gap-1"
-        >
+        <div className="hero-sub mb-10 flex flex-col items-center gap-1">
           <span
             className="text-white/45"
             style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", letterSpacing: "0.01em" }}
           >
             Reach Your Right Audience
           </span>
-          {/* Animated cycling word */}
           <div className="overflow-hidden">
             <span
               className="block font-extrabold text-gradient"

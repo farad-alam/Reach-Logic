@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 
 const links = [
@@ -89,10 +90,14 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6 xl:px-12 flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
-            <img
+            <Image
               src="/logo.png"
               alt="Reach Logic"
+              width={152}
+              height={32}
+              priority
               className="h-8 md:h-9 w-auto object-contain"
+              style={{ height: "auto" }}
             />
           </Link>
 

@@ -5,11 +5,33 @@ import CustomCursor from "./CustomCursor";
 import Preloader from "./Preloader";
 import ScrollProgress from "./ScrollProgress";
 
-export default function ClientProviders() {
-  const [preloaderDone, setPreloaderDone] = useState(false);
+function isMobileOrTouch() {
+  if (typeof window === "undefined") return false;
+  return (
+    window.innerWidth < 768 ||
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0
+  );
+}
 
-  // Lock scroll while preloader is active
+export default function ClientProviders() {
+  // On mobile, skip the preloader entirely — it blocks LCP measurement
+  const [preloaderDone, setPreloaderDone] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
+    const mobile = isMobileOrTouch();
+    setIsMobile(mobile);
+
+    if (mobile) {
+      // On mobile: skip preloader, fire ready event immediately
+      (window as never as Record<string, unknown>).__rlReady = true;
+      window.dispatchEvent(new CustomEvent("reachlogic:ready"));
+      setPreloaderDone(true);
+      return;
+    }
+
+    // On desktop: lock scroll while preloader is active
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
@@ -19,24 +41,24 @@ export default function ClientProviders() {
   const handleComplete = () => {
     document.body.style.overflow = "";
     setPreloaderDone(true);
-    // Signal hero (and any other components) that the page is ready
     (window as never as Record<string, unknown>).__rlReady = true;
     window.dispatchEvent(new CustomEvent("reachlogic:ready"));
   };
 
   return (
     <>
-      <CustomCursor />
+      {/* Custom cursor — desktop only */}
+      {!isMobile && <CustomCursor />}
       <ScrollProgress />
 
-      {/* Animated film grain overlay */}
+      {/* Grain overlay — desktop only (hidden via CSS on mobile) */}
       <div
         className="grain-overlay"
         aria-hidden="true"
       />
 
-      {/* Preloader — unmounts after animation completes */}
-      {!preloaderDone && <Preloader onComplete={handleComplete} />}
+      {/* Preloader — desktop only, unmounts after animation completes */}
+      {!isMobile && !preloaderDone && <Preloader onComplete={handleComplete} />}
     </>
   );
 }
