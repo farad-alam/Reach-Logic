@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
+import { preload } from "react-dom";
 import ClientProviders from "@/components/ClientProviders";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navbar from "@/components/Navbar";
@@ -78,10 +79,32 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Inject fetchpriority="high" preload for logo in the HTML <head>.
+  // React 19's preload() is called inside a Server Component and hoists a
+  // <link rel="preload" fetchpriority="high"> before the browser sees the body.
+  // We target the Next.js Image-optimized URL (/_next/image) — not the raw PNG —
+  // so the preloaded resource matches exactly what the <img> srcset will request.
+  preload("/_next/image?url=%2Flogo.png&w=384&q=75", {
+    as: "image",
+    fetchPriority: "high",
+    // Cover 1x and 2x mobile DPRs
+    imageSrcSet:
+      "/_next/image?url=%2Flogo.png&w=256&q=75 256w, /_next/image?url=%2Flogo.png&w=384&q=75 384w, /_next/image?url=%2Flogo.png&w=640&q=75 640w",
+    imageSizes: "152px",
+  });
+
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <body
-        style={{ fontFamily: "var(--font-inter), sans-serif" }}
+        style={{
+          fontFamily: "var(--font-inter), sans-serif",
+          // Critical above-fold styles inlined directly in HTML so the page
+          // shows the correct background/foreground before the CSS chunk loads.
+          // Without this the browser paints white, then flashes to dark — which
+          // Lighthouse counts against Speed Index.
+          backgroundColor: "#042f28",
+          color: "#ffffff",
+        }}
         className="min-h-screen antialiased"
       >
         <RootJsonLd />
