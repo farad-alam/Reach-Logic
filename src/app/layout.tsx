@@ -80,13 +80,6 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
-      <head>
-        {/* Preconnect to Google Fonts to reduce render-blocking CSS latency */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Preload logo (LCP element on mobile) */}
-        <link rel="preload" as="image" href="/logo.png" />
-      </head>
       <body
         style={{ fontFamily: "var(--font-inter), sans-serif" }}
         className="min-h-screen antialiased"
