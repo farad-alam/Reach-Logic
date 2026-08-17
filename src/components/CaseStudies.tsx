@@ -5,41 +5,41 @@ import { useEffect, useRef, useState } from "react";
 const cases = [
   {
     industry: "E-Commerce · Fashion",
-    client: "LuxeWear Co.",
+    client: "HONEYSUCC’L JO",
     num: "01",
     challenge:
-      "Stagnant Instagram growth and poor ROAS on Meta ads after 6 months of in-house management.",
+      "A new brand with no existing audience, no social commerce setup, and no website capable of supporting online purchases.",
     strategy:
-      "Rebuilt their ad funnel from scratch — custom audiences, UGC creatives, and retargeting sequences.",
-    result: "+312%",
-    resultLabel: "ROAS in 60 days",
-    metrics: ["+312% ROAS", "60-day turnaround", "€18K → €74K monthly revenue"],
+      "Built the brand's digital presence from scratch by implementing an organic Instagram and TikTok growth strategy and setting up Facebook & Instagram Shops. Focused on attracting targeted followers, improving discoverability, and providing a frictionless shopping experience that supported long-term growth.",
+    result: "+122.58%",
+    resultLabel: "growth in two months",
+    metrics: ["+122.58% growth", "Social commerce setup", "Frictionless shopping"],
     accent: "#0aad92",
   },
   {
     industry: "SaaS · B2B",
-    client: "Stackr Analytics",
+    client: "Bountisphere",
     num: "02",
     challenge:
-      "Zero brand presence on LinkedIn despite a strong product. Struggling to generate inbound leads.",
+      "Launch a new SaaS brand from scratch and transform it into an active, recognizable presence on Instagram and TikTok without relying on paid follower acquisition.",
     strategy:
-      "Built a LinkedIn thought-leadership content engine with 3–4 high-value posts per week plus targeted paid campaigns.",
-    result: "220",
-    resultLabel: "qualified leads in 90 days",
-    metrics: ["220 qualified leads", "4.1% LinkedIn engagement rate", "8× organic reach growth"],
+      "Developed the complete social media strategy, including branded post templates, content planning, and consistent publishing across Instagram and TikTok. Executed a data-driven organic engagement strategy to reach the right audience, grow an engaged community, and establish the brand's credibility.",
+    result: "+282.02%",
+    resultLabel: "growth in three months",
+    metrics: ["+282.02% growth", "Organic audience scaling", "Active community built"],
     accent: "#5eead4",
   },
   {
     industry: "Local Services · F&B",
-    client: "Urban Brew Roasters",
+    client: "Coriander & Lace",
     num: "03",
     challenge:
-      "Newly opened café with no digital footprint, competing against established chains.",
+      "Low engagement despite consistent posting, limiting organic reach and audience growth.",
     strategy:
-      "Hyperlocal Google & Meta ads combined with a UGC creator program. Revamped website with online ordering.",
-    result: "45",
-    resultLabel: "days to fully booked weekends",
-    metrics: ["Fully booked in 45 days", "+580% website traffic", "4.9★ Google rating"],
+      "Applied a targeted organic engagement strategy to connect with the right local audience, increase post visibility, and strengthen community interaction, resulting in 855% higher average post engagement rate.",
+    result: "+855%",
+    resultLabel: "increase in post engagements",
+    metrics: ["+855% engagement", "Targeted local reach", "Higher post visibility"],
     accent: "#0aad92",
   },
 ];
