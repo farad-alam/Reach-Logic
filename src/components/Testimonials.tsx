@@ -10,7 +10,7 @@ const testimonials = [
     rating: 5,
     quote: "Hasan was the perfect fit for my job requirements. He is trustworthy and I was able to follow up on all his work. Somehow my instagram wasn't getting any traffic anymore. I let him take over my account and I couldn't be happier. If you need help with your Instagram, He is the man to hire. I highly recommend Hasan and will soon be working with him again.",
     avatar: "AW",
-    image: "", // Image coming later
+    image: "/images/testimonials/alex-witthoeft.jpg",
   },
   {
     name: "Aaron Perez",
