@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 const testimonials = [
   {
@@ -9,6 +10,7 @@ const testimonials = [
     rating: 5,
     quote: "Hasan was the perfect fit for my job requirements. He is trustworthy and I was able to follow up on all his work. Somehow my instagram wasn't getting any traffic anymore. I let him take over my account and I couldn't be happier. If you need help with your Instagram, He is the man to hire. I highly recommend Hasan and will soon be working with him again.",
     avatar: "AW",
+    image: "", // Image coming later
   },
   {
     name: "Aaron Perez",
@@ -16,6 +18,7 @@ const testimonials = [
     rating: 5,
     quote: "Monira helped me grow quality target audiences for my clients via Instagram and always performed at the highest level. Highly recommend her to anyone looking to engage and connect with their target audience on social media and especially Instagram.",
     avatar: "AP",
+    image: "/images/testimonials/aaron-perez.png",
   },
   {
     name: "Joanna Garzilli",
@@ -23,6 +26,7 @@ const testimonials = [
     rating: 5,
     quote: "Overall Hasan has been wonderful and we are grateful for the work he has done! There were only a couple of occasions where we made specific requests that were not adhered to however that could be because of misunderstanding in language barrier. If you are looking for support with Instagram engagement Hasan is a gem, one of the best out there!",
     avatar: "JG",
+    image: "/images/testimonials/joanna-garzilli.png",
   },
   {
     name: "David Liston",
@@ -30,6 +34,7 @@ const testimonials = [
     rating: 5,
     quote: "Hasan was fantastic! We hired him for 35 hours a week for 6 months. He helped us find Instagram followers that were directly related to our cause, which is special needs. He was very professional and I would highly recommend him. Our project has come to an end but I hope we can hire him again in the future.",
     avatar: "DL",
+    image: "/images/testimonials/david-liston.jpg",
   },
   {
     name: "Christina Nguyen",
@@ -37,6 +42,7 @@ const testimonials = [
     rating: 5,
     quote: "It was pleasure to work with Mst. Monira. She is an Instagram expert. She helped me to gain authentic followers and completed the project successfully on time. She is smart lady. The communication is clear and straightforward. I'd work with her again. Thank you",
     avatar: "CN",
+    image: "/images/testimonials/christina-nguyen.jpg",
   },
   {
     name: "Amy Luck",
@@ -44,6 +50,7 @@ const testimonials = [
     rating: 5,
     quote: "I have been working with these guys since years now! With lots of hard work and timely communication they made sure they delivered the best to me. Highly recommended!",
     avatar: "AL",
+    image: "",
   },
   {
     name: "Sarah",
@@ -51,6 +58,7 @@ const testimonials = [
     rating: 5,
     quote: "He did a great job and was very responsive, with good communication. He definitely helped build my Pinterest and Instagram following and take the burden off me (I have other things to focus on aside from doing social media). No complaints, just appreciation. I will use him again in the future!",
     avatar: "S",
+    image: "", // Image coming later
   },
   {
     name: "Carla Watkins",
@@ -58,6 +66,7 @@ const testimonials = [
     rating: 5,
     quote: "It was a pleasure working with Mst. Monira Khatun. She started work quickly, generated results as promised, and made adjustments based on my business' changing needs. Looking forward to working her again soon",
     avatar: "CW",
+    image: "/images/testimonials/carla-watkins.png",
   },
 ];
 
@@ -186,10 +195,14 @@ export default function Testimonials() {
           {/* Author */}
           <div className="flex items-center justify-center gap-4">
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+              className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden relative"
               style={{ background: "linear-gradient(135deg,#085e51,#0aad92)", color: "#fff" }}
             >
-              {t.avatar}
+              {t.image ? (
+                <Image src={t.image} alt={t.name} fill className="object-cover" sizes="48px" />
+              ) : (
+                t.avatar
+              )}
             </div>
             <div className="text-left flex flex-col justify-center">
               <div className="font-semibold text-white text-base flex items-center gap-2">
