@@ -50,7 +50,7 @@ const testimonials = [
     rating: 5,
     quote: "I have been working with these guys since years now! With lots of hard work and timely communication they made sure they delivered the best to me. Highly recommended!",
     avatar: "AL",
-    image: "",
+    image: "/images/testimonials/amy-luck.jpg",
   },
   {
     name: "Sarah",
