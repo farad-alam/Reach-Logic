@@ -58,7 +58,7 @@ const testimonials = [
     rating: 5,
     quote: "He did a great job and was very responsive, with good communication. He definitely helped build my Pinterest and Instagram following and take the burden off me (I have other things to focus on aside from doing social media). No complaints, just appreciation. I will use him again in the future!",
     avatar: "S",
-    image: "", // Image coming later
+    image: "/images/testimonials/sarah.jpg",
   },
   {
     name: "Carla Watkins",
