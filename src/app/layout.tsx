@@ -8,6 +8,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TawkToChat from "@/components/TawkToChat";
 import { RootJsonLd } from "@/components/JsonLd";
+import { ToastProvider } from "@/components/toast/toast-provider";
+import { ToastListener } from "@/components/toast/toast-listener";
+import { Suspense } from "react";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -109,12 +112,17 @@ export default function RootLayout({
       >
         <RootJsonLd />
         <ClientProviders />
-        <SmoothScroll>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <TawkToChat />
-        </SmoothScroll>
+        <ToastProvider>
+          <Suspense fallback={null}>
+            <ToastListener />
+          </Suspense>
+          <SmoothScroll>
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+            <TawkToChat />
+          </SmoothScroll>
+        </ToastProvider>
       </body>
     </html>
   );
