@@ -31,13 +31,16 @@ export type TestModeIdentity = { id: string; email: string };
 
 /** Used by both the app (reading the cookie) and Playwright's own session-injection helper (writing it) — one shared encoding, not two. */
 export function encodeTestModeIdentity(identity: TestModeIdentity): string {
-  return Buffer.from(JSON.stringify(identity), "utf8").toString("base64url");
+  const base64 = btoa(JSON.stringify(identity));
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 export function decodeTestModeIdentity(cookieValue: string | undefined | null): TestModeIdentity | null {
   if (!TEST_MODE || !cookieValue) return null;
   try {
-    const parsed = JSON.parse(Buffer.from(cookieValue, "base64url").toString("utf8"));
+    let base64 = cookieValue.replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) base64 += "=";
+    const parsed = JSON.parse(atob(base64));
     if (typeof parsed?.id === "string" && typeof parsed?.email === "string") {
       return { id: parsed.id, email: parsed.email };
     }

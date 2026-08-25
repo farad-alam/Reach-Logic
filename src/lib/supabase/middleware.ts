@@ -21,9 +21,14 @@ export async function updateSession(request: NextRequest) {
 async function updateRealSupabaseSession(request: NextRequest, initialResponse: NextResponse) {
   let response = initialResponse;
 
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.warn("Missing Supabase environment variables. Skipping Supabase middleware.");
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookieOptions: getSupabaseCookieOptions(),
       cookies: {
