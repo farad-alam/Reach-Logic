@@ -3,10 +3,7 @@ import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { preload } from "react-dom";
 import ClientProviders from "@/components/ClientProviders";
-import SmoothScroll from "@/components/SmoothScroll";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import TawkToChat from "@/components/TawkToChat";
+
 import { RootJsonLd } from "@/components/JsonLd";
 import { ToastProvider } from "@/components/toast/toast-provider";
 import { ToastListener } from "@/components/toast/toast-listener";
@@ -116,12 +113,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <ToastListener />
           </Suspense>
-          <SmoothScroll>
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
-            <TawkToChat />
-          </SmoothScroll>
+          <main>{children}</main>
         </ToastProvider>
       </body>
     </html>
