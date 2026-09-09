@@ -3,11 +3,7 @@ import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { preload } from "react-dom";
 import ClientProviders from "@/components/ClientProviders";
-
 import { RootJsonLd } from "@/components/JsonLd";
-import { ToastProvider } from "@/components/toast/toast-provider";
-import { ToastListener } from "@/components/toast/toast-listener";
-import { Suspense } from "react";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -72,7 +68,6 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
 
-
   manifest: "/site.webmanifest",
 };
 
@@ -80,14 +75,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   // Inject fetchpriority="high" preload for logo in the HTML <head>.
-  // React 19's preload() is called inside a Server Component and hoists a
-  // <link rel="preload" fetchpriority="high"> before the browser sees the body.
-  // We target the Next.js Image-optimized URL (/_next/image) — not the raw PNG —
-  // so the preloaded resource matches exactly what the <img> srcset will request.
   preload("/_next/image?url=%2Flogo.png&w=384&q=75", {
     as: "image",
     fetchPriority: "high",
-    // Cover 1x and 2x mobile DPRs
     imageSrcSet:
       "/_next/image?url=%2Flogo.png&w=256&q=75 256w, /_next/image?url=%2Flogo.png&w=384&q=75 384w, /_next/image?url=%2Flogo.png&w=640&q=75 640w",
     imageSizes: "152px",
@@ -98,10 +88,6 @@ export default function RootLayout({
       <body
         style={{
           fontFamily: "var(--font-inter), sans-serif",
-          // Critical above-fold styles inlined directly in HTML so the page
-          // shows the correct background/foreground before the CSS chunk loads.
-          // Without this the browser paints white, then flashes to dark — which
-          // Lighthouse counts against Speed Index.
           backgroundColor: "#042f28",
           color: "#ffffff",
         }}
@@ -109,12 +95,7 @@ export default function RootLayout({
       >
         <RootJsonLd />
         <ClientProviders />
-        <ToastProvider>
-          <Suspense fallback={null}>
-            <ToastListener />
-          </Suspense>
-          <main>{children}</main>
-        </ToastProvider>
+        <main>{children}</main>
       </body>
     </html>
   );

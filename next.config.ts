@@ -10,9 +10,9 @@ const CONTENT_SECURITY_POLICY = [
   "font-src 'self' https: data:",
   "style-src 'self' 'unsafe-inline' https:",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "connect-src 'self' https://tawk.to wss://tawk.to https://*.tawk.to wss://*.tawk.to",
   "worker-src 'self' blob:",
-  "frame-src 'none'",
+  "frame-src https://tawk.to https://*.tawk.to",
   "upgrade-insecure-requests",
 ].join("; ");
 
@@ -55,10 +55,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // Inline and optimize critical CSS — removes the render-blocking CSS chunk
     optimizeCss: true,
-    serverActions: {
-      bodySizeLimit: "12mb",
-    },
-    proxyClientMaxBodySize: "12mb",
   },
 };
 
