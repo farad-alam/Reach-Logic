@@ -26,31 +26,40 @@ async function updateRealSupabaseSession(request: NextRequest, initialResponse: 
     return response;
   }
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookieOptions: getSupabaseCookieOptions(),
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL.trim().replace(/^["']|["']$/g, ''),
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.trim().replace(/^["']|["']$/g, ''),
+      {
+        cookieOptions: getSupabaseCookieOptions(),
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value),
+            );
+            response = NextResponse.next({ request });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options),
+            );
+          },
         },
       },
-    },
-  );
+    );
 
-  // Revalidates the token against Supabase Auth (and refreshes it if
-  // expired) rather than trusting the cookie payload alone.
-  await supabase.auth.getUser();
+    // Revalidates the token against Supabase Auth (and refreshes it if expired).
+    // Wrapped in a 5-second timeout to prevent middleware from timing out Vercel's 25s limit if Supabase is down or unreachable.
+    await Promise.race([
+      supabase.auth.getUser(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Supabase auth check timed out")), 5000),
+      ),
+    ]);
+  } catch (err) {
+    console.error("Supabase middleware auth check error:", err);
+  }
 
   return response;
 }
