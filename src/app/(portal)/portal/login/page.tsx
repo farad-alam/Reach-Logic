@@ -1,13 +1,13 @@
 // src/app/(portal)/portal/login/page.tsx
 "use client";
 
-import { useState, FormEvent } from "react";
+import { Suspense, useState, FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -227,5 +227,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="auth-shell"><div className="auth-card" style={{ display: 'flex', justifyContent: 'center' }}><Loader2 className="animate-spin" /></div></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
