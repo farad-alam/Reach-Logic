@@ -23,7 +23,7 @@ export async function GET() {
       }
     });
     
-    return NextResponse.json({ message: "✅ Super Admin created successfully!", email, password: "Admin123!" });
+    return NextResponse.json({ message: "✅ Super Admin created successfully!", email, password: "You know that" });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
