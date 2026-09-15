@@ -10,6 +10,7 @@ const schema = z.object({
   description: z.string().min(1).max(3000),
   startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
+  clientId: z.string().cuid().optional(), // only used by SUPER_ADMIN
 });
 
 export async function POST(req: NextRequest) {
@@ -30,7 +31,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid data provided." }, { status: 400 });
     }
 
-    const { serviceTitle, description, startDate, endDate } = parsed.data;
+    const { serviceTitle, description, startDate, endDate, clientId: bodyClientId } = parsed.data;
+
+    // Determine which client this order is for
+    let clientId: string;
+    if (role === "SUPER_ADMIN") {
+      if (!bodyClientId) {
+        return NextResponse.json({ error: "clientId is required for admin orders." }, { status: 400 });
+      }
+      // Verify the client exists
+      const client = await prisma.user.findUnique({
+        where: { id: bodyClientId, role: "CLIENT" },
+        select: { id: true },
+      });
+      if (!client) {
+        return NextResponse.json({ error: "Client not found." }, { status: 404 });
+      }
+      clientId = bodyClientId;
+    } else {
+      clientId = session.user.id;
+    }
 
     const order = await prisma.order.create({
       data: {
@@ -38,7 +58,7 @@ export async function POST(req: NextRequest) {
         description: description.trim(),
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        clientId: session.user.id,
+        clientId,
         createdById: session.user.id,
         status: "AWAITING_QUOTE",
       },
