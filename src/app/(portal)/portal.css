@@ -681,3 +681,13 @@
   color: #dc2626;
   margin-bottom: 16px;
 }
+
+.auth-success {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 7px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #16a34a;
+  margin-bottom: 16px;
+}
