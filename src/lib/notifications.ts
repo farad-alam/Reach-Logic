@@ -26,27 +26,35 @@ export async function notify({
   sendEmail = true,
 }: NotifyOptions) {
   // Store in DB
-  await prisma.notification.create({
-    data: { userId, type, title, body, link },
-  });
+  try {
+    await prisma.notification.create({
+      data: { userId, type, title, body, link },
+    });
+  } catch (err) {
+    console.error("[notify] Error saving notification to DB:", err);
+  }
 
   if (!sendEmail) return;
 
   // Send email
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { email: true, fullName: true },
-  });
-  if (!user) return;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, fullName: true },
+    });
+    if (!user) return;
 
-  const actionUrl = link ? `${BASE_URL}${link}` : `${BASE_URL}/portal`;
+    const actionUrl = link ? `${BASE_URL}${link}` : `${BASE_URL}/portal`;
 
-  await resend.emails.send({
-    from: FROM,
-    to: user.email,
-    subject: title,
-    html: buildNotificationEmail({ title, body, actionUrl }),
-  });
+    await resend.emails.send({
+      from: FROM,
+      to: user.email,
+      subject: title,
+      html: buildNotificationEmail({ title, body, actionUrl }),
+    });
+  } catch (emailErr) {
+    console.error("[notify] Error sending email via Resend:", emailErr);
+  }
 }
 
 /** Notify all thread participants about a new message */

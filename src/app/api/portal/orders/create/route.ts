@@ -6,11 +6,11 @@ import { z } from "zod";
 import { notify } from "@/lib/notifications";
 
 const schema = z.object({
-  serviceTitle: z.string().min(1).max(150),
-  description: z.string().min(1).max(3000),
+  serviceTitle: z.string().min(1, "Service title is required").max(150),
+  description: z.string().min(1, "Description is required").max(3000),
   startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
-  clientId: z.string().cuid().optional(), // only used by SUPER_ADMIN
+  clientId: z.string().min(1).optional(), // only used by SUPER_ADMIN
 });
 
 export async function POST(req: NextRequest) {
@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid data provided." }, { status: 400 });
+      const message = parsed.error.issues[0]?.message || "Invalid data provided.";
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     const { serviceTitle, description, startDate, endDate, clientId: bodyClientId } = parsed.data;
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, orderId: order.id });
   } catch (error) {
     console.error("[orders/create]", error);
-    return NextResponse.json({ error: "Failed to create order." }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "Failed to create order.";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
