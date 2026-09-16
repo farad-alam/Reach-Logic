@@ -6,7 +6,8 @@ import Link from "next/link";
 import { UserCog, UserX, UserPlus, Mail, Calendar } from "lucide-react";
 import DeactivateButton from "./DeactivateButton";
 
-export const metadata = { title: "Team — ReachLogic Portal" };
+export const metadata = { title: "Team" };
+
 
 function formatDate(d: Date) {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));

@@ -57,8 +57,10 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Notify other participants
-    await notifyNewMessage(threadId, session.user.id, body.trim());
+    // Notify other participants (best-effort — don't let email failure crash the send)
+    notifyNewMessage(threadId, session.user.id, body.trim()).catch((err) =>
+      console.error("[messages/send] notify failed (non-fatal):", err)
+    );
 
     return NextResponse.json({ ok: true, message });
   } catch (error) {

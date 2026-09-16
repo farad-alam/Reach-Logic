@@ -158,8 +158,8 @@ model Invoice {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  orderId  String
-  order    Order  @relation(fields: [orderId], references: [id])
+  orderId  String?
+  order    Order?  @relation(fields: [orderId], references: [id])
 
   clientId String
   client   User   @relation(fields: [clientId], references: [id])

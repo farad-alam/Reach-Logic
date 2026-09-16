@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import NotificationList from "@/components/portal/NotificationList";
 
-export const metadata = { title: "Notifications — ReachLogic Portal" };
+export const metadata = { title: "Notifications" };
+
 
 export default async function AdminNotificationsPage() {
   const session = await auth();

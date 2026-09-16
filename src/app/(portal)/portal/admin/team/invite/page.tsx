@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import InviteTeamForm from "./InviteTeamForm";
 
-export const metadata = { title: "Invite Team Member — ReachLogic Portal" };
+export const metadata = { title: "Invite Team Member" };
+
 
 export default async function InviteTeamPage() {
   const session = await auth();

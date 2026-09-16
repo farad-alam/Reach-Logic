@@ -82,9 +82,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Auto-post to thread
+    // Auto-post to thread (use the resolved clientId, not the admin's ID)
     const thread = await prisma.thread.findUnique({
-      where: { clientId: session.user.id }
+      where: { clientId },
     });
 
     if (thread) {

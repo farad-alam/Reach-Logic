@@ -8,7 +8,7 @@ import { notifyInvoiceCreated } from "@/lib/notifications";
 
 const schema = z.object({
   clientId: z.string().min(1),
-  orderId: z.string().min(1),
+  orderId: z.string().optional(),
   dueDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid due date" }),
   notes: z.string().optional(),
   lineItems: z.array(
@@ -35,12 +35,16 @@ export async function POST(req: NextRequest) {
 
     const { clientId, orderId, dueDate, notes, lineItems } = parsed.data;
 
-    // Verify order exists and belongs to client
-    const order = await prisma.order.findFirst({
-      where: { id: orderId, clientId },
-    });
-    if (!order) {
-      return NextResponse.json({ error: "Invalid project selected." }, { status: 400 });
+    // Verify order belongs to client only when an order is linked
+    let orderStatus: string | null = null;
+    if (orderId) {
+      const order = await prisma.order.findFirst({
+        where: { id: orderId, clientId },
+      });
+      if (!order) {
+        return NextResponse.json({ error: "Invalid project selected." }, { status: 400 });
+      }
+      orderStatus = order.status;
     }
 
     const invoiceNumber = await getNextInvoiceNumber();
@@ -51,8 +55,8 @@ export async function POST(req: NextRequest) {
         dueDate: new Date(dueDate),
         notes: notes?.trim() || null,
         clientId,
-        orderId,
-        isLocked: order.status === "COMPLETED" || order.status === "CANCELLED",
+        orderId: orderId ?? undefined,
+        isLocked: orderStatus === "COMPLETED" || orderStatus === "CANCELLED",
         lineItems: {
           create: lineItems.map((item) => ({
             description: item.description,
@@ -78,7 +82,7 @@ export async function POST(req: NextRequest) {
           threadId: thread.id,
           body: `New invoice created: ${invoiceNumber}.`,
           type: "SYSTEM",
-          metadata: { invoiceId: invoice.id, orderId: order.id, event: "invoice_created" },
+          metadata: { invoiceId: invoice.id, orderId: orderId ?? null, event: "invoice_created" },
         }
       });
     }

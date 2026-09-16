@@ -23,8 +23,11 @@ export default async function AdminMessagesIndex() {
     },
   });
 
+  // Filter out any threads whose client was deleted (data integrity guard)
+  const validThreads = threads.filter((t) => t.client != null);
+
   // Sort by latest message date (descending)
-  threads.sort((a, b) => {
+  validThreads.sort((a, b) => {
     const dateA = a.messages[0]?.createdAt.getTime() || a.createdAt.getTime();
     const dateB = b.messages[0]?.createdAt.getTime() || b.createdAt.getTime();
     return dateB - dateA;
@@ -39,7 +42,7 @@ export default async function AdminMessagesIndex() {
         </div>
       </div>
       
-      {threads.length === 0 ? (
+      {validThreads.length === 0 ? (
         <div className="card">
            <div className="empty-state">
              <MessageSquare size={40} className="empty-state-icon" />
@@ -49,7 +52,7 @@ export default async function AdminMessagesIndex() {
         </div>
       ) : (
         <div className="card" style={{ padding: 0 }}>
-          {threads.map((thread) => {
+          {validThreads.map((thread) => {
             const latestMsg = thread.messages[0];
             const hasMessages = !!latestMsg;
             
@@ -90,6 +93,7 @@ export default async function AdminMessagesIndex() {
           })}
         </div>
       )}
+
     </div>
   );
 }

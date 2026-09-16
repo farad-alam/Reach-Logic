@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import ProfileForm from "@/components/portal/ProfileForm";
 
-export const metadata = { title: "Settings — ReachLogic Portal" };
+export const metadata = { title: "Settings" };
+
 
 export default async function AdminSettingsPage() {
   const session = await auth();

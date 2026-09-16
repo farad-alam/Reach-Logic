@@ -60,7 +60,7 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
       {invoice.isLocked && (
         <div style={{ background: "var(--neutral-100)", border: "1px solid var(--neutral-200)", padding: "12px 16px", borderRadius: 8, marginBottom: 24, display: "flex", alignItems: "center", gap: 8 }}>
            <Lock size={16} color="var(--neutral-600)" />
-           <span style={{ fontSize: 13, color: "var(--neutral-700)" }}>This invoice is locked because the associated project is {invoice.order.status}.</span>
+           <span style={{ fontSize: 13, color: "var(--neutral-700)" }}>This invoice is locked because the associated project is {invoice.order?.status ?? "unknown"}.</span>
         </div>
       )}
 
@@ -73,9 +73,13 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
         </div>
         <div className="card">
           <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Project</div>
-          <Link href={`/portal/admin/orders/${invoice.orderId}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--brand-accent)", fontWeight: 500, textDecoration: "none" }}>
-            {invoice.order.serviceTitle}
-          </Link>
+          {invoice.order ? (
+            <Link href={`/portal/admin/orders/${invoice.orderId}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--brand-accent)", fontWeight: 500, textDecoration: "none" }}>
+              {invoice.order.serviceTitle}
+            </Link>
+          ) : (
+            <span style={{ fontSize: 15, color: "var(--neutral-400)" }}>—</span>
+          )}
         </div>
         <div className="card">
           <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Due Date</div>

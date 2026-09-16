@@ -73,8 +73,8 @@ export default function NewInvoiceForm({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!clientId || !orderId || !dueDate || lineItems.length === 0) {
-      setError("Please fill all required fields and add at least one line item.");
+    if (!clientId || !dueDate || lineItems.length === 0) {
+      setError("Please select a client, set a due date, and add at least one line item.");
       return;
     }
     
@@ -132,8 +132,8 @@ export default function NewInvoiceForm({
 
         <div className="form-group">
           <label className="form-label" htmlFor="order">Project</label>
-          <select id="order" className="form-select" value={orderId} onChange={handleOrderChange} required disabled={!clientId}>
-            <option value="">Select a project...</option>
+          <select id="order" className="form-select" value={orderId} onChange={handleOrderChange} disabled={!clientId}>
+            <option value="">None (standalone invoice)</option>
             {availableOrders.map(o => (
               <option key={o.id} value={o.id}>{o.serviceTitle} {o.amount ? `($${Number(o.amount).toFixed(2)})` : ""}</option>
             ))}

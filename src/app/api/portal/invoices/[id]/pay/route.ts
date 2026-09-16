@@ -45,7 +45,7 @@ export async function POST(
       userId: invoice.clientId,
       type: "INVOICE_PAID",
       title: `Payment Received: Invoice ${invoice.invoiceNumber}`,
-      body: `We have received your payment for Invoice ${invoice.invoiceNumber} (${invoice.order.serviceTitle}). Thank you!`,
+      body: `We have received your payment for Invoice ${invoice.invoiceNumber}${invoice.order ? ` (${invoice.order.serviceTitle})` : ""}. Thank you!`,
       link: `/portal/client/invoices/${invoice.id}`,
     });
 

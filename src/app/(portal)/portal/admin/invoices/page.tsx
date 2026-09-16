@@ -79,7 +79,7 @@ export default async function AdminInvoicesPage() {
                 <tr key={inv.id}>
                   <td style={{ fontWeight: 600 }}>{inv.invoiceNumber}</td>
                   <td style={{ color: "var(--neutral-600)" }}>{inv.client.fullName ?? inv.client.email}</td>
-                  <td style={{ color: "var(--neutral-600)" }}>{inv.order.serviceTitle}</td>
+                  <td style={{ color: "var(--neutral-600)" }}>{inv.order?.serviceTitle ?? "—"}</td>
                   <td style={{ fontWeight: 500 }}>{fmt(inv.total)}</td>
                   <td style={{ fontSize: 13, color: "var(--neutral-500)" }}>{fmtDate(inv.dueDate)}</td>
                   <td>
