@@ -48,6 +48,9 @@ export default async function OrdersPage() {
           <h1 className="page-header-title">Orders</h1>
           <p className="page-header-sub">{orders.length} total order{orders.length !== 1 ? "s" : ""}</p>
         </div>
+        <Link href="/portal/admin/orders/new" className="btn btn-primary">
+          + New Order
+        </Link>
       </div>
 
       {orders.length === 0 ? (
@@ -77,7 +80,9 @@ export default async function OrdersPage() {
                 <tr key={order.id}>
                   <td style={{ fontWeight: 500 }}>{order.serviceTitle}</td>
                   <td style={{ color: "var(--neutral-600)" }}>
-                    {order.client.fullName ?? order.client.email}
+                    <Link href={`/portal/admin/clients/${order.clientId}`} style={{ color: "var(--brand-accent)", textDecoration: "none", fontWeight: 500 }}>
+                      {order.client.fullName ?? order.client.email}
+                    </Link>
                   </td>
                   <td style={{ fontSize: 12, color: "var(--neutral-500)" }}>
                     {order.createdBy.role === "CLIENT" ? "Client" : "Admin"}
