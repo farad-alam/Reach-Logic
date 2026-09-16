@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { UserCog, UserPlus, Mail, Calendar } from "lucide-react";
 import DeactivateButton from "./DeactivateButton";
+import ReactivateButton from "./ReactivateButton";
 import PendingInvitesList from "@/components/portal/PendingInvitesList";
 
 export const metadata = { title: "Team" };
@@ -115,9 +116,11 @@ export default async function TeamPage() {
                 {member.threadMemberships.length} thread{member.threadMemberships.length !== 1 ? "s" : ""}
               </div>
 
-              {/* Deactivate */}
-              {member.isActive && (
+              {/* Deactivate / Reactivate */}
+              {member.isActive ? (
                 <DeactivateButton userId={member.id} />
+              ) : (
+                <ReactivateButton userId={member.id} />
               )}
             </div>
           ))}

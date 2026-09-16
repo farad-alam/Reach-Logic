@@ -133,6 +133,40 @@ export async function notifyInvoiceCreated(invoiceId: string) {
   });
 }
 
+/** Notify the admin(s) when a user accepts their invitation */
+export async function notifyInviteAccepted(acceptedUserId: string) {
+  const accepted = await prisma.user.findUnique({
+    where: { id: acceptedUserId },
+    select: { fullName: true, email: true, role: true },
+  });
+  if (!accepted) return;
+
+  // Notify all SUPER_ADMINs
+  const admins = await prisma.user.findMany({
+    where: { role: "SUPER_ADMIN", isActive: true },
+    select: { id: true },
+  });
+
+  const name = accepted.fullName ?? accepted.email;
+  const roleLabel = accepted.role === "CLIENT" ? "client" : "team member";
+  const link = accepted.role === "CLIENT"
+    ? `/portal/admin/clients`
+    : `/portal/admin/team`;
+
+  await Promise.all(
+    admins.map((admin) =>
+      notify({
+        userId: admin.id,
+        type: "INVITATION_SENT",
+        title: `${name} joined as a ${roleLabel}`,
+        body: `${name} (${accepted.email}) has accepted their invitation and created their account.`,
+        link,
+        sendEmail: false, // in-app only — avoid spam on every accept
+      })
+    )
+  );
+}
+
 // ─── Email template ───────────────────────────────────────────────────────────
 function buildNotificationEmail({
   title,

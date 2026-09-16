@@ -8,6 +8,8 @@ import {
   MessageSquare, UserCheck, UserX, DollarSign, ChevronRight,
 } from "lucide-react";
 import CreateOrderForm from "./CreateOrderForm";
+import EditClientForm from "./EditClientForm";
+import DeactivateClientButton from "./DeactivateClientButton";
 
 export const metadata = { title: "Client Detail" };
 
@@ -44,13 +46,7 @@ export default async function ClientDetailPage({
 
   const client = await prisma.user.findUnique({
     where: { id: clientId, role: "CLIENT" },
-    select: {
-      id: true,
-      fullName: true,
-      email: true,
-      avatarUrl: true,
-      isActive: true,
-      createdAt: true,
+    include: {
       clientOrders: {
         orderBy: { createdAt: "desc" },
         select: {
@@ -124,17 +120,21 @@ export default async function ClientDetailPage({
         </div>
 
         {/* Quick action buttons */}
-        <div style={{ display: "flex", gap: 8 }}>
-          <Link
-            href={`/portal/admin/messages/${clientId}`}
-            className="btn btn-outline btn-sm"
-          >
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <EditClientForm
+            clientId={clientId}
+            initialData={{
+              fullName: client.fullName,
+              company: client.company ?? null,
+              phone: client.phone ?? null,
+              address: client.address ?? null,
+            }}
+          />
+          <DeactivateClientButton clientId={clientId} isActive={client.isActive} />
+          <Link href={`/portal/admin/messages/${clientId}`} className="btn btn-outline btn-sm">
             <MessageSquare size={13} /> Message
           </Link>
-          <Link
-            href={`/portal/admin/invoices/new?clientId=${clientId}`}
-            className="btn btn-outline btn-sm"
-          >
+          <Link href={`/portal/admin/invoices/new?clientId=${clientId}`} className="btn btn-outline btn-sm">
             <FileText size={13} /> New Invoice
           </Link>
         </div>

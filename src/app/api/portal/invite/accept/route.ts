@@ -1,6 +1,7 @@
 // src/app/api/portal/invite/accept/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { acceptInvitation } from "@/lib/invitations";
+import { notifyInviteAccepted } from "@/lib/notifications";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
@@ -29,6 +30,13 @@ export async function POST(req: NextRequest) {
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+
+    // Notify admins — best-effort, non-blocking
+    if (result.userId) {
+      notifyInviteAccepted(result.userId).catch((err) =>
+        console.error("[invite/accept] notify failed (non-fatal):", err)
+      );
     }
 
     return NextResponse.json({ ok: true, role: result.role });
