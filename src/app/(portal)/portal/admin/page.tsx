@@ -56,6 +56,7 @@ export default async function AdminDashboard() {
     totalOrders,
     orders,
     paidInvoicesData,
+    unpaidInvoicesData,
     recentOrders,
     recentInvoices,
   ] = await Promise.all([
@@ -67,6 +68,10 @@ export default async function AdminDashboard() {
     }),
     prisma.invoice.findMany({
       where: { isPaid: true },
+      include: { lineItems: { select: { amount: true } } },
+    }),
+    prisma.invoice.findMany({
+      where: { isPaid: false, isLocked: false },
       include: { lineItems: { select: { amount: true } } },
     }),
     prisma.order.findMany({
@@ -90,7 +95,10 @@ export default async function AdminDashboard() {
     (sum, inv) => sum + inv.lineItems.reduce((s, li) => s + Number(li.amount), 0),
     0
   );
-  const totalDue = totalValue - totalPaid;
+  const totalDue = unpaidInvoicesData.reduce(
+    (sum, inv) => sum + inv.lineItems.reduce((s, li) => s + Number(li.amount), 0),
+    0
+  );
 
   // Invoice totals (sum line items)
   const invoicesWithTotals = recentInvoices.map((inv) => ({

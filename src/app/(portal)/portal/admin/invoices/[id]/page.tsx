@@ -4,7 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { ArrowLeft, User, Calendar, CheckCircle2, Lock } from "lucide-react";
-import MarkPaidButton from "./MarkPaidButton";
+import InvoiceActions from "./InvoiceActions";
 
 export const metadata = { title: "Invoice Details" };
 
@@ -49,11 +49,14 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           {invoice.isPaid ? (
             <span className="badge badge-paid" style={{ padding: "6px 12px", fontSize: 14 }}>
-              <CheckCircle2 size={16} /> Paid on {invoice.paidAt ? fmtDate(invoice.paidAt) : ""}
+              <CheckCircle2 size={16} /> Paid{invoice.paidAt ? ` on ${fmtDate(invoice.paidAt)}` : ""}
             </span>
+          ) : invoice.isLocked ? (
+            <span className="badge badge-cancelled" style={{ padding: "6px 12px", fontSize: 14 }}>Cancelled</span>
           ) : (
-             <MarkPaidButton invoiceId={invoice.id} />
+            <span className="badge badge-unpaid" style={{ padding: "6px 12px", fontSize: 14 }}>Unpaid</span>
           )}
+          <InvoiceActions invoiceId={invoice.id} isPaid={invoice.isPaid} isLocked={invoice.isLocked} />
         </div>
       </div>
 
