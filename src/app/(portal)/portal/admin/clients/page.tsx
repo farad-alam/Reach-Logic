@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { Users, Plus, Mail } from "lucide-react";
+import PendingInvitesList from "@/components/portal/PendingInvitesList";
 
 export const metadata = { title: "Clients" };
 
@@ -20,10 +21,14 @@ export default async function ClientsPage() {
     },
   });
 
-  // Pending invitations
-  const pendingInvites = await prisma.invitation.count({
+  // Pending invitations — full records for resend/revoke UI
+  const pendingInvites = await prisma.invitation.findMany({
     where: { role: "CLIENT", acceptedAt: null, expiresAt: { gt: new Date() } },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, email: true, createdAt: true, expiresAt: true },
   });
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
 
   return (
     <div className="portal-page">
@@ -32,7 +37,7 @@ export default async function ClientsPage() {
           <h1 className="page-header-title">Clients</h1>
           <p className="page-header-sub">
             {clients.length} client{clients.length !== 1 ? "s" : ""}
-            {pendingInvites > 0 && ` · ${pendingInvites} pending invitation${pendingInvites !== 1 ? "s" : ""}`}
+            {pendingInvites.length > 0 && ` · ${pendingInvites.length} pending invitation${pendingInvites.length !== 1 ? "s" : ""}`}
           </p>
         </div>
         <Link href="/portal/admin/clients/invite" className="btn btn-primary">
@@ -138,6 +143,12 @@ export default async function ClientsPage() {
           </table>
         </div>
       )}
+
+      <PendingInvitesList
+        invites={pendingInvites}
+        role="CLIENT"
+        baseUrl={baseUrl}
+      />
     </div>
   );
 }

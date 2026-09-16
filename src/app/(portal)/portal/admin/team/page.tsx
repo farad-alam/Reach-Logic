@@ -3,11 +3,11 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { UserCog, UserX, UserPlus, Mail, Calendar } from "lucide-react";
+import { UserCog, UserPlus, Mail, Calendar } from "lucide-react";
 import DeactivateButton from "./DeactivateButton";
+import PendingInvitesList from "@/components/portal/PendingInvitesList";
 
 export const metadata = { title: "Team" };
-
 
 function formatDate(d: Date) {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));
@@ -30,6 +30,14 @@ export default async function TeamPage() {
       threadMemberships: { select: { id: true } },
     },
   });
+
+  const pendingInvites = await prisma.invitation.findMany({
+    where: { role: "TEAM_MEMBER", acceptedAt: null, expiresAt: { gt: new Date() } },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, email: true, createdAt: true, expiresAt: true },
+  });
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
 
   return (
     <div className="portal-page">
@@ -115,6 +123,12 @@ export default async function TeamPage() {
           ))}
         </div>
       )}
+
+      <PendingInvitesList
+        invites={pendingInvites}
+        role="TEAM_MEMBER"
+        baseUrl={baseUrl}
+      />
     </div>
   );
 }
