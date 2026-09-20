@@ -8,6 +8,19 @@ import PendingInvitesList from "@/components/portal/PendingInvitesList";
 
 export const metadata = { title: "Clients" };
 
+function getInitials(name: string | null | undefined, email: string | null | undefined) {
+  if (name && name.trim()) {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length > 0) {
+      return parts.map((p) => p[0]?.toUpperCase() ?? "").join("").slice(0, 2);
+    }
+  }
+  if (email && email.trim()) {
+    return email.trim()[0]?.toUpperCase() ?? "C";
+  }
+  return "C";
+}
+
 export default async function ClientsPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/portal/login");
@@ -99,9 +112,7 @@ export default async function ClientsPage() {
                             flexShrink: 0,
                           }}
                         >
-                          {client.fullName
-                            ? client.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
-                            : client.email[0].toUpperCase()}
+                          {getInitials(client.fullName, client.email)}
                         </div>
                         <div>
                           <div style={{ fontWeight: 500, color: "var(--neutral-900)" }}>

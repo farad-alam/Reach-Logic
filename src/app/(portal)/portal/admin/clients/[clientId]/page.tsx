@@ -28,11 +28,35 @@ const statusLabels: Record<string, string> = {
   CANCELLED: "Cancelled",
 };
 
-function fmt(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+function fmt(n: number | string | null | undefined) {
+  if (n == null) return "$0.00";
+  const val = Number(n);
+  if (isNaN(val)) return "$0.00";
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val);
 }
-function fmtDate(d: Date) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));
+
+function fmtDate(d: Date | string | number | null | undefined) {
+  if (!d) return "—";
+  try {
+    const dateObj = typeof d === "string" || typeof d === "number" ? new Date(d) : d;
+    if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return "—";
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(dateObj);
+  } catch {
+    return "—";
+  }
+}
+
+function getInitials(name: string | null | undefined, email: string | null | undefined) {
+  if (name && name.trim()) {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length > 0) {
+      return parts.map((p) => p[0]?.toUpperCase() ?? "").join("").slice(0, 2);
+    }
+  }
+  if (email && email.trim()) {
+    return email.trim()[0]?.toUpperCase() ?? "C";
+  }
+  return "C";
 }
 
 export default async function ClientDetailPage({
@@ -45,7 +69,7 @@ export default async function ClientDetailPage({
   const { clientId } = await params;
 
   const client = await prisma.user.findUnique({
-    where: { id: clientId, role: "CLIENT" },
+    where: { id: clientId },
     include: {
       clientOrders: {
         orderBy: { createdAt: "desc" },
@@ -66,16 +90,29 @@ export default async function ClientDetailPage({
     },
   });
 
-  if (!client) notFound();
+  if (!client) {
+    return (
+      <div className="portal-page">
+        <Link href="/portal/admin/clients" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--neutral-500)", fontSize: 13, textDecoration: "none", marginBottom: 18 }}>
+          <ArrowLeft size={14} /> Back to Clients
+        </Link>
+        <div className="card" style={{ textAlign: "center", padding: "48px 24px" }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--neutral-900)", marginBottom: 8 }}>Client Not Found</h2>
+          <p style={{ fontSize: 14, color: "var(--neutral-500)", marginBottom: 20 }}>No client found with ID "{clientId}".</p>
+          <Link href="/portal/admin/clients" className="btn btn-primary" style={{ display: "inline-flex" }}>
+            Return to Client List
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
-  const totalValue = client.clientOrders.reduce((s, o) => s + Number(o.amount ?? 0), 0);
-  const totalPaidInvoices = client.clientInvoices
+  const totalValue = (client.clientOrders ?? []).reduce((s, o) => s + Number(o.amount ?? 0), 0);
+  const totalPaidInvoices = (client.clientInvoices ?? [])
     .filter((inv) => inv.isPaid)
-    .reduce((s, inv) => s + inv.lineItems.reduce((ls, li) => ls + Number(li.amount), 0), 0);
+    .reduce((s, inv) => s + (inv.lineItems ?? []).reduce((ls, li) => ls + Number(li.amount ?? 0), 0), 0);
 
-  const initials = client.fullName
-    ? client.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
-    : client.email[0].toUpperCase();
+  const initials = getInitials(client.fullName, client.email);
 
   return (
     <div className="portal-page">
