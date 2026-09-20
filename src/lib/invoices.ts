@@ -1,20 +1,22 @@
 // src/lib/invoices.ts — Invoice utilities
 import { prisma } from "@/lib/db";
+import { neon } from "@neondatabase/serverless";
 
-/** Get next global invoice number (INV-0001, INV-0002, ...) */
+/** Get next global invoice number (INV-0001, INV-0002, ...) using atomic SQL */
 export async function getNextInvoiceNumber(): Promise<string> {
-  // Atomic increment using a transaction
-  const result = await prisma.$transaction(async (tx) => {
-    // Upsert the counter row (id=1 always)
-    const counter = await tx.invoiceCounter.upsert({
-      where: { id: 1 },
-      create: { id: 1, lastNum: 1 },
-      update: { lastNum: { increment: 1 } },
-    });
-    return counter.lastNum;
-  });
-
-  return `INV-${String(result).padStart(4, "0")}`;
+  // Use raw SQL with RETURNING for atomic upsert + increment.
+  // PrismaNeonHttp doesn't support interactive transactions, so we use
+  // Neon's serverless driver directly for this one atomic operation.
+  const sql = neon(process.env.DATABASE_URL!);
+  const rows = await sql`
+    INSERT INTO invoice_counter (id, "lastNum")
+    VALUES (1, 1)
+    ON CONFLICT (id)
+    DO UPDATE SET "lastNum" = invoice_counter."lastNum" + 1
+    RETURNING "lastNum"
+  `;
+  const lastNum = (rows[0] as { lastNum: number }).lastNum;
+  return `INV-${String(lastNum).padStart(4, "0")}`;
 }
 
 /** Lock all invoices for an order when it's Completed or Cancelled */

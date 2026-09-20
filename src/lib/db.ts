@@ -1,15 +1,10 @@
-// lib/db.ts — Prisma client singleton using Neon WebSocket adapter (Prisma 7)
+// lib/db.ts — Prisma client singleton using Neon HTTP adapter (Prisma 7)
+// PrismaNeonHttp is correct for Vercel serverless (stateless HTTP, no WebSocket pool).
 import { PrismaClient } from "@prisma/client";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import { neonConfig } from "@neondatabase/serverless";
-import ws from "ws";
-
-if (typeof window === "undefined") {
-  neonConfig.webSocketConstructor = ws;
-}
+import { PrismaNeonHttp } from "@prisma/adapter-neon";
 
 function createPrismaClient() {
-  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
+  const adapter = new PrismaNeonHttp(process.env.DATABASE_URL!, {});
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
