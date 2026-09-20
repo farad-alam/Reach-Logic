@@ -129,9 +129,8 @@ export default async function ClientDashboard() {
             <div>
               {orders.map((order) => (
                 <Link key={order.id} href={`/portal/client/orders/${order.id}`}
+                  className="list-row-hover"
                   style={{ display: "flex", alignItems: "center", padding: "12px 20px", gap: 12, textDecoration: "none", borderBottom: "1px solid var(--neutral-50)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--neutral-50)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "var(--neutral-900)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -162,9 +161,8 @@ export default async function ClientDashboard() {
             <div>
               {invoicesWithTotals.map((inv) => (
                 <Link key={inv.id} href={`/portal/client/invoices/${inv.id}`}
+                  className="list-row-hover"
                   style={{ display: "flex", alignItems: "center", padding: "12px 20px", gap: 12, textDecoration: "none", borderBottom: "1px solid var(--neutral-50)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--neutral-50)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)" }}>

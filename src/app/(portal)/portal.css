@@ -691,3 +691,12 @@
   color: #16a34a;
   margin-bottom: 16px;
 }
+
+/* Hoverable list row — replaces inline onMouseEnter/Leave (Server Components can't use JS handlers) */
+.list-row-hover {
+  transition: background 0.15s ease;
+}
+.list-row-hover:hover {
+  background: var(--neutral-50) !important;
+}
+

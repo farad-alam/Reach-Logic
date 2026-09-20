@@ -75,6 +75,7 @@ export default async function AdminMessagesIndex() {
             
             return (
               <Link key={thread.id} href={`/portal/admin/messages/${thread.client.id}`}
+                className="list-row-hover"
                 style={{ 
                   display: "flex", 
                   alignItems: "center", 
@@ -84,8 +85,6 @@ export default async function AdminMessagesIndex() {
                   borderBottom: "1px solid var(--neutral-100)",
                   background: unread > 0 ? "var(--neutral-50)" : "transparent",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--neutral-50)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = unread > 0 ? "var(--neutral-50)" : "transparent")}
               >
                 <div style={{ position: "relative", flexShrink: 0 }}>
                   <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--brand-mid)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600 }}>

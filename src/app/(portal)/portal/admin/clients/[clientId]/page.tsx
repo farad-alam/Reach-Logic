@@ -224,13 +224,12 @@ export default async function ClientDetailPage({
                 <Link
                   key={order.id}
                   href={`/portal/admin/orders/${order.id}`}
+                  className="list-row-hover"
                   style={{
                     display: "flex", alignItems: "center", gap: 12,
                     padding: "12px 18px", textDecoration: "none",
                     borderBottom: i < client.clientOrders.length - 1 ? "1px solid var(--neutral-50)" : "none",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--neutral-50)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, color: "var(--neutral-900)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -268,13 +267,12 @@ export default async function ClientDetailPage({
                   <Link
                     key={inv.id}
                     href={`/portal/admin/invoices/${inv.id}`}
+                    className="list-row-hover"
                     style={{
                       display: "flex", alignItems: "center", gap: 12,
                       padding: "12px 18px", textDecoration: "none",
                       borderBottom: i < client.clientInvoices.length - 1 ? "1px solid var(--neutral-50)" : "none",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--neutral-50)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: "var(--neutral-900)" }}>{inv.invoiceNumber}</div>
