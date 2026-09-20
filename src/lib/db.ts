@@ -1,6 +1,6 @@
-// lib/db.ts — Prisma client singleton using Neon serverless adapter (Prisma 7)
+// lib/db.ts — Prisma client singleton using Neon WebSocket adapter (Prisma 7)
 import { PrismaClient } from "@prisma/client";
-import { PrismaNeonHttp } from "@prisma/adapter-neon";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 
@@ -9,7 +9,7 @@ if (typeof window === "undefined") {
 }
 
 function createPrismaClient() {
-  const adapter = new PrismaNeonHttp(process.env.DATABASE_URL!, {});
+  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
