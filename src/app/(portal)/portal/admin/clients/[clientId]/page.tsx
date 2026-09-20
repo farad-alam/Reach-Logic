@@ -1,6 +1,6 @@
 // src/app/(portal)/portal/admin/clients/[clientId]/page.tsx
 import { auth } from "@/lib/auth";
-import { redirect, notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import {
