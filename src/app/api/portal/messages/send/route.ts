@@ -8,7 +8,6 @@ import { z } from "zod";
 const schema = z.object({
   threadId: z.string().min(1),
   body: z.string().min(1).max(5000),
-  // attachments: will add later if needed
 });
 
 export async function POST(req: NextRequest) {
@@ -42,9 +41,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (!hasAccess) {
-       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    // Create message WITHOUT nested include (avoids implicit transaction on Neon HTTP)
     const message = await prisma.message.create({
       data: {
         threadId,
@@ -52,9 +52,12 @@ export async function POST(req: NextRequest) {
         body: body.trim(),
         type: "USER",
       },
-      include: {
-        sender: { select: { id: true, fullName: true, avatarUrl: true, email: true } },
-      }
+    });
+
+    // Fetch sender separately
+    const sender = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, fullName: true, avatarUrl: true, email: true },
     });
 
     // Notify other participants (best-effort — don't let email failure crash the send)
@@ -62,9 +65,10 @@ export async function POST(req: NextRequest) {
       console.error("[messages/send] notify failed (non-fatal):", err)
     );
 
-    return NextResponse.json({ ok: true, message });
+    return NextResponse.json({ ok: true, message: { ...message, sender } });
   } catch (error) {
     console.error("[messages/send]", error);
-    return NextResponse.json({ error: "Failed to send message." }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "Failed to send message.";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
