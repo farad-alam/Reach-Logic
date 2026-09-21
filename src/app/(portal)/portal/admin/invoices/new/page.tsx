@@ -22,6 +22,8 @@ export default async function NewInvoicePage({
       id: true,
       fullName: true,
       email: true,
+      company: true,
+      address: true,
       clientOrders: {
         where: { status: { notIn: ["AWAITING_QUOTE", "CANCELLED"] } },
         select: { id: true, serviceTitle: true, amount: true },

@@ -1,5 +1,5 @@
 "use client";
-import { useState, FormEvent, useMemo } from "react";
+import { useState, FormEvent, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 
@@ -7,6 +7,8 @@ interface ClientData {
   id: string;
   fullName: string | null;
   email: string;
+  company: string | null;
+  address: string | null;
   clientOrders: Array<{ id: string; serviceTitle: string; amount: number | null }>;
 }
 
@@ -40,6 +42,25 @@ export default function NewInvoiceForm({
 
   const selectedClient = clients.find(c => c.id === clientId);
   const availableOrders = selectedClient?.clientOrders || [];
+
+  const [billingName, setBillingName] = useState("");
+  const [billingEmail, setBillingEmail] = useState("");
+  const [billingCompany, setBillingCompany] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+
+  useEffect(() => {
+    if (selectedClient) {
+      setBillingName(selectedClient.fullName || "");
+      setBillingEmail(selectedClient.email || "");
+      setBillingCompany(selectedClient.company || "");
+      setBillingAddress(selectedClient.address || "");
+    } else {
+      setBillingName("");
+      setBillingEmail("");
+      setBillingCompany("");
+      setBillingAddress("");
+    }
+  }, [selectedClient]);
 
   // When client changes, reset order unless we just loaded
   const handleClientChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -97,6 +118,10 @@ export default function NewInvoiceForm({
           dueDate,
           notes,
           lineItems,
+          billingName,
+          billingEmail,
+          billingCompany,
+          billingAddress,
         }),
       });
 
@@ -139,6 +164,32 @@ export default function NewInvoiceForm({
             ))}
           </select>
         </div>
+      </div>
+
+      <div style={{ marginTop: 24, marginBottom: 16, borderBottom: "1px solid var(--neutral-200)", paddingBottom: 8 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--neutral-900)" }}>Billing Information</h3>
+        <p style={{ fontSize: 13, color: "var(--neutral-500)", marginTop: 4 }}>Auto-filled from client profile, but can be modified for this specific invoice.</p>
+      </div>
+
+      <div className="grid-2">
+        <div className="form-group">
+          <label className="form-label" htmlFor="billingName">Billing Name</label>
+          <input type="text" id="billingName" className="form-input" value={billingName} onChange={(e) => setBillingName(e.target.value)} required />
+        </div>
+        <div className="form-group">
+          <label className="form-label" htmlFor="billingEmail">Billing Email</label>
+          <input type="email" id="billingEmail" className="form-input" value={billingEmail} onChange={(e) => setBillingEmail(e.target.value)} required />
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" htmlFor="billingCompany">Company</label>
+        <input type="text" id="billingCompany" className="form-input" value={billingCompany} onChange={(e) => setBillingCompany(e.target.value)} />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" htmlFor="billingAddress">Billing Address</label>
+        <textarea id="billingAddress" className="form-textarea" rows={3} value={billingAddress} onChange={(e) => setBillingAddress(e.target.value)} />
       </div>
 
       <div className="form-group">

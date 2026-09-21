@@ -76,15 +76,15 @@ model User {
   sessions Session[]
 
   // CRM relations
-  sentInvitations     Invitation[]  @relation("InvitedBy")
-  receivedInvitation  Invitation?   @relation("InvitedUser")
-  createdOrders       Order[]       @relation("OrderCreatedBy")
-  clientOrders        Order[]       @relation("ClientOrders")
-  clientInvoices      Invoice[]
-  threadMemberships   ThreadMember[]
-  sentMessages        Message[]
-  notifications       Notification[]
-  clientThread        Thread?
+  sentInvitations    Invitation[]   @relation("InvitedBy")
+  receivedInvitation Invitation?    @relation("InvitedUser")
+  createdOrders      Order[]        @relation("OrderCreatedBy")
+  clientOrders       Order[]        @relation("ClientOrders")
+  clientInvoices     Invoice[]
+  threadMemberships  ThreadMember[]
+  sentMessages       Message[]
+  notifications      Notification[]
+  clientThread       Thread?
 
   @@map("users")
 }
@@ -135,8 +135,8 @@ model Order {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
-  clientId  String
-  client    User   @relation("ClientOrders", fields: [clientId], references: [id])
+  clientId String
+  client   User   @relation("ClientOrders", fields: [clientId], references: [id])
 
   createdById String
   createdBy   User   @relation("OrderCreatedBy", fields: [createdById], references: [id])
@@ -161,11 +161,17 @@ model Invoice {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  orderId  String?
-  order    Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   clientId String
   client   User   @relation(fields: [clientId], references: [id])
+
+  // Billing address (snapshot at invoice time)
+  billingName    String?
+  billingEmail   String?
+  billingCompany String?
+  billingAddress String?
 
   lineItems InvoiceLineItem[]
 
@@ -226,15 +232,15 @@ model ThreadMember {
 }
 
 enum MessageType {
-  USER       // Regular user message
-  SYSTEM     // Auto-posted (order update, invoice created)
+  USER // Regular user message
+  SYSTEM // Auto-posted (order update, invoice created)
 }
 
 model Message {
   id        String      @id @default(cuid())
   body      String
   type      MessageType @default(USER)
-  metadata  Json?       // { orderId?, invoiceId?, event? } for system messages
+  metadata  Json? // { orderId?, invoiceId?, event? } for system messages
   createdAt DateTime    @default(now())
 
   threadId String
@@ -251,7 +257,7 @@ model Message {
 model Attachment {
   id                 String   @id @default(cuid())
   fileName           String
-  fileSize           Int      // bytes
+  fileSize           Int // bytes
   cloudinaryPublicId String
   cloudinaryUrl      String
   createdAt          DateTime @default(now())

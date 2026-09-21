@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { notify } from "@/lib/notifications";
+import { notify, sendPaidInvoiceEmail } from "@/lib/notifications";
 
 const schema = z.object({
   action: z.enum(["mark_sent", "mark_paid", "mark_overdue", "cancel", "reopen"]),
@@ -60,13 +60,7 @@ export async function PATCH(
 
     // Notifications
     if (action === "mark_paid") {
-      await notify({
-        userId: invoice.clientId,
-        type: "INVOICE_PAID",
-        title: `Payment Recorded: ${invoice.invoiceNumber}`,
-        body: `Your invoice ${invoice.invoiceNumber} has been marked as paid. Thank you!`,
-        link: `/portal/client/invoices/${id}`,
-      });
+      await sendPaidInvoiceEmail(invoice.id);
 
       // System message to thread
       const thread = await prisma.thread.findUnique({ where: { clientId: invoice.clientId } });

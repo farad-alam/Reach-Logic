@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { ArrowLeft, User, Calendar, CheckCircle2, Lock } from "lucide-react";
 import InvoiceActions from "./InvoiceActions";
+import DownloadPdfButton from "@/components/portal/DownloadPdfButton";
 
 export const metadata = { title: "Invoice Details" };
 
@@ -35,17 +36,10 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
 
   return (
     <div className="portal-page">
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }} data-html2canvas-ignore="true">
         <Link href="/portal/admin/invoices" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--neutral-500)", textDecoration: "none" }}>
           <ArrowLeft size={14} /> Back to Invoices
         </Link>
-      </div>
-
-      <div className="page-header" style={{ alignItems: "center" }}>
-        <div>
-          <h1 className="page-header-title">Invoice {invoice.invoiceNumber}</h1>
-          <p className="page-header-sub">Created on {fmtDate(invoice.createdAt)}</p>
-        </div>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           {invoice.isPaid ? (
             <span className="badge badge-paid" style={{ padding: "6px 12px", fontSize: 14 }}>
@@ -57,83 +51,109 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
             <span className="badge badge-unpaid" style={{ padding: "6px 12px", fontSize: 14 }}>Unpaid</span>
           )}
           <InvoiceActions invoiceId={invoice.id} isPaid={invoice.isPaid} isLocked={invoice.isLocked} />
+          <DownloadPdfButton targetId="invoice-document" filename={`Invoice_${invoice.invoiceNumber}.pdf`} />
         </div>
       </div>
 
       {invoice.isLocked && (
-        <div style={{ background: "var(--neutral-100)", border: "1px solid var(--neutral-200)", padding: "12px 16px", borderRadius: 8, marginBottom: 24, display: "flex", alignItems: "center", gap: 8 }}>
+        <div data-html2canvas-ignore="true" style={{ background: "var(--neutral-100)", border: "1px solid var(--neutral-200)", padding: "12px 16px", borderRadius: 8, marginBottom: 24, display: "flex", alignItems: "center", gap: 8 }}>
            <Lock size={16} color="var(--neutral-600)" />
            <span style={{ fontSize: 13, color: "var(--neutral-700)" }}>This invoice is locked because the associated project is {invoice.order?.status ?? "unknown"}.</span>
         </div>
       )}
 
-      <div className="grid-3" style={{ marginBottom: 24 }}>
-        <div className="card">
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Client</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--neutral-900)", fontWeight: 500 }}>
-            <User size={16} color="var(--brand-accent)" /> {invoice.client.fullName ?? invoice.client.email}
+      {/* The Printable Invoice Document */}
+      <div id="invoice-document" className="invoice-doc card" style={{ padding: 40 }}>
+        {/* Invoice Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 40 }}>
+          <div>
+            <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--brand-dark)", letterSpacing: "-0.02em", margin: 0 }}>ReachLogic</h1>
+            <div style={{ color: "var(--neutral-500)", fontSize: 13, marginTop: 4 }}>
+              hello@reachlogic.net<br />
+              www.reachlogic.net
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--neutral-900)", margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>Invoice</h2>
+            <div style={{ fontSize: 15, color: "var(--neutral-600)", marginTop: 4 }}>#{invoice.invoiceNumber}</div>
           </div>
         </div>
-        <div className="card">
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Project</div>
-          {invoice.order ? (
-            <Link href={`/portal/admin/orders/${invoice.orderId}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--brand-accent)", fontWeight: 500, textDecoration: "none" }}>
-              {invoice.order.serviceTitle}
-            </Link>
-          ) : (
-            <span style={{ fontSize: 15, color: "var(--neutral-400)" }}>—</span>
-          )}
-        </div>
-        <div className="card">
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Due Date</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--neutral-900)", fontWeight: 500 }}>
-            <Calendar size={16} color="var(--neutral-400)" /> {fmtDate(invoice.dueDate)}
-          </div>
-        </div>
-      </div>
 
-      <div className="card" style={{ padding: 0 }}>
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--neutral-100)" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--neutral-900)" }}>Line Items</h3>
+        {/* From / To Section */}
+        <div className="grid-2" style={{ marginBottom: 40, gap: 40 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-400)", textTransform: "uppercase", marginBottom: 8 }}>Bill To:</div>
+            <div style={{ fontSize: 15, color: "var(--neutral-900)", lineHeight: 1.5 }}>
+              {invoice.billingName ? <strong style={{ display: "block" }}>{invoice.billingName}</strong> : <strong style={{ display: "block" }}>{invoice.client.fullName ?? invoice.client.email}</strong>}
+              {invoice.billingCompany && <div style={{ color: "var(--neutral-700)" }}>{invoice.billingCompany}</div>}
+              {invoice.billingEmail && <div style={{ color: "var(--neutral-600)" }}>{invoice.billingEmail}</div>}
+              {invoice.billingAddress && <div style={{ color: "var(--neutral-600)", whiteSpace: "pre-wrap", marginTop: 4 }}>{invoice.billingAddress}</div>}
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontSize: 13, color: "var(--neutral-500)", fontWeight: 500 }}>Issue Date:</span>
+              <span style={{ fontSize: 14, color: "var(--neutral-900)", fontWeight: 500 }}>{fmtDate(invoice.createdAt)}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontSize: 13, color: "var(--neutral-500)", fontWeight: 500 }}>Due Date:</span>
+              <span style={{ fontSize: 14, color: "var(--neutral-900)", fontWeight: 500 }}>{fmtDate(invoice.dueDate)}</span>
+            </div>
+            {invoice.order && (
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 13, color: "var(--neutral-500)", fontWeight: 500 }}>Project:</span>
+                <span style={{ fontSize: 14, color: "var(--neutral-900)", fontWeight: 500 }}>{invoice.order.serviceTitle}</span>
+              </div>
+            )}
+          </div>
         </div>
-        
-        <table className="portal-table">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th style={{ textAlign: "right" }}>Qty</th>
-              <th style={{ textAlign: "right" }}>Rate</th>
-              <th style={{ textAlign: "right" }}>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoice.lineItems.map((item) => (
-              <tr key={item.id}>
-                <td style={{ fontWeight: 500 }}>{item.description}</td>
-                <td style={{ textAlign: "right", color: "var(--neutral-600)" }}>{Number(item.quantity)}</td>
-                <td style={{ textAlign: "right", color: "var(--neutral-600)" }}>{fmt(Number(item.rate))}</td>
-                <td style={{ textAlign: "right", fontWeight: 600 }}>{fmt(Number(item.amount))}</td>
+
+        {/* Line Items Table */}
+        <div style={{ marginBottom: 40 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid var(--neutral-200)" }}>
+                <th style={{ textAlign: "left", padding: "12px 0", fontSize: 13, color: "var(--neutral-500)", textTransform: "uppercase" }}>Description</th>
+                <th style={{ textAlign: "right", padding: "12px 0", fontSize: 13, color: "var(--neutral-500)", textTransform: "uppercase" }}>Qty</th>
+                <th style={{ textAlign: "right", padding: "12px 0", fontSize: 13, color: "var(--neutral-500)", textTransform: "uppercase", width: 100 }}>Rate</th>
+                <th style={{ textAlign: "right", padding: "12px 0", fontSize: 13, color: "var(--neutral-500)", textTransform: "uppercase", width: 100 }}>Amount</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        <div style={{ padding: "20px 24px", background: "var(--neutral-50)", display: "flex", justifyContent: "flex-end" }}>
+            </thead>
+            <tbody>
+              {invoice.lineItems.map((item) => (
+                <tr key={item.id} style={{ borderBottom: "1px solid var(--neutral-100)" }}>
+                  <td style={{ padding: "16px 0", fontSize: 14, color: "var(--neutral-900)", fontWeight: 500 }}>{item.description}</td>
+                  <td style={{ textAlign: "right", padding: "16px 0", fontSize: 14, color: "var(--neutral-600)" }}>{Number(item.quantity)}</td>
+                  <td style={{ textAlign: "right", padding: "16px 0", fontSize: 14, color: "var(--neutral-600)" }}>{fmt(Number(item.rate))}</td>
+                  <td style={{ textAlign: "right", padding: "16px 0", fontSize: 14, color: "var(--neutral-900)", fontWeight: 600 }}>{fmt(Number(item.amount))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Totals */}
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 40 }}>
           <div style={{ width: 300 }}>
-             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-               <span style={{ fontSize: 16, fontWeight: 600, color: "var(--neutral-900)" }}>Total</span>
-               <span style={{ fontSize: 24, fontWeight: 700, color: "var(--neutral-900)" }}>{fmt(total)}</span>
-             </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--neutral-100)" }}>
+              <span style={{ fontSize: 14, color: "var(--neutral-600)" }}>Subtotal</span>
+              <span style={{ fontSize: 14, color: "var(--neutral-900)", fontWeight: 500 }}>{fmt(total)}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", alignItems: "center" }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: "var(--neutral-900)" }}>Total Due</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: "var(--brand-dark)" }}>{fmt(total)}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {invoice.notes && (
-        <div className="card" style={{ marginTop: 24 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--neutral-900)", marginBottom: 12 }}>Notes</h3>
-          <p style={{ fontSize: 14, color: "var(--neutral-600)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{invoice.notes}</p>
-        </div>
-      )}
+        {/* Notes */}
+        {invoice.notes && (
+          <div style={{ borderTop: "1px solid var(--neutral-200)", paddingTop: 24 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-400)", textTransform: "uppercase", marginBottom: 8 }}>Notes</h3>
+            <p style={{ fontSize: 14, color: "var(--neutral-700)", lineHeight: 1.6, whiteSpace: "pre-wrap", margin: 0 }}>{invoice.notes}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

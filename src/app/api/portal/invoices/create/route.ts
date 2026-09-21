@@ -18,6 +18,10 @@ const schema = z.object({
       rate: z.number().min(0),
     })
   ).min(1),
+  billingName: z.string().optional(),
+  billingEmail: z.string().optional(),
+  billingCompany: z.string().optional(),
+  billingAddress: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -33,7 +37,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid data provided." }, { status: 400 });
     }
 
-    const { clientId, orderId, dueDate, notes, lineItems } = parsed.data;
+    const { clientId, orderId, dueDate, notes, lineItems, billingName, billingEmail, billingCompany, billingAddress } = parsed.data;
 
     // Verify order belongs to client only when an order is linked
     let orderStatus: string | null = null;
@@ -57,6 +61,10 @@ export async function POST(req: NextRequest) {
         clientId,
         orderId: orderId ?? undefined,
         isLocked: orderStatus === "COMPLETED" || orderStatus === "CANCELLED",
+        billingName: billingName || null,
+        billingEmail: billingEmail || null,
+        billingCompany: billingCompany || null,
+        billingAddress: billingAddress || null,
         lineItems: {
           create: lineItems.map((item) => ({
             description: item.description,

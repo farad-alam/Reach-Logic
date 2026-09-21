@@ -12,7 +12,15 @@ export default async function ClientProfilePage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { fullName: true, email: true, avatarUrl: true, createdAt: true },
+    select: {
+      fullName: true,
+      email: true,
+      avatarUrl: true,
+      company: true,
+      phone: true,
+      address: true,
+      createdAt: true,
+    },
   });
   if (!user) redirect("/portal/login");
 
@@ -21,13 +29,16 @@ export default async function ClientProfilePage() {
       <div className="page-header">
         <div>
           <h1 className="page-header-title">My Profile</h1>
-          <p className="page-header-sub">Update your name, avatar and password</p>
+          <p className="page-header-sub">Update your contact details, billing address and password</p>
         </div>
       </div>
       <ProfileForm
         initialName={user.fullName ?? ""}
         initialEmail={user.email}
         initialAvatar={user.avatarUrl}
+        initialCompany={user.company ?? ""}
+        initialPhone={user.phone ?? ""}
+        initialAddress={user.address ?? ""}
       />
     </div>
   );

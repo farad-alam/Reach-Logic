@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { FileText, CheckCircle2 } from "lucide-react";
+import { FileText, CheckCircle2, Download } from "lucide-react";
+import InvoiceListDownloadButton from "@/components/portal/InvoiceListDownloadButton";
 
 export const metadata = { title: "Invoices" };
 
@@ -64,7 +65,7 @@ export default async function ClientInvoicesPage() {
                 <th>Amount</th>
                 <th>Due Date</th>
                 <th>Status</th>
-                <th></th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -82,7 +83,10 @@ export default async function ClientInvoicesPage() {
                     )}
                   </td>
                   <td style={{ textAlign: "right" }}>
-                    <Link href={`/portal/client/invoices/${inv.id}`} className="btn btn-outline btn-sm">View Details</Link>
+                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", alignItems: "center" }}>
+                      <InvoiceListDownloadButton invoiceId={inv.id} invoiceNumber={inv.invoiceNumber} />
+                      <Link href={`/portal/client/invoices/${inv.id}`} className="btn btn-outline btn-sm">View Details</Link>
+                    </div>
                   </td>
                 </tr>
               ))}

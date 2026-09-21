@@ -8,6 +8,9 @@ import { z } from "zod";
 const schema = z.object({
   fullName: z.string().min(1).max(100).optional(),
   avatarUrl: z.string().url().optional().nullable(),
+  company: z.string().max(100).optional().nullable(),
+  phone: z.string().max(30).optional().nullable(),
+  address: z.string().max(500).optional().nullable(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(8).optional(),
 });
@@ -20,7 +23,7 @@ export async function PATCH(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const { fullName, avatarUrl, currentPassword, newPassword } = parsed.data;
+  const { fullName, avatarUrl, company, phone, address, currentPassword, newPassword } = parsed.data;
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -43,6 +46,9 @@ export async function PATCH(req: NextRequest) {
   const updateData: Record<string, unknown> = {};
   if (fullName !== undefined) updateData.fullName = fullName;
   if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
+  if (company !== undefined) updateData.company = company;
+  if (phone !== undefined) updateData.phone = phone;
+  if (address !== undefined) updateData.address = address;
   if (newPassword) updateData.passwordHash = await bcrypt.hash(newPassword, 12);
 
   if (Object.keys(updateData).length === 0) {

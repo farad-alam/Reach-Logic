@@ -1,19 +1,34 @@
 "use client";
 import { useState, FormEvent } from "react";
-import { Loader2, Check, Camera } from "lucide-react";
+import { Loader2, Check, Camera, MapPin } from "lucide-react";
 
 interface Props {
   initialName: string;
   initialEmail: string;
   initialAvatar?: string | null;
+  initialCompany?: string;
+  initialPhone?: string;
+  initialAddress?: string;
 }
 
-export default function ProfileForm({ initialName, initialEmail, initialAvatar }: Props) {
+export default function ProfileForm({
+  initialName,
+  initialEmail,
+  initialAvatar,
+  initialCompany = "",
+  initialPhone = "",
+  initialAddress = "",
+}: Props) {
   const [fullName, setFullName] = useState(initialName);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatar ?? "");
+  const [company, setCompany] = useState(initialCompany);
+  const [phone, setPhone] = useState(initialPhone);
+  const [address, setAddress] = useState(initialAddress);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [profileLoading, setProfileLoading] = useState(false);
   const [passLoading, setPassLoading] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -27,7 +42,13 @@ export default function ProfileForm({ initialName, initialEmail, initialAvatar }
       const res = await fetch("/api/portal/users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, avatarUrl: avatarUrl || null }),
+        body: JSON.stringify({
+          fullName,
+          avatarUrl: avatarUrl || null,
+          company: company || null,
+          phone: phone || null,
+          address: address || null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -136,6 +157,72 @@ export default function ProfileForm({ initialName, initialEmail, initialAvatar }
           <button type="submit" className="btn btn-primary btn-sm" disabled={profileLoading}>
             {profileLoading ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
             Save Changes
+          </button>
+        </form>
+      </div>
+
+      {/* Billing Address Section */}
+      <div className="card card-sm">
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <MapPin size={16} color="var(--brand-accent)" />
+          <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--neutral-900)", margin: 0 }}>
+            Billing Address
+          </h2>
+        </div>
+        <p style={{ fontSize: 13, color: "var(--neutral-500)", marginBottom: 20 }}>
+          Used to auto-fill your billing details on invoices. You can always override this per invoice.
+        </p>
+
+        <form onSubmit={handleProfile}>
+          <div className="grid-2">
+            <div className="form-group">
+              <label className="form-label" htmlFor="company">Company / Business Name</label>
+              <input
+                id="company"
+                type="text"
+                className="form-input"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Acme Inc. (optional)"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="phone">Phone Number</label>
+              <input
+                id="phone"
+                type="tel"
+                className="form-input"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+1 555 000 0000 (optional)"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="address">Full Billing Address</label>
+            <textarea
+              id="address"
+              className="form-textarea"
+              rows={3}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder={"123 Main Street\nNew York, NY 10001\nUnited States"}
+            />
+            <div style={{ fontSize: 12, color: "var(--neutral-400)", marginTop: 6 }}>
+              This address will be automatically added to any new invoices created for your account.
+            </div>
+          </div>
+
+          {profileMsg && (
+            <div className={profileMsg.ok ? "auth-success" : "auth-error"} style={{ marginBottom: 12 }}>
+              {profileMsg.text}
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary btn-sm" disabled={profileLoading}>
+            {profileLoading ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+            Save Billing Address
           </button>
         </form>
       </div>
