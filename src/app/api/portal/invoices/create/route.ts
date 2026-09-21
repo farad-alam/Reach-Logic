@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
 
     const invoiceNumber = await getNextInvoiceNumber();
 
+    // Create the invoice WITHOUT nested lineItems to avoid implicit transaction
     const invoice = await prisma.invoice.create({
       data: {
         invoiceNumber,
@@ -65,16 +66,21 @@ export async function POST(req: NextRequest) {
         billingEmail: billingEmail || null,
         billingCompany: billingCompany || null,
         billingAddress: billingAddress || null,
-        lineItems: {
-          create: lineItems.map((item) => ({
-            description: item.description,
-            quantity: item.quantity,
-            rate: item.rate,
-            amount: item.quantity * item.rate,
-          })),
-        },
       },
     });
+
+    // Insert line items one by one (PrismaNeonHttp doesn't support nested writes / transactions)
+    for (const item of lineItems) {
+      await prisma.invoiceLineItem.create({
+        data: {
+          invoiceId: invoice.id,
+          description: item.description,
+          quantity: item.quantity,
+          rate: item.rate,
+          amount: item.quantity * item.rate,
+        },
+      });
+    }
 
     // Notify client
     await notifyInvoiceCreated(invoice.id);
@@ -98,6 +104,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, invoiceId: invoice.id });
   } catch (error) {
     console.error("[invoices/create]", error);
-    return NextResponse.json({ error: "Failed to create invoice." }, { status: 500 });
+    const msg = error instanceof Error ? error.message : "Failed to create invoice.";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

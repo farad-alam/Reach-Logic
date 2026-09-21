@@ -63,7 +63,12 @@ export async function POST(req: NextRequest) {
         createdById: session.user.id,
         status: "AWAITING_QUOTE",
       },
-      include: { client: true },
+    });
+
+    // Fetch client separately (avoid implicit transaction from nested include)
+    const client = await prisma.user.findUnique({
+      where: { id: clientId },
+      select: { fullName: true, email: true },
     });
 
     // Find super admins to notify
@@ -78,7 +83,7 @@ export async function POST(req: NextRequest) {
         userId: admin.id,
         type: "ORDER_CREATED",
         title: "New Project Request",
-        body: `${order.client.fullName || order.client.email} submitted a new project: "${order.serviceTitle}". Needs a quote.`,
+        body: `${client?.fullName || client?.email || "A client"} submitted a new project: "${order.serviceTitle}". Needs a quote.`,
         link: `/portal/admin/orders/${order.id}`,
       });
     }
