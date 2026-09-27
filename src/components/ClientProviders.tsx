@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CustomCursor from "./CustomCursor";
 import Preloader from "./Preloader";
 import ScrollProgress from "./ScrollProgress";
 
@@ -47,8 +46,6 @@ export default function ClientProviders() {
 
   return (
     <>
-      {/* Custom cursor — desktop only */}
-      {!isMobile && <CustomCursor />}
       <ScrollProgress />
 
       {/* Grain overlay — desktop only (hidden via CSS on mobile) */}
