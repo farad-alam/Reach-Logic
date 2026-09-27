@@ -132,6 +132,14 @@ model Order {
   endDate      DateTime
   amount       Decimal?    @db.Decimal(10, 2) // null until SA quotes
   status       OrderStatus @default(AWAITING_QUOTE)
+
+  // Billing address captured at project creation
+  billingStreet  String?
+  billingCity    String?
+  billingState   String?
+  billingZip     String?
+  billingCountry String?
+
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 

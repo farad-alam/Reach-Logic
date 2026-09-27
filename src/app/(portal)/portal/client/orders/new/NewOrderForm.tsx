@@ -14,6 +14,12 @@ export default function NewOrderForm() {
   const [endDate, setEndDate] = useState("");
   const [amount, setAmount] = useState("");
 
+  const [billingStreet, setBillingStreet] = useState("");
+  const [billingCity, setBillingCity] = useState("");
+  const [billingState, setBillingState] = useState("");
+  const [billingZip, setBillingZip] = useState("");
+  const [billingCountry, setBillingCountry] = useState("");
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -29,6 +35,11 @@ export default function NewOrderForm() {
           startDate,
           endDate,
           amount,
+          billingStreet,
+          billingCity,
+          billingState,
+          billingZip,
+          billingCountry,
         }),
       });
 
@@ -89,8 +100,8 @@ export default function NewOrderForm() {
           />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
-          <div className="form-group">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 24 }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
             <label className="form-label" htmlFor="startDate" style={{ fontSize: 13, fontWeight: 600 }}>Start Date <span style={{ color: "var(--brand-accent)" }}>*</span></label>
             <input 
               id="startDate" 
@@ -101,7 +112,7 @@ export default function NewOrderForm() {
               required 
             />
           </div>
-          <div className="form-group">
+          <div className="form-group" style={{ marginBottom: 0 }}>
             <label className="form-label" htmlFor="endDate" style={{ fontSize: 13, fontWeight: 600 }}>End Date <span style={{ color: "var(--brand-accent)" }}>*</span></label>
             <input 
               id="endDate" 
@@ -113,7 +124,7 @@ export default function NewOrderForm() {
             />
             <div style={{ fontSize: 11, color: "var(--neutral-400)", marginTop: 6 }}>Must be after the Start Date</div>
           </div>
-          <div className="form-group">
+          <div className="form-group" style={{ marginBottom: 0 }}>
             <label className="form-label" htmlFor="amount" style={{ fontSize: 13, fontWeight: 600 }}>Amount (USD) <span style={{ color: "var(--brand-accent)" }}>*</span></label>
             <div style={{ display: "flex", border: "1px solid var(--neutral-200)", borderRadius: 6, overflow: "hidden" }}>
               <div style={{ background: "var(--neutral-50)", padding: "10px 16px", borderRight: "1px solid var(--neutral-200)", color: "var(--neutral-600)", fontWeight: 600 }}>$</div>
@@ -128,6 +139,69 @@ export default function NewOrderForm() {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Billing Address Mandatory Section */}
+        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid var(--neutral-100)" }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--brand-dark)", marginBottom: 16 }}>
+            Billing Address: <span style={{ color: "var(--neutral-900)" }}>*</span>
+          </h3>
+
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+            <div>
+              <input
+                type="text"
+                className="form-input"
+                value={billingStreet}
+                onChange={(e) => setBillingStreet(e.target.value)}
+                placeholder="e.g. Street address"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="text"
+                className="form-input"
+                value={billingCity}
+                onChange={(e) => setBillingCity(e.target.value)}
+                placeholder="City"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="text"
+                className="form-input"
+                value={billingState}
+                onChange={(e) => setBillingState(e.target.value)}
+                placeholder="State"
+                required
+              />
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 16 }}>
+            <div>
+              <input
+                type="text"
+                className="form-input"
+                value={billingZip}
+                onChange={(e) => setBillingZip(e.target.value)}
+                placeholder="Zip code"
+                required
+              />
+            </div>
+            <div>
+              <input
+                type="text"
+                className="form-input"
+                value={billingCountry}
+                onChange={(e) => setBillingCountry(e.target.value)}
+                placeholder="Country"
+                required
               />
             </div>
           </div>

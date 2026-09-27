@@ -77,7 +77,7 @@ export default async function ClientDashboard() {
             {unreadMessages > 0 && <span className="notif-dot" style={{ top: -2, right: -2 }} />}
           </Link>
           <Link href="/portal/client/orders/new" className="btn btn-primary btn-sm">
-            <Plus size={14} /> New Order
+            <Plus size={14} /> Start New Project
           </Link>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default async function ClientDashboard() {
             <div className="empty-state" style={{ padding: "32px 20px" }}>
               <ShoppingBag size={28} color="var(--neutral-300)" />
               <span style={{ fontSize: 13, color: "var(--neutral-400)", marginBottom: 12 }}>You have no orders yet</span>
-              <Link href="/portal/client/orders/new" className="btn btn-outline btn-sm">Start a new order</Link>
+              <Link href="/portal/client/orders/new" className="btn btn-outline btn-sm">Start New Project</Link>
             </div>
           ) : (
             <div>
