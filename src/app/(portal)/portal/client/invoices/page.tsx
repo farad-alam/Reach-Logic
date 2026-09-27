@@ -56,40 +56,62 @@ export default async function ClientInvoicesPage() {
           </div>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="portal-table">
-            <thead>
+        <div className="table-wrapper" style={{ borderRadius: 8, border: "1px solid var(--neutral-200)", overflow: "hidden", background: "#fff" }}>
+          <table className="portal-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead style={{ background: "var(--neutral-50)", borderBottom: "1px solid var(--neutral-200)", textTransform: "uppercase", fontSize: 11, fontWeight: 700, color: "var(--neutral-500)", letterSpacing: "0.05em" }}>
               <tr>
-                <th>Invoice</th>
-                <th>Project</th>
-                <th>Amount</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th style={{ padding: "16px 24px", textAlign: "left" }}>Invoice</th>
+                <th style={{ padding: "16px 24px", textAlign: "left" }}>Project</th>
+                <th style={{ padding: "16px 24px", textAlign: "left" }}>Total Amount</th>
+                <th style={{ padding: "16px 24px", textAlign: "left" }}>Due Date</th>
+                <th style={{ padding: "16px 24px", textAlign: "left" }}>Paid</th>
+                <th style={{ padding: "16px 24px", textAlign: "left" }}>Due</th>
+                <th style={{ padding: "16px 24px", textAlign: "left" }}>Status</th>
+                <th style={{ padding: "16px 24px", textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {invoicesWithTotals.map((inv) => (
-                <tr key={inv.id}>
-                  <td style={{ fontWeight: 600 }}>{inv.invoiceNumber}</td>
-                  <td style={{ color: "var(--neutral-600)" }}>{inv.order?.serviceTitle ?? "—"}</td>
-                  <td style={{ fontWeight: 500 }}>{fmt(inv.total)}</td>
-                  <td style={{ fontSize: 13, color: "var(--neutral-500)" }}>{fmtDate(inv.dueDate)}</td>
-                  <td>
-                    {inv.isPaid ? (
-                      <span className="badge badge-paid"><CheckCircle2 size={12} /> Paid</span>
-                    ) : (
-                      <span className="badge badge-unpaid">Unpaid</span>
-                    )}
-                  </td>
-                  <td style={{ textAlign: "right" }}>
-                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", alignItems: "center" }}>
-                      <InvoiceListDownloadButton invoiceId={inv.id} invoiceNumber={inv.invoiceNumber} />
-                      <Link href={`/portal/client/invoices/${inv.id}`} className="btn btn-outline btn-sm">View Details</Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {invoicesWithTotals.map((inv) => {
+                const amountPaid = inv.isPaid ? inv.total : Number(inv.amountPaid || 0);
+                const amountDue = Math.max(0, inv.total - amountPaid);
+                const isPartiallyPaid = !inv.isPaid && amountPaid > 0;
+                
+                return (
+                  <tr key={inv.id} style={{ borderBottom: "1px solid var(--neutral-100)", fontSize: 13 }}>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{inv.invoiceNumber}</td>
+                    <td style={{ padding: "16px 24px", color: "var(--neutral-600)" }}>{inv.order?.serviceTitle ?? "—"}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{fmt(inv.total)}</td>
+                    <td style={{ padding: "16px 24px", color: "var(--neutral-500)" }}>{fmtDate(inv.dueDate)}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--success-dark)" }}>{fmt(amountPaid)}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: amountDue > 0 ? "var(--warning-dark)" : "var(--neutral-500)" }}>{fmt(amountDue)}</td>
+                    <td style={{ padding: "16px 24px" }}>
+                      {inv.isPaid ? (
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--success-light)", color: "var(--success-dark)", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                          <CheckCircle2 size={12} /> Paid
+                        </div>
+                      ) : isPartiallyPaid ? (
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#e0f2fe", color: "#0369a1", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                          <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid currentColor", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor" }} />
+                          </div> Partially Paid
+                        </div>
+                      ) : (
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--warning-light)", color: "var(--warning-dark)", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                          <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid currentColor", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                            <div style={{ width: 2, height: 4, background: "currentColor", position: "absolute", top: 2 }} />
+                          </div> Unpaid
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: "16px 24px", textAlign: "right" }}>
+                      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", alignItems: "center" }}>
+                        <InvoiceListDownloadButton invoiceId={inv.id} invoiceNumber={inv.invoiceNumber} />
+                        <Link href={`/portal/client/invoices/${inv.id}`} className="btn btn-outline btn-sm">View Details</Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -168,6 +168,7 @@ model Invoice {
   dueDate       DateTime
   isPaid        Boolean   @default(false)
   paidAt        DateTime?
+  amountPaid    Decimal   @db.Decimal(10, 2) @default(0) // Tracks partial payments
   notes         String?
   isLocked      Boolean   @default(false) // true when order → COMPLETED or CANCELLED
   createdAt     DateTime  @default(now())
