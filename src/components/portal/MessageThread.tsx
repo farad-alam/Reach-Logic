@@ -257,9 +257,6 @@ export default function MessageThread({
                         </div>
                       )}
                     </div>
-                    <div className="message-meta" style={{ alignSelf: isOwn ? "flex-end" : "flex-start" }}>
-                      {fmt(msg.createdAt)}
-                    </div>
                   </div>
                 </div>
               </div>

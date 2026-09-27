@@ -37,9 +37,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ thr
       if (!isMember) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    // Payment totals — only compute for SUPER_ADMIN
+    // Payment totals — compute for SUPER_ADMIN and CLIENT
     let payments = null;
-    if (role === "SUPER_ADMIN") {
+    if (role === "SUPER_ADMIN" || role === "CLIENT") {
       const invoices = await prisma.invoice.findMany({
         where: { clientId: thread.clientId },
         include: { lineItems: { select: { amount: true } } },

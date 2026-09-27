@@ -1169,6 +1169,62 @@
   border: 2px solid var(--neutral-50);
 }
 
+/* --- Client Thread Sidebar (left panel for client view) --- */
+.chat-thread-sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--neutral-200);
+  background: var(--neutral-50);
+  width: 240px;
+  overflow: hidden;
+}
+
+.chat-thread-sidebar-header {
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--neutral-200);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-thread-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.thread-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s;
+}
+.thread-sidebar-item:hover { background: var(--neutral-200); }
+.thread-sidebar-item.active { background: #fff; border: 1px solid var(--brand-dark); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+.team-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border: 1.5px solid #fff;
+}
+.team-status-dot.online { background: #10b981; }
+.team-status-dot.away { background: #9ca3af; }
+
 /* --- Chat center --- */
 .chat-center {
   display: flex;

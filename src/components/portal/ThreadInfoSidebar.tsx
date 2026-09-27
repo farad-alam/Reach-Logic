@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus } from "lucide-react";
 
 interface Member {
   id: string;
@@ -86,14 +86,43 @@ export default function ThreadInfoSidebar({
 }) {
   const [info, setInfo] = useState<ThreadInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchInfo = () => {
     setLoading(true);
     fetch(`/api/portal/threads/${threadId}/info`)
       .then((r) => r.json())
       .then((d) => setInfo(d.thread ?? null))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchInfo();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadId]);
+
+  async function handleInvite() {
+    if (!inviteEmail.trim() || inviting) return;
+    setInviting(true);
+    try {
+      const res = await fetch(`/api/portal/threads/${threadId}/invite-colleague`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: inviteEmail.trim() })
+      });
+      if (res.ok) {
+        setInviteEmail("");
+        setInviteOpen(false);
+        fetchInfo(); // Refresh thread info
+      } else {
+        alert("Failed to invite colleague.");
+      }
+    } finally {
+      setInviting(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -108,6 +137,9 @@ export default function ThreadInfoSidebar({
   const pct = info.payments && info.payments.totalBilled > 0
     ? Math.round((info.payments.totalPaid / info.payments.totalBilled) * 100)
     : 0;
+
+  const agencyTeam = info.members.filter(m => m.role === "SUPER_ADMIN" || m.role === "TEAM_MEMBER");
+  const clientTeam = info.members.filter(m => m.role === "CLIENT");
 
   return (
     <div className="thread-info-sidebar">
@@ -164,19 +196,19 @@ export default function ThreadInfoSidebar({
         </div>
       )}
 
-      {/* Payments — SUPER ADMIN ONLY */}
-      {isAdmin && info.payments && (
+      {/* Payments */}
+      {info.payments && (
         <div className="info-section">
           <div className="info-section-label" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            PAYMENTS
-            <span style={{ background: "#fef3c7", color: "#92400e", fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, textTransform: "uppercase" }}>Admin Only</span>
+            {isAdmin ? "PAYMENTS" : "PAYMENT STATUS"}
+            {isAdmin && <span style={{ background: "#fef3c7", color: "#92400e", fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, textTransform: "uppercase" }}>Admin Only</span>}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-            <div className="info-payment-card" style={{ borderColor: "var(--brand-accent)" }}>
+            <div className="info-payment-card" style={{ borderColor: "var(--brand-accent)", background: isAdmin ? "transparent" : "#f0fdf4" }}>
               <div style={{ fontSize: 11, color: "var(--neutral-500)", marginBottom: 2 }}>Total Paid</div>
               <div style={{ fontSize: 17, fontWeight: 700, color: "var(--brand-dark)" }}>{fmt(info.payments.totalPaid)}</div>
             </div>
-            <div className="info-payment-card" style={{ borderColor: "#f59e0b" }}>
+            <div className="info-payment-card" style={{ borderColor: "#f59e0b", background: isAdmin ? "transparent" : "#fffbeb" }}>
               <div style={{ fontSize: 11, color: "var(--neutral-500)", marginBottom: 2 }}>Due</div>
               <div style={{ fontSize: 17, fontWeight: 700, color: "#b45309" }}>{fmt(info.payments.totalDue)}</div>
             </div>
@@ -188,13 +220,45 @@ export default function ThreadInfoSidebar({
         </div>
       )}
 
-      {/* Thread members */}
+      {/* Your Team (Agency) */}
+      {agencyTeam.length > 0 && (
+        <div className="info-section">
+          <div className="info-section-label">YOUR TEAM</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {agencyTeam.map((member) => (
+              <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 8, position: "relative" }}>
+                <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--brand-mid)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, flexShrink: 0, position: "relative" }}>
+                  {member.avatarUrl
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={member.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                    : (member.fullName?.[0] ?? member.email[0]).toUpperCase()
+                  }
+                  <div className={`team-status-dot ${member.role === 'SUPER_ADMIN' ? 'away' : 'online'}`} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "var(--neutral-900)" }}>
+                    {member.fullName ?? member.email.split('@')[0]}
+                  </div>
+                </div>
+                <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>
+                  {member.role === "SUPER_ADMIN" ? "Super Admin" : "Team Member"}
+                </span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: member.role === "SUPER_ADMIN" ? "var(--neutral-400)" : "#10b981", marginLeft: 4 }}>
+                  {member.role === "SUPER_ADMIN" ? "Away" : "Online"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* In This Thread (Client Colleagues) */}
       <div className="info-section">
         <div className="info-section-label">IN THIS THREAD</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {info.members.map((member) => (
+          {clientTeam.map((member) => (
             <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--brand-mid)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
+              <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--neutral-200)", color: "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
                 {member.avatarUrl
                   // eslint-disable-next-line @next/next/no-img-element
                   ? <img src={member.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
@@ -207,11 +271,38 @@ export default function ThreadInfoSidebar({
                   {member.id === currentUserId && <span style={{ color: "var(--neutral-400)", marginLeft: 4, fontWeight: 400 }}>(you)</span>}
                 </div>
               </div>
-              <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>
-                {member.role === "SUPER_ADMIN" ? "Super Admin" : member.role === "TEAM_MEMBER" ? "Team" : "Client"}
-              </span>
+              <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>Client</span>
             </div>
           ))}
+          {!isAdmin && clientTeam.length < 3 && (
+            <div style={{ marginTop: 8 }}>
+              {!inviteOpen ? (
+                <button
+                  onClick={() => setInviteOpen(true)}
+                  style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--brand-accent)", background: "none", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}
+                >
+                  <Plus size={14} /> + Add your colleague here
+                </button>
+              ) : (
+                <div style={{ display: "flex", gap: 6 }}>
+                  <input
+                    type="email"
+                    placeholder="Colleague email..."
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    style={{ flex: 1, minWidth: 0, padding: "6px 8px", fontSize: 12, borderRadius: 6, border: "1px solid var(--neutral-200)", outline: "none" }}
+                  />
+                  <button
+                    onClick={handleInvite}
+                    disabled={inviting || !inviteEmail.trim()}
+                    style={{ background: "var(--brand-dark)", color: "#fff", border: "none", borderRadius: 6, padding: "0 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", opacity: (!inviteEmail.trim() || inviting) ? 0.5 : 1 }}
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
