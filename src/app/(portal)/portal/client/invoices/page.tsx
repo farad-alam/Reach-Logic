@@ -82,25 +82,21 @@ export default async function ClientInvoicesPage() {
                     <td style={{ padding: "16px 24px", color: "var(--neutral-600)" }}>{inv.order?.serviceTitle ?? "—"}</td>
                     <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{fmt(inv.total)}</td>
                     <td style={{ padding: "16px 24px", color: "var(--neutral-500)" }}>{fmtDate(inv.dueDate)}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--success-dark)" }}>{fmt(amountPaid)}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: amountDue > 0 ? "var(--warning-dark)" : "var(--neutral-500)" }}>{fmt(amountDue)}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "#16a34a" }}>{fmt(amountPaid)}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: amountDue > 0 ? "#ea580c" : "#6b7280" }}>{fmt(amountDue)}</td>
                     <td style={{ padding: "16px 24px" }}>
                       {inv.isPaid ? (
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--success-light)", color: "var(--success-dark)", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                          <CheckCircle2 size={12} /> Paid
-                        </div>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#dcfce7", color: "#16a34a", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                          <CheckCircle2 size={11} /> Paid
+                        </span>
                       ) : isPartiallyPaid ? (
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#e0f2fe", color: "#0369a1", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                          <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid currentColor", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor" }} />
-                          </div> Partially Paid
-                        </div>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#dbeafe", color: "#1d4ed8", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                          ◉ Partially Paid
+                        </span>
                       ) : (
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--warning-light)", color: "var(--warning-dark)", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                          <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid currentColor", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                            <div style={{ width: 2, height: 4, background: "currentColor", position: "absolute", top: 2 }} />
-                          </div> Unpaid
-                        </div>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#fef3c7", color: "#d97706", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                          ⊙ Unpaid
+                        </span>
                       )}
                     </td>
                     <td style={{ padding: "16px 24px", textAlign: "right" }}>

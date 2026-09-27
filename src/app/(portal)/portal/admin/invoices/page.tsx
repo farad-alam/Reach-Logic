@@ -3,7 +3,9 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { FileText, Plus, CheckCircle2 } from "lucide-react";
+import { FileText, Plus, CheckCircle2, Download } from "lucide-react";
+import InvoiceManageDropdown from "./InvoiceManageDropdown";
+import AdminInvoiceDownloadButton from "./AdminInvoiceDownloadButton";
 
 export const metadata = { title: "Invoices" };
 
@@ -40,8 +42,8 @@ export default async function AdminInvoicesPage() {
         <div>
           <h1 className="page-header-title">Invoices</h1>
           <p className="page-header-sub">
-            {invoices.length} total invoice{invoices.length !== 1 ? "s" : ""}
-            {unpaidCount > 0 && <span style={{ color: "var(--warning)" }}> · {unpaidCount} unpaid</span>}
+            All client invoices. Use Manage to record payments or edit an invoice.
+            {unpaidCount > 0 && <span style={{ color: "#ea580c" }}> · {unpaidCount} unpaid</span>}
           </p>
         </div>
         <Link href="/portal/admin/invoices/new" className="btn btn-primary">
@@ -61,19 +63,19 @@ export default async function AdminInvoicesPage() {
           </div>
         </div>
       ) : (
-        <div className="table-wrapper" style={{ borderRadius: 8, border: "1px solid var(--neutral-200)", overflow: "hidden", background: "#fff" }}>
-          <table className="portal-table" style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead style={{ background: "var(--neutral-50)", borderBottom: "1px solid var(--neutral-200)", textTransform: "uppercase", fontSize: 11, fontWeight: 700, color: "var(--neutral-500)", letterSpacing: "0.05em" }}>
-              <tr>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Invoice</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Client</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Project</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Total Amount</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Due Date</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Paid</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Due</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Status</th>
-                <th style={{ padding: "16px 24px", textAlign: "right" }}>Actions</th>
+        <div style={{ borderRadius: 10, border: "1px solid var(--neutral-200)", overflow: "hidden", background: "#fff" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "#fafafa", borderBottom: "1px solid var(--neutral-200)" }}>
+                <th style={thStyle}>Invoice</th>
+                <th style={thStyle}>Client</th>
+                <th style={thStyle}>Project</th>
+                <th style={thStyle}>Total Amount</th>
+                <th style={thStyle}>Due Date</th>
+                <th style={thStyle}>Paid</th>
+                <th style={thStyle}>Due</th>
+                <th style={thStyle}>Status</th>
+                <th style={{ ...thStyle, textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -81,37 +83,47 @@ export default async function AdminInvoicesPage() {
                 const amountPaid = inv.isPaid ? inv.total : Number(inv.amountPaid || 0);
                 const amountDue = Math.max(0, inv.total - amountPaid);
                 const isPartiallyPaid = !inv.isPaid && amountPaid > 0;
-                
+
                 return (
-                  <tr key={inv.id} style={{ borderBottom: "1px solid var(--neutral-100)", fontSize: 13 }}>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{inv.invoiceNumber}</td>
-                    <td style={{ padding: "16px 24px", color: "var(--neutral-600)" }}>{inv.client.fullName ?? inv.client.email}</td>
-                    <td style={{ padding: "16px 24px", color: "var(--neutral-600)" }}>{inv.order?.serviceTitle ?? "—"}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{fmt(inv.total)}</td>
-                    <td style={{ padding: "16px 24px", color: "var(--neutral-500)" }}>{fmtDate(inv.dueDate)}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--success-dark)" }}>{fmt(amountPaid)}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: amountDue > 0 ? "var(--warning-dark)" : "var(--neutral-500)" }}>{fmt(amountDue)}</td>
-                    <td style={{ padding: "16px 24px" }}>
+                  <tr key={inv.id} style={{ borderBottom: "1px solid #f3f4f6", fontSize: 13 }}>
+                    <td style={{ ...tdStyle, fontWeight: 700, color: "#111827" }}>{inv.invoiceNumber}</td>
+                    <td style={{ ...tdStyle, color: "#4b5563" }}>{inv.client.fullName ?? inv.client.email}</td>
+                    <td style={{ ...tdStyle, color: "#4b5563" }}>{inv.order?.serviceTitle ?? "—"}</td>
+                    <td style={{ ...tdStyle, fontWeight: 700, color: "#111827" }}>{fmt(inv.total)}</td>
+                    <td style={{ ...tdStyle, color: "#6b7280" }}>{fmtDate(inv.dueDate)}</td>
+                    <td style={{ ...tdStyle, fontWeight: 700, color: "#16a34a" }}>{fmt(amountPaid)}</td>
+                    <td style={{ ...tdStyle, fontWeight: 700, color: amountDue > 0 ? "#ea580c" : "#6b7280" }}>{fmt(amountDue)}</td>
+                    <td style={tdStyle}>
                       {inv.isPaid ? (
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--success-light)", color: "var(--success-dark)", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                          <CheckCircle2 size={12} /> Paid
-                        </div>
+                        <span style={badgeStyle("#dcfce7", "#16a34a")}>
+                          <CheckCircle2 size={11} /> Paid
+                        </span>
                       ) : isPartiallyPaid ? (
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#e0f2fe", color: "#0369a1", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                          <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid currentColor", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor" }} />
-                          </div> Partially Paid
-                        </div>
+                        <span style={badgeStyle("#dbeafe", "#1d4ed8")}>
+                          ◉ Partially Paid
+                        </span>
                       ) : (
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--warning-light)", color: "var(--warning-dark)", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                          <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid currentColor", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                            <div style={{ width: 2, height: 4, background: "currentColor", position: "absolute", top: 2 }} />
-                          </div> Unpaid
-                        </div>
+                        <span style={badgeStyle("#fef3c7", "#d97706")}>
+                          ⊙ Unpaid
+                        </span>
                       )}
                     </td>
-                    <td style={{ padding: "16px 24px", textAlign: "right" }}>
-                      <Link href={`/portal/admin/invoices/${inv.id}`} className="btn btn-outline btn-sm">Manage</Link>
+                    <td style={{ ...tdStyle, textAlign: "right" }}>
+                      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", alignItems: "center" }}>
+                        <AdminInvoiceDownloadButton invoiceId={inv.id} invoiceNumber={inv.invoiceNumber} />
+                        <Link
+                          href={`/portal/admin/invoices/${inv.id}`}
+                          className="btn btn-outline btn-sm"
+                          style={{ fontSize: 13 }}>
+                          View
+                        </Link>
+                        <InvoiceManageDropdown
+                          invoiceId={inv.id}
+                          isPaid={inv.isPaid}
+                          isLocked={inv.isLocked}
+                          invoiceNumber={inv.invoiceNumber}
+                        />
+                      </div>
                     </td>
                   </tr>
                 );
@@ -122,4 +134,35 @@ export default async function AdminInvoicesPage() {
       )}
     </div>
   );
+}
+
+const thStyle: React.CSSProperties = {
+  padding: "14px 20px",
+  textAlign: "left",
+  fontSize: 11,
+  fontWeight: 700,
+  color: "#6b7280",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+  whiteSpace: "nowrap",
+};
+
+const tdStyle: React.CSSProperties = {
+  padding: "14px 20px",
+  verticalAlign: "middle",
+};
+
+function badgeStyle(bg: string, color: string): React.CSSProperties {
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 5,
+    background: bg,
+    color,
+    padding: "3px 10px",
+    borderRadius: 20,
+    fontSize: 11,
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+  };
 }
