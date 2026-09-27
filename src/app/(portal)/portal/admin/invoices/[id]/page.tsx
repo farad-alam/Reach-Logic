@@ -26,7 +26,7 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
     where: { id },
     include: {
       client: { select: { fullName: true, email: true } },
-      order: { select: { id: true, serviceTitle: true, status: true } },
+      order: { select: { id: true, serviceTitle: true, status: true, startDate: true, endDate: true } },
       lineItems: true,
     },
   });
@@ -77,6 +77,9 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
         clientFullName={invoice.client.fullName}
         clientEmail={invoice.client.email}
         orderServiceTitle={invoice.order?.serviceTitle ?? null}
+        orderNumber={invoice.order ? `ORD-${invoice.order.id.slice(-5).toUpperCase()}` : null}
+        orderStartDate={invoice.order?.startDate ?? null}
+        orderEndDate={invoice.order?.endDate ?? null}
         lineItems={invoice.lineItems.map(item => ({
           id: item.id,
           description: item.description,

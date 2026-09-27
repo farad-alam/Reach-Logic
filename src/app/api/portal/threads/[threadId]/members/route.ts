@@ -24,12 +24,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
     const thread = await prisma.thread.findUnique({ where: { id: threadId } });
     if (!thread) return NextResponse.json({ error: "Thread not found" }, { status: 404 });
 
-    // Upsert membership
-    await prisma.threadMember.upsert({
+    // Check if member already exists
+    const existing = await prisma.threadMember.findUnique({
       where: { threadId_userId: { threadId, userId } },
-      update: {},
-      create: { threadId, userId },
     });
+    
+    if (!existing) {
+      await prisma.threadMember.create({
+        data: { threadId, userId },
+      });
+    }
 
     const member = await prisma.user.findUnique({
       where: { id: userId },

@@ -11,6 +11,8 @@ const schema = z.object({
   startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
   clientId: z.string().min(1).optional(), // only used by SUPER_ADMIN
+  threadId: z.string().optional(),
+  amount: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    const { serviceTitle, description, startDate, endDate, clientId: bodyClientId } = parsed.data;
+    const { serviceTitle, description, startDate, endDate, clientId: bodyClientId, threadId, amount } = parsed.data;
 
     // Determine which client this order is for
     let clientId: string;
@@ -61,7 +63,9 @@ export async function POST(req: NextRequest) {
         endDate: new Date(endDate),
         clientId,
         createdById: session.user.id,
-        status: "AWAITING_QUOTE",
+        status: (amount && role === "SUPER_ADMIN") ? "PENDING" : "AWAITING_QUOTE",
+        amount: amount ? Number(amount) : null,
+        threadId: threadId || null,
       },
     });
 

@@ -357,33 +357,46 @@ function ManageMembersModal({
 
   async function addMember(userId: string) {
     setWorking(userId);
-    const res = await fetch(`/api/portal/threads/${threadId}/members`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-    });
-    const data = await res.json();
-    if (data.ok) {
-      onUpdate({
-        ...thread,
-        members: [...thread.members, { user: data.member }],
+    try {
+      const res = await fetch(`/api/portal/threads/${threadId}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
       });
+      const data = await res.json();
+      if (data.ok) {
+        onUpdate({
+          ...thread,
+          members: [...thread.members, { user: data.member }],
+        });
+      } else {
+        alert(data.error || "Failed to add member");
+      }
+    } catch (err: any) {
+      alert("Network error: " + err.message);
     }
     setWorking(null);
   }
 
   async function removeMember(userId: string) {
     setWorking(userId);
-    const res = await fetch(`/api/portal/threads/${threadId}/members`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
-    });
-    if (res.ok) {
-      onUpdate({
-        ...thread,
-        members: thread.members.filter((m) => m.user.id !== userId),
+    try {
+      const res = await fetch(`/api/portal/threads/${threadId}/members`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
       });
+      const data = await res.json();
+      if (res.ok) {
+        onUpdate({
+          ...thread,
+          members: thread.members.filter((m) => m.user.id !== userId),
+        });
+      } else {
+        alert(data.error || "Failed to remove member");
+      }
+    } catch (err: any) {
+      alert("Network error: " + err.message);
     }
     setWorking(null);
   }
