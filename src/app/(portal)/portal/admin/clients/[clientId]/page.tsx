@@ -86,7 +86,7 @@ export default async function ClientDetailPage({
         take: 5,
         include: { lineItems: { select: { amount: true } } },
       },
-      clientThread: { select: { id: true } },
+      clientThreads: { select: { id: true }, take: 1 },
     },
   });
 

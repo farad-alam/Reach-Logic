@@ -8,6 +8,16 @@ import { z } from "zod";
 const schema = z.object({
   threadId: z.string().min(1),
   body: z.string().min(1).max(5000),
+  attachments: z
+    .array(
+      z.object({
+        fileName: z.string(),
+        fileSize: z.number(),
+        cloudinaryPublicId: z.string(),
+        cloudinaryUrl: z.string(),
+      })
+    )
+    .optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -23,7 +33,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid input." }, { status: 400 });
     }
 
-    const { threadId, body } = parsed.data;
+    const { threadId, body, attachments } = parsed.data;
 
     // Verify access
     const role = (session.user as { role?: string }).role;
@@ -35,7 +45,7 @@ export async function POST(req: NextRequest) {
       hasAccess = thread?.clientId === session.user.id;
     } else if (role === "TEAM_MEMBER") {
       const membership = await prisma.threadMember.findUnique({
-        where: { threadId_userId: { threadId, userId: session.user.id } }
+        where: { threadId_userId: { threadId, userId: session.user.id } },
       });
       hasAccess = !!membership;
     }
@@ -54,18 +64,38 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Insert attachments one by one
+    if (attachments && attachments.length > 0) {
+      for (const att of attachments) {
+        await prisma.attachment.create({
+          data: {
+            messageId: message.id,
+            fileName: att.fileName,
+            fileSize: att.fileSize,
+            cloudinaryPublicId: att.cloudinaryPublicId,
+            cloudinaryUrl: att.cloudinaryUrl,
+          },
+        });
+      }
+    }
+
     // Fetch sender separately
     const sender = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { id: true, fullName: true, avatarUrl: true, email: true },
     });
 
-    // Notify other participants (best-effort — don't let email failure crash the send)
+    // Fetch saved attachments
+    const savedAttachments = await prisma.attachment.findMany({
+      where: { messageId: message.id },
+    });
+
+    // Notify other participants (best-effort)
     notifyNewMessage(threadId, session.user.id, body.trim()).catch((err) =>
       console.error("[messages/send] notify failed (non-fatal):", err)
     );
 
-    return NextResponse.json({ ok: true, message: { ...message, sender } });
+    return NextResponse.json({ ok: true, message: { ...message, sender, attachments: savedAttachments } });
   } catch (error) {
     console.error("[messages/send]", error);
     const msg = error instanceof Error ? error.message : "Failed to send message.";

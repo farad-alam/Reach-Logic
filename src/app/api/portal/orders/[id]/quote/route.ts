@@ -52,16 +52,17 @@ export async function POST(
       link: `/portal/client/orders/${order.id}`,
     });
 
-    // Auto-post to thread
-    const thread = await prisma.thread.findUnique({
-      where: { clientId: order.clientId }
-    });
+    // Auto-post to thread linked to order or General fallback
+    const thread = order.threadId
+      ? await prisma.thread.findUnique({ where: { id: order.threadId } })
+      : await prisma.thread.findFirst({ where: { clientId: order.clientId, name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId: order.clientId } });
 
     if (thread) {
       await prisma.message.create({
         data: {
           threadId: thread.id,
-          body: `Project "${order.serviceTitle}" has been quoted for $${body.amount.toFixed(2)} and is now Pending Start.`,
+          body: `📋 "${order.serviceTitle}" has been quoted and is now Pending Start`,
           type: "SYSTEM",
           metadata: { orderId: order.id, event: "order_quoted" },
         }

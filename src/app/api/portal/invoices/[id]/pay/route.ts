@@ -49,16 +49,18 @@ export async function POST(
       link: `/portal/client/invoices/${invoice.id}`,
     });
 
-    // Auto-post to thread
-    const thread = await prisma.thread.findUnique({
-      where: { clientId: invoice.clientId }
-    });
+    // Auto-post to thread linked to invoice's order or General fallback
+    const orderThreadId = invoice.order ? (await prisma.order.findUnique({ where: { id: invoice.order.id }, select: { threadId: true } }))?.threadId : null;
+    const thread = orderThreadId
+      ? await prisma.thread.findUnique({ where: { id: orderThreadId } })
+      : await prisma.thread.findFirst({ where: { clientId: invoice.clientId, name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId } });
 
     if (thread) {
       await prisma.message.create({
         data: {
           threadId: thread.id,
-          body: `Payment received for Invoice ${invoice.invoiceNumber}. Thank you!`,
+          body: `💳 Payment received for Invoice ${invoice.invoiceNumber}${invoice.order ? ` — "${invoice.order.serviceTitle}"` : ""}. Thank you!`,
           type: "SYSTEM",
           metadata: { invoiceId: invoice.id, orderId: invoice.orderId, event: "invoice_paid" },
         }

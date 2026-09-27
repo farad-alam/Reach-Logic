@@ -63,12 +63,13 @@ export async function PATCH(
       await sendPaidInvoiceEmail(invoice.id);
 
       // System message to thread
-      const thread = await prisma.thread.findUnique({ where: { clientId: invoice.clientId } });
+      const thread = await prisma.thread.findFirst({ where: { clientId: invoice.clientId, name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId } });
       if (thread) {
         await prisma.message.create({
           data: {
             threadId: thread.id,
-            body: `Payment recorded for Invoice ${invoice.invoiceNumber}. Thank you!`,
+            body: `💳 Payment recorded for Invoice ${invoice.invoiceNumber}. Thank you!`,
             type: "SYSTEM",
             metadata: { invoiceId: id, event: "invoice_paid" },
           },

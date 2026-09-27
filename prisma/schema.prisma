@@ -84,7 +84,7 @@ model User {
   threadMemberships  ThreadMember[]
   sentMessages       Message[]
   notifications      Notification[]
-  clientThread       Thread?
+  clientThreads      Thread[]
 
   @@map("users")
 }
@@ -140,6 +140,10 @@ model Order {
 
   createdById String
   createdBy   User   @relation("OrderCreatedBy", fields: [createdById], references: [id])
+
+  // Optional thread link — set when order is created from a specific thread
+  threadId String?
+  thread   Thread? @relation(fields: [threadId], references: [id], onDelete: SetNull)
 
   invoices Invoice[]
 
@@ -205,15 +209,18 @@ model InvoiceCounter {
 
 model Thread {
   id        String   @id @default(cuid())
+  name      String   @default("General") // Display name, max 30 chars
   createdAt DateTime @default(now())
 
-  // One thread per client
-  clientId String @unique
+  // Many threads per client (removed @unique)
+  clientId String
   client   User   @relation(fields: [clientId], references: [id])
 
   members  ThreadMember[]
   messages Message[]
+  orders   Order[]
 
+  @@index([clientId])
   @@map("threads")
 }
 

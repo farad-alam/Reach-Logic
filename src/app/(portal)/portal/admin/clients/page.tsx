@@ -30,7 +30,7 @@ export default async function ClientsPage() {
     orderBy: { createdAt: "desc" },
     include: {
       clientOrders: { select: { id: true, status: true, amount: true } },
-      clientThread: { select: { id: true } },
+      clientThreads: { select: { id: true }, take: 1 },
     },
   });
 

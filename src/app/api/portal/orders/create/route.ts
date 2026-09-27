@@ -88,16 +88,17 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Auto-post to thread (use the resolved clientId, not the admin's ID)
-    const thread = await prisma.thread.findUnique({
-      where: { clientId },
-    });
+    // Auto-post to the thread linked to the order (or General thread fallback)
+    const thread = order.threadId
+      ? await prisma.thread.findUnique({ where: { id: order.threadId } })
+      : await prisma.thread.findFirst({ where: { clientId, name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId } });
 
     if (thread) {
       await prisma.message.create({
         data: {
           threadId: thread.id,
-          body: `New project requested: "${order.serviceTitle}". Status: Awaiting Quote.`,
+          body: `📋 New order requested: "${order.serviceTitle}"`,
           type: "SYSTEM",
           metadata: { orderId: order.id, event: "order_created" },
         }

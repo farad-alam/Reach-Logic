@@ -25,7 +25,7 @@ export async function PATCH(
 
     const order = await prisma.order.findUnique({
       where: { id },
-      include: { client: { select: { id: true } } }
+      select: { id: true, clientId: true, status: true, serviceTitle: true, threadId: true }
     });
 
     if (!order) {
@@ -45,23 +45,23 @@ export async function PATCH(
     // Notify client
     await notifyOrderStatus(order.id, status);
 
-    // Auto-post to thread
-    const thread = await prisma.thread.findUnique({
-      where: { clientId: order.clientId }
-    });
+    // Auto-post to thread linked to order (or General fallback)
+    const thread = order.threadId
+      ? await prisma.thread.findUnique({ where: { id: order.threadId } })
+      : await prisma.thread.findFirst({ where: { clientId: order.clientId, name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId: order.clientId } });
 
     if (thread) {
-      const statusLabels: Record<string, string> = {
-        PENDING: "Pending Start",
-        IN_PROGRESS: "In Progress",
-        COMPLETED: "Completed",
-        CANCELLED: "Cancelled",
+      const statusMessages: Record<string, string> = {
+        PENDING: `📌 "${order.serviceTitle}" is now Pending`,
+        IN_PROGRESS: `🚀 "${order.serviceTitle}" is now In Progress`,
+        COMPLETED: `✅ "${order.serviceTitle}" has been Completed`,
+        CANCELLED: `❌ "${order.serviceTitle}" has been Cancelled`,
       };
-      
       await prisma.message.create({
         data: {
           threadId: thread.id,
-          body: `Project "${order.serviceTitle}" status changed to ${statusLabels[status]}.`,
+          body: statusMessages[status] ?? `"${order.serviceTitle}" status changed to ${status}`,
           type: "SYSTEM",
           metadata: { orderId: order.id, event: "status_change", newStatus: status },
         }

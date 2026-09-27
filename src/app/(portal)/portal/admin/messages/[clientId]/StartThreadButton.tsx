@@ -15,7 +15,7 @@ export default function StartThreadButton({ clientId }: { clientId: string }) {
       const res = await fetch("/api/portal/threads/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId }),
+        body: JSON.stringify({ clientId, name: "General" }),
       });
       const data = await res.json();
       if (!res.ok) {

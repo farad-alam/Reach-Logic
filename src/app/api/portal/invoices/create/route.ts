@@ -85,16 +85,22 @@ export async function POST(req: NextRequest) {
     // Notify client
     await notifyInvoiceCreated(invoice.id);
 
-    // Auto-post to thread
-    const thread = await prisma.thread.findUnique({
-      where: { clientId }
-    });
+    // Auto-post to thread — prefer order's thread, fallback to General
+    let orderThreadId: string | null = null;
+    if (orderId) {
+      const linkedOrder = await prisma.order.findUnique({ where: { id: orderId }, select: { threadId: true } });
+      orderThreadId = linkedOrder?.threadId ?? null;
+    }
+    const thread = orderThreadId
+      ? await prisma.thread.findUnique({ where: { id: orderThreadId } })
+      : await prisma.thread.findFirst({ where: { clientId, name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId } });
 
     if (thread) {
       await prisma.message.create({
         data: {
           threadId: thread.id,
-          body: `New invoice created: ${invoiceNumber}.`,
+          body: `🧾 Invoice ${invoiceNumber} has been generated — check your email`,
           type: "SYSTEM",
           metadata: { invoiceId: invoice.id, orderId: orderId ?? null, event: "invoice_created" },
         }
