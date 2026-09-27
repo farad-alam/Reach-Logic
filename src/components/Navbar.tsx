@@ -130,7 +130,14 @@ export default function Navbar() {
           </ul>
 
           {/* CTA */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-4">
+            <Link
+              href="/portal/login"
+              className="text-sm font-semibold transition-colors duration-300 hover:text-white"
+              style={{ color: "rgba(255,255,255,0.8)" }}
+            >
+              Login
+            </Link>
             <button
               onClick={() => handleNavClick("/contact")}
               className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105"
@@ -197,6 +204,18 @@ export default function Navbar() {
             {l.label}
           </button>
         ))}
+        <button
+          onClick={() => handleNavClick("/portal/login")}
+          className="text-3xl font-bold text-white/80 hover:text-white transition-colors"
+          style={{
+            fontFamily: "var(--font-fraunces)",
+            transform: menuOpen ? "translateY(0)" : "translateY(20px)",
+            transition: `transform 0.4s ease ${links.length * 0.06}s, opacity 0.4s ease ${links.length * 0.06}s`,
+            opacity: menuOpen ? 1 : 0,
+          }}
+        >
+          Login
+        </button>
         <button
           onClick={() => handleNavClick("/contact")}
           className="mt-4 px-8 py-3 rounded-full text-base font-semibold"
