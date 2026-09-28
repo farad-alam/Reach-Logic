@@ -44,7 +44,7 @@ export default async function TeamMessagesPage({
   }
 
   return (
-    <div className="admin-chat-shell" style={{ gridTemplateColumns: "1fr 280px", height: "100%" }}>
+    <div className="admin-chat-shell" style={{ gridTemplateColumns: "1fr 280px" }}>
       {/* Center: chat */}
       <div className="chat-center">
         {activeThread ? (

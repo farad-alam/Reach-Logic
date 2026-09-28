@@ -54,7 +54,7 @@ export default function ClientChatPage({
   const selectedThread = threads.find((t) => t.id === selectedThreadId);
 
   return (
-    <div className="admin-chat-shell" style={{ gridTemplateColumns: "1fr 280px", height: "100%" }}>
+    <div className="admin-chat-shell" style={{ gridTemplateColumns: "1fr 280px" }}>
       {/* Center: chat */}
       <div className="chat-center">
         <div className="chat-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
