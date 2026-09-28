@@ -142,17 +142,6 @@ export default function Navbar() {
             >
               Client Login
             </Link>
-            <button
-              onClick={() => handleNavClick("/contact")}
-              className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105"
-              style={{
-                background: "linear-gradient(135deg, #085e51, #0aad92)",
-                color: "#fff",
-                boxShadow: "0 0 20px rgba(10,173,146,0.3)",
-              }}
-            >
-              Book a Call
-            </button>
           </div>
 
           {/* Hamburger */}
@@ -210,7 +199,7 @@ export default function Navbar() {
         ))}
         <button
           onClick={() => handleNavClick("/portal/login")}
-          className="text-3xl font-bold text-white/80 hover:text-white transition-colors"
+          className="text-3xl font-bold text-white/80 hover:text-white transition-colors mt-4"
           style={{
             fontFamily: "var(--font-fraunces)",
             transform: menuOpen ? "translateY(0)" : "translateY(20px)",
@@ -219,13 +208,6 @@ export default function Navbar() {
           }}
         >
           Client Login
-        </button>
-        <button
-          onClick={() => handleNavClick("/contact")}
-          className="mt-4 px-8 py-3 rounded-full text-base font-semibold"
-          style={{ background: "linear-gradient(135deg, #085e51, #0aad92)", color: "#fff" }}
-        >
-          Book a Call
         </button>
       </div>
     </>
