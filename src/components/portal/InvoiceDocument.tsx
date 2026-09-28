@@ -186,9 +186,26 @@ export default function InvoiceDocument({
         <div className="invoice-totals-row">
           {/* Totals block */}
           <div className="invoice-totals-right">
-            <div className="invoice-total-block" style={{ color: "#fff", display: "flex", alignItems: "center", minHeight: "56px" }}>
-              <span style={{ lineHeight: 1 }}>Total (USD)</span>
-              <span className="invoice-total-amount" style={{ lineHeight: 1 }}>{fmt(total)}</span>
+            <div 
+              className="invoice-total-block" 
+              style={{ 
+                color: "#fff", 
+                display: "table", 
+                width: "100%", 
+                boxSizing: "border-box", 
+                padding: 0,
+                height: "56px"
+              }}
+            >
+              <div style={{ display: "table-cell", verticalAlign: "middle", paddingLeft: "20px" }}>
+                Total (USD)
+              </div>
+              <div 
+                className="invoice-total-amount" 
+                style={{ display: "table-cell", verticalAlign: "middle", textAlign: "right", paddingRight: "20px" }}
+              >
+                {fmt(total)}
+              </div>
             </div>
             
             {(actualAmountPaid > 0) && (
