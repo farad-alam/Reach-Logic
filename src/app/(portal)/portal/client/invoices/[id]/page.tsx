@@ -33,6 +33,7 @@ export default async function ClientInvoiceDetailPage({ params }: { params: Prom
   if (!invoice || invoice.clientId !== session.user.id) notFound();
 
   const total = invoice.lineItems.reduce((sum, item) => sum + Number(item.amount), 0);
+  const amountPaid = invoice.isPaid ? total : Number(invoice.amountPaid || 0);
 
   return (
     <div className="portal-page">
@@ -77,6 +78,7 @@ export default async function ClientInvoiceDetailPage({ params }: { params: Prom
           amount: Number(item.amount),
         }))}
         notes={invoice.notes}
+        amountPaid={amountPaid}
       />
     </div>
   );

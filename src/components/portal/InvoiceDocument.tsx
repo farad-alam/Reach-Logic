@@ -26,6 +26,7 @@ interface InvoiceDocumentProps {
   notes: string | null;
   paymentMethod?: string | null;
   transactionId?: string | null;
+  amountPaid?: number;
 }
 
 function fmt(n: number | string) {
@@ -64,8 +65,11 @@ export default function InvoiceDocument({
   notes,
   paymentMethod,
   transactionId,
+  amountPaid = 0,
 }: InvoiceDocumentProps) {
   const total = lineItems.reduce((sum, item) => sum + Number(item.amount), 0);
+  const actualAmountPaid = isPaid ? total : amountPaid;
+  const balanceDue = Math.max(0, total - actualAmountPaid);
   const billToName = billingName || clientFullName || clientEmail;
   const displayEmail = billingEmail || clientEmail;
 
@@ -182,28 +186,24 @@ export default function InvoiceDocument({
         <div className="invoice-totals-row">
           {/* Totals block */}
           <div className="invoice-totals-right">
-            <div className="invoice-total-block" style={{ color: "#fff" }}>
-              <span>Total (USD)</span>
-              <span className="invoice-total-amount">{fmt(total)}</span>
+            <div className="invoice-total-block" style={{ color: "#fff", display: "flex", alignItems: "center", minHeight: "56px" }}>
+              <span style={{ lineHeight: 1 }}>Total (USD)</span>
+              <span className="invoice-total-amount" style={{ lineHeight: 1 }}>{fmt(total)}</span>
             </div>
-            {isPaid && (
-              <>
-                <div className="invoice-totals-sub-row">
-                  <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>Amount Paid</span>
-                  <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>{fmt(total)}</span>
-                </div>
-                <div className="invoice-totals-sub-row">
-                  <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>Balance Due</span>
-                  <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>{fmt(0)}</span>
-                </div>
-              </>
-            )}
-            {!isPaid && (
+            
+            {(actualAmountPaid > 0) && (
               <div className="invoice-totals-sub-row">
-                <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>Balance Due</span>
-                <span style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{fmt(total)}</span>
+                <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>Amount Paid</span>
+                <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>{fmt(actualAmountPaid)}</span>
               </div>
             )}
+            
+            <div className="invoice-totals-sub-row" style={{ marginTop: 4 }}>
+              <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>Balance Due</span>
+              <span style={{ fontWeight: balanceDue > 0 ? 600 : 400, color: "var(--neutral-900)" }}>
+                {isPaid || balanceDue === 0 ? "PAID" : fmt(balanceDue)}
+              </span>
+            </div>
           </div>
         </div>
 

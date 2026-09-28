@@ -89,6 +89,7 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
           amount: Number(item.amount),
         }))}
         notes={invoice.notes}
+        amountPaid={amountPaid}
       />
 
       {/* Manage Payments Panel */}
