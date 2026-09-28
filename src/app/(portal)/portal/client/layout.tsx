@@ -2,7 +2,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import PortalSidebar from "@/components/portal/PortalSidebar";
+import PortalShell from "@/components/portal/PortalShell";
 
 export default async function ClientLayout({
   children,
@@ -24,15 +24,14 @@ export default async function ClientLayout({
   });
 
   return (
-    <div className="portal-shell">
-      <PortalSidebar
-        role="CLIENT"
-        userName={user.fullName ?? ""}
-        userEmail={user.email}
-        avatarUrl={user.avatarUrl}
-        unreadCount={unreadCount}
-      />
-      <main className="portal-main">{children}</main>
-    </div>
+    <PortalShell
+      role="CLIENT"
+      userName={user.fullName ?? ""}
+      userEmail={user.email}
+      avatarUrl={user.avatarUrl}
+      unreadCount={unreadCount}
+    >
+      {children}
+    </PortalShell>
   );
 }

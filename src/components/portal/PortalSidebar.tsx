@@ -29,6 +29,7 @@ interface SidebarProps {
   userEmail: string;
   avatarUrl?: string | null;
   unreadCount?: number;
+  isCollapsed?: boolean;
 }
 
 const adminNav: NavItem[] = [
@@ -84,12 +85,13 @@ export default function PortalSidebar({
   userEmail,
   avatarUrl,
   unreadCount = 0,
+  isCollapsed = false,
 }: SidebarProps) {
   const pathname = usePathname();
   const nav = navByRole[role];
 
   return (
-    <aside className="portal-sidebar">
+    <aside className={`portal-sidebar ${isCollapsed ? "collapsed" : ""}`}>
       {/* Logo */}
       <div style={{ padding: "20px 20px 0 20px", marginBottom: "30px", display: "flex", flexDirection: "column" }}>
         <Link href={`/portal/${role.toLowerCase()}`} style={{ display: "block" }}>
