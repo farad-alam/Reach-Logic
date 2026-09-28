@@ -23,18 +23,14 @@ export default function PortalShell({
 }: PortalShellProps) {
   const pathname = usePathname();
   
-  // Collapse sidebar explicitly on messages route for all roles
-  const isMessageRoute = pathname.includes("/messages");
-
   return (
-    <div className={`portal-shell ${isMessageRoute ? "sidebar-collapsed" : ""}`}>
+    <div className="portal-shell">
       <PortalSidebar
         role={role}
         userName={userName}
         userEmail={userEmail}
         avatarUrl={avatarUrl}
         unreadCount={unreadCount}
-        isCollapsed={isMessageRoute}
       />
       <main className="portal-main">{children}</main>
     </div>

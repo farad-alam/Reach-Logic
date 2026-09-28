@@ -1,7 +1,6 @@
-"use client";
-
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
@@ -13,7 +12,9 @@ import {
   Settings,
   LogOut,
   UserCog,
+  ChevronDown,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 
 interface NavItem {
@@ -30,6 +31,20 @@ interface SidebarProps {
   avatarUrl?: string | null;
   unreadCount?: number;
   isCollapsed?: boolean;
+}
+
+interface ThreadClient {
+  id: string;
+  fullName: string | null;
+  email: string;
+}
+
+interface ThreadItem {
+  id: string;
+  name: string;
+  clientId: string;
+  client?: ThreadClient | null;
+  unread?: number;
 }
 
 const adminNav: NavItem[] = [
@@ -64,12 +79,6 @@ const navByRole = {
   TEAM_MEMBER: teamNav,
 };
 
-const roleLabel = {
-  SUPER_ADMIN: "Super Admin",
-  CLIENT: "Client",
-  TEAM_MEMBER: "Team Member",
-};
-
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -88,7 +97,75 @@ export default function PortalSidebar({
   isCollapsed = false,
 }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const nav = navByRole[role];
+
+  const activeThreadId = searchParams.get("threadId");
+  const isMessagePage = pathname.includes("/messages");
+
+  const [messagesExpanded, setMessagesExpanded] = useState(isMessagePage);
+  const [threads, setThreads] = useState<ThreadItem[]>([]);
+  const [newThreadName, setNewThreadName] = useState("");
+  const [creatingThread, setCreatingThread] = useState(false);
+
+  // Fetch threads whenever on a message route or when expanded
+  const fetchThreads = async () => {
+    try {
+      const res = await fetch("/api/portal/threads");
+      if (res.ok) {
+        const data = await res.json();
+        setThreads(data.threads || []);
+      }
+    } catch (e) {
+      console.error("Failed to fetch threads for sidebar", e);
+    }
+  };
+
+  useEffect(() => {
+    if (isMessagePage || messagesExpanded) {
+      fetchThreads();
+    }
+  }, [isMessagePage, messagesExpanded]);
+
+  async function handleCreateThread(e?: React.FormEvent) {
+    if (e) e.preventDefault();
+    if (!newThreadName.trim() || creatingThread) return;
+    setCreatingThread(true);
+    try {
+      const res = await fetch("/api/portal/threads/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newThreadName.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNewThreadName("");
+        await fetchThreads();
+        const baseRoute = role === "CLIENT" ? "/portal/client/messages" : role === "SUPER_ADMIN" ? "/portal/admin/messages" : "/portal/team/messages";
+        router.push(`${baseRoute}?threadId=${data.thread.id}`);
+      }
+    } finally {
+      setCreatingThread(false);
+    }
+  }
+
+  // Group threads by client for ADMIN / TEAM_MEMBER
+  const groupedThreads: { clientId: string; clientName: string; threads: ThreadItem[] }[] = [];
+  if (role !== "CLIENT") {
+    const map = new Map<string, { clientName: string; threads: ThreadItem[] }>();
+    threads.forEach((t) => {
+      const cId = t.clientId || "unknown";
+      const cName = t.client?.fullName || t.client?.email || "CLIENT";
+      if (!map.has(cId)) {
+        map.set(cId, { clientName: cName, threads: [] });
+      }
+      map.get(cId)!.threads.push(t);
+    });
+    map.forEach((val, key) => {
+      groupedThreads.push({ clientId: key, clientName: val.clientName, threads: val.threads });
+    });
+  }
 
   return (
     <aside className={`portal-sidebar ${isCollapsed ? "collapsed" : ""}`}>
@@ -106,6 +183,7 @@ export default function PortalSidebar({
       {/* Navigation */}
       <nav className="portal-nav">
         {nav.map((item) => {
+          const isMessagesItem = item.label === "Messages";
           const isActive =
             item.href === "/portal/admin" ||
             item.href === "/portal/client" ||
@@ -116,6 +194,156 @@ export default function PortalSidebar({
           const showBadge =
             (item.label === "Notifications" || item.label === "Messages") &&
             unreadCount > 0;
+
+          if (isMessagesItem) {
+            const messagesBaseRoute =
+              role === "CLIENT"
+                ? "/portal/client/messages"
+                : role === "SUPER_ADMIN"
+                ? "/portal/admin/messages"
+                : "/portal/team/messages";
+
+            return (
+              <div key={item.href} style={{ marginBottom: 4 }}>
+                <div
+                  className={`portal-nav-link ${isActive ? "active" : ""}`}
+                  style={{ cursor: "pointer", justifyContent: "space-between" }}
+                  onClick={() => {
+                    setMessagesExpanded((v) => !v);
+                    if (!pathname.startsWith(messagesBaseRoute)) {
+                      router.push(messagesBaseRoute);
+                    }
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {item.icon}
+                    <span>{item.label}</span>
+                    {showBadge && <span className="portal-nav-badge">{unreadCount}</span>}
+                  </div>
+                  {messagesExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </div>
+
+                {/* Sub-threads Accordion */}
+                {messagesExpanded && (
+                  <div style={{ paddingLeft: 12, paddingTop: 4, paddingBottom: 6 }}>
+                    {role === "CLIENT" ? (
+                      <div>
+                        {threads.map((t) => {
+                          const isThreadActive = activeThreadId ? activeThreadId === t.id : pathname.includes(t.id);
+                          return (
+                            <Link
+                              key={t.id}
+                              href={`${messagesBaseRoute}?threadId=${t.id}`}
+                              className={`portal-subnav-link ${isThreadActive ? "active" : ""}`}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                                padding: "7px 12px",
+                                fontSize: 13,
+                                color: isThreadActive ? "#fff" : "rgba(255,255,255,0.7)",
+                                background: isThreadActive ? "rgba(255,255,255,0.12)" : "transparent",
+                                borderRadius: 6,
+                                textDecoration: "none",
+                                marginBottom: 2,
+                                fontWeight: isThreadActive ? 600 : 400,
+                              }}
+                            >
+                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: isThreadActive ? "var(--brand-accent)" : "rgba(255,255,255,0.4)" }} />
+                              <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {t.name}
+                              </span>
+                              {(t.unread ?? 0) > 0 && <span className="portal-nav-badge">{t.unread}</span>}
+                            </Link>
+                          );
+                        })}
+
+                        {/* Inline Create Thread Input */}
+                        <form onSubmit={handleCreateThread} style={{ display: "flex", gap: 6, marginTop: 8, padding: "0 4px" }}>
+                          <input
+                            type="text"
+                            placeholder="New thread name"
+                            value={newThreadName}
+                            onChange={(e) => setNewThreadName(e.target.value)}
+                            style={{
+                              flex: 1,
+                              minWidth: 0,
+                              background: "rgba(0, 0, 0, 0.25)",
+                              border: "1px solid rgba(255, 255, 255, 0.15)",
+                              color: "#fff",
+                              borderRadius: 6,
+                              padding: "6px 10px",
+                              fontSize: 12,
+                              outline: "none",
+                            }}
+                          />
+                          <button
+                            type="submit"
+                            disabled={creatingThread || !newThreadName.trim()}
+                            style={{
+                              background: "#10b981",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: 6,
+                              width: 28,
+                              height: 28,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              opacity: !newThreadName.trim() || creatingThread ? 0.5 : 1,
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </form>
+                      </div>
+                    ) : (
+                      <div>
+                        {groupedThreads.map((group) => (
+                          <div key={group.clientId} style={{ marginBottom: 8 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", padding: "6px 12px 2px 12px" }}>
+                              {group.clientName}
+                            </div>
+                            {group.threads.map((t) => {
+                              const isThreadActive = activeThreadId ? activeThreadId === t.id : pathname.includes(t.id);
+                              return (
+                                <Link
+                                  key={t.id}
+                                  href={`${messagesBaseRoute}?clientId=${group.clientId}&threadId=${t.id}`}
+                                  className={`portal-subnav-link ${isThreadActive ? "active" : ""}`}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    padding: "6px 12px 6px 16px",
+                                    fontSize: 13,
+                                    color: isThreadActive ? "#fff" : "rgba(255,255,255,0.7)",
+                                    background: isThreadActive ? "rgba(255,255,255,0.12)" : "transparent",
+                                    borderRadius: 6,
+                                    textDecoration: "none",
+                                    marginBottom: 2,
+                                    fontWeight: isThreadActive ? 600 : 400,
+                                  }}
+                                >
+                                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: isThreadActive ? "var(--brand-accent)" : "rgba(255,255,255,0.4)" }} />
+                                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {t.name}
+                                  </span>
+                                  {(t.unread ?? 0) > 0 && <span className="portal-nav-badge">{t.unread}</span>}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          }
 
           return (
             <Link

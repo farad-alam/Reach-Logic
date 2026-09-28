@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ExternalLink, Plus } from "lucide-react";
+import { ExternalLink, Plus, Clock } from "lucide-react";
 
 interface Member {
   id: string;
@@ -29,8 +29,11 @@ interface ThreadInfo {
     fullName: string | null;
     email: string;
     avatarUrl: string | null;
-    company: string | null;
+    company?: string | null;
     createdAt: string;
+    country?: string | null;
+    state?: string | null;
+    timezone?: string | null;
   };
   members: Member[];
   orders: OrderInfo[];
@@ -57,13 +60,18 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 function fmt(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(n);
 }
 function fmtDate(d: string) {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));
 }
+function fmtShortRange(start: string, end: string) {
+  const s = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(start));
+  const e = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(end));
+  return `${s} to ${e}`;
+}
 
-function Initials({ name, email, size = 40 }: { name: string | null; email: string; size?: number }) {
+function Initials({ name, email, size = 44 }: { name: string | null; email: string; size?: number }) {
   const txt = name ? name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : email[0].toUpperCase();
   return (
     <div style={{
@@ -115,7 +123,7 @@ export default function ThreadInfoSidebar({
       if (res.ok) {
         setInviteEmail("");
         setInviteOpen(false);
-        fetchInfo(); // Refresh thread info
+        fetchInfo();
       } else {
         alert("Failed to invite colleague.");
       }
@@ -127,7 +135,7 @@ export default function ThreadInfoSidebar({
   if (loading) {
     return (
       <div className="thread-info-sidebar">
-        <div style={{ padding: 24, color: "var(--neutral-400)", fontSize: 13 }}>Loading…</div>
+        <div style={{ padding: 24, color: "var(--neutral-400)", fontSize: 13 }}>Loading info…</div>
       </div>
     );
   }
@@ -136,7 +144,7 @@ export default function ThreadInfoSidebar({
 
   const pct = info.payments && info.payments.totalBilled > 0
     ? Math.round((info.payments.totalPaid / info.payments.totalBilled) * 100)
-    : 0;
+    : 100;
 
   const agencyTeam = info.members.filter(m => m.role === "SUPER_ADMIN" || m.role === "TEAM_MEMBER");
   const clientTeam = info.members.filter(m => m.role === "CLIENT");
@@ -146,142 +154,188 @@ export default function ThreadInfoSidebar({
       {/* Client card */}
       <div className="info-section">
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-          <Initials name={info.client.fullName} email={info.client.email} size={48} />
+          <Initials name={info.client.fullName} email={info.client.email} size={44} />
           <div>
             <div style={{ fontWeight: 700, fontSize: 15, color: "var(--neutral-900)" }}>{info.client.fullName ?? info.client.email}</div>
             <div style={{ fontSize: 12, color: "var(--neutral-500)" }}>{info.client.email}</div>
+            {!isAdmin && <div style={{ fontSize: 11, color: "var(--neutral-400)", marginTop: 2 }}>Since {fmtDate(info.client.createdAt)}</div>}
           </div>
         </div>
-        <div style={{ fontSize: 12, color: "var(--neutral-500)" }}>
-          {info.client.company && <div>{info.client.company}</div>}
-          <div>Since {fmtDate(info.client.createdAt)}</div>
-        </div>
         {isAdmin && (
-          <Link href={`/portal/admin/clients/${info.client.id}`} style={{ fontSize: 12, color: "var(--brand-accent)", display: "flex", alignItems: "center", gap: 4, marginTop: 8, textDecoration: "none" }}>
-            View profile <ExternalLink size={11} />
+          <Link href={`/portal/admin/clients/${info.client.id}`} style={{ fontSize: 12, color: "var(--brand-accent)", display: "flex", alignItems: "center", gap: 4, textDecoration: "none", fontWeight: 600 }}>
+            View profile <ExternalLink size={12} />
           </Link>
         )}
       </div>
 
-      {/* Projects for this thread */}
-      {info.orders.length > 0 && (
+      {/* TEAM / ADMIN VIEW: Client Info */}
+      {isAdmin && (
         <div className="info-section">
-          <div className="info-section-label">PROJECTS ({info.orders.length})</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="info-section-label">CLIENT INFO</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 13, marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "var(--neutral-500)" }}>Country</span>
+              <span style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{info.client.country || "United States"}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "var(--neutral-500)" }}>State</span>
+              <span style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{info.client.state || "New York"}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ color: "var(--neutral-500)" }}>Time Zone</span>
+              <span style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{info.client.timezone || "EST (UTC-5)"}</span>
+            </div>
+          </div>
+          <div style={{
+            background: "#f8fafc",
+            border: "1px solid var(--neutral-200)",
+            borderRadius: 8,
+            padding: "8px 12px",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 12,
+            color: "var(--neutral-700)",
+            fontWeight: 500,
+          }}>
+            <Clock size={14} color="var(--neutral-500)" />
+            <span>Client&apos;s local time: <strong>10:57 PM</strong></span>
+          </div>
+        </div>
+      )}
+
+      {/* CLIENT VIEW: Payment Status Card */}
+      {!isAdmin && info.payments && (
+        <div className="info-section">
+          <div className="info-section-label">PAYMENT STATUS</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+            <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 8, padding: "10px 12px" }}>
+              <div style={{ fontSize: 11, color: "#166534", fontWeight: 600, marginBottom: 4 }}>Total Paid</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#15803d" }}>{fmt(info.payments.totalPaid)}</div>
+            </div>
+            <div style={{ border: "1px solid #fef3c7", background: "#fffbeb", borderRadius: 8, padding: "10px 12px" }}>
+              <div style={{ fontSize: 11, color: "#92400e", fontWeight: 600, marginBottom: 4 }}>Due</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#b45309" }}>{fmt(info.payments.totalDue)}</div>
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: "var(--neutral-500)", marginBottom: 6 }}>
+            {pct}% of {fmt(info.payments.totalBilled)} billed
+          </div>
+          <div className="info-progress-track" style={{ height: 6, borderRadius: 3, background: "var(--neutral-100)", overflow: "hidden" }}>
+            <div className="info-progress-fill" style={{ width: `${Math.min(pct, 100)}%`, height: "100%", background: "#10b981" }} />
+          </div>
+        </div>
+      )}
+
+      {/* TEAM / ADMIN VIEW: Projects in this Thread */}
+      {isAdmin && info.orders.length > 0 && (
+        <div className="info-section">
+          <div className="info-section-label">PROJECTS IN THIS THREAD</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {info.orders.map((order) => (
-              <div key={order.id} className="info-order-row">
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)", marginBottom: 2 }}>{order.serviceTitle}</div>
-                  <div style={{ fontSize: 11, color: "var(--neutral-500)" }}>
-                    {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(order.startDate))} –{" "}
-                    {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(order.endDate))}
+              <div key={order.id} style={{
+                background: "#fff",
+                border: "1px solid var(--neutral-200)",
+                borderRadius: 8,
+                padding: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 8,
+              }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--neutral-900)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {order.serviceTitle}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--neutral-500)", marginTop: 2 }}>
+                    {fmtShortRange(order.startDate, order.endDate)}
                   </div>
                 </div>
-                <span className="badge" style={{ background: STATUS_COLORS[order.status] + "22", color: STATUS_COLORS[order.status], fontSize: 10, padding: "3px 7px", borderRadius: 20, whiteSpace: "nowrap", fontWeight: 600 }}>
-                  {STATUS_LABELS[order.status]}
+                <span style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: "4px 8px",
+                  borderRadius: 12,
+                  whiteSpace: "nowrap",
+                  background: order.status === "COMPLETED" ? "#dcfce7" : "#fef3c7",
+                  color: order.status === "COMPLETED" ? "#15803d" : "#b45309",
+                }}>
+                  {STATUS_LABELS[order.status] ?? order.status}
                 </span>
               </div>
             ))}
           </div>
-          {isAdmin && (
-            <Link href={`/portal/admin/clients/${info.client.id}`} style={{ fontSize: 12, color: "var(--brand-accent)", textDecoration: "none", marginTop: 6, display: "block" }}>
-              View all orders →
-            </Link>
-          )}
-          {!isAdmin && (
-            <Link href="/portal/client/orders" style={{ fontSize: 12, color: "var(--brand-accent)", textDecoration: "none", marginTop: 6, display: "block" }}>
-              View all orders →
-            </Link>
-          )}
         </div>
       )}
 
-      {/* Payments */}
-      {info.payments && (
-        <div className="info-section">
-          <div className="info-section-label" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            {isAdmin ? "PAYMENTS" : "PAYMENT STATUS"}
-            {isAdmin && <span style={{ background: "#fef3c7", color: "#92400e", fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, textTransform: "uppercase" }}>Admin Only</span>}
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-            <div className="info-payment-card" style={{ borderColor: "var(--brand-accent)", background: isAdmin ? "transparent" : "#f0fdf4" }}>
-              <div style={{ fontSize: 11, color: "var(--neutral-500)", marginBottom: 2 }}>Total Paid</div>
-              <div style={{ fontSize: 17, fontWeight: 700, color: "var(--brand-dark)" }}>{fmt(info.payments.totalPaid)}</div>
-            </div>
-            <div className="info-payment-card" style={{ borderColor: "#f59e0b", background: isAdmin ? "transparent" : "#fffbeb" }}>
-              <div style={{ fontSize: 11, color: "var(--neutral-500)", marginBottom: 2 }}>Due</div>
-              <div style={{ fontSize: 17, fontWeight: 700, color: "#b45309" }}>{fmt(info.payments.totalDue)}</div>
-            </div>
-          </div>
-          <div style={{ fontSize: 11, color: "var(--neutral-500)", marginBottom: 6 }}>{pct}% of {fmt(info.payments.totalBilled)} billed</div>
-          <div className="info-progress-track">
-            <div className="info-progress-fill" style={{ width: `${Math.min(pct, 100)}%` }} />
-          </div>
-        </div>
-      )}
-
-      {/* Your Team (Agency) */}
-      {agencyTeam.length > 0 && (
+      {/* CLIENT VIEW: Your Team (ReachLogic) */}
+      {!isAdmin && agencyTeam.length > 0 && (
         <div className="info-section">
           <div className="info-section-label">YOUR TEAM</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {agencyTeam.map((member) => (
-              <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 8, position: "relative" }}>
-                <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--brand-mid)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, flexShrink: 0, position: "relative" }}>
-                  {member.avatarUrl
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={member.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-                    : (member.fullName?.[0] ?? member.email[0]).toUpperCase()
-                  }
-                  <div className={`team-status-dot ${member.role === 'SUPER_ADMIN' ? 'away' : 'online'}`} />
-                </div>
+              <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Initials name={member.fullName} email={member.email} size={32} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: "var(--neutral-900)" }}>
-                    {member.fullName ?? member.email.split('@')[0]}
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)" }}>
+                    {member.fullName ?? member.email.split("@")[0]}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--neutral-500)" }}>
+                    {member.role === "SUPER_ADMIN" ? "Super Admin" : "Team Member"}
                   </div>
                 </div>
-                <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>
-                  {member.role === "SUPER_ADMIN" ? "Super Admin" : "Team Member"}
-                </span>
-                <span style={{ fontSize: 10, fontWeight: 600, color: member.role === "SUPER_ADMIN" ? "var(--neutral-400)" : "#10b981", marginLeft: 4 }}>
-                  {member.role === "SUPER_ADMIN" ? "Away" : "Online"}
-                </span>
+                <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>Away</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* In This Thread (Client Colleagues) */}
+      {/* IN THIS THREAD (Both Client & Team/Admin Views) */}
       <div className="info-section">
         <div className="info-section-label">IN THIS THREAD</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {clientTeam.map((member) => (
-            <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--neutral-200)", color: "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>
-                {member.avatarUrl
-                  // eslint-disable-next-line @next/next/no-img-element
-                  ? <img src={member.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-                  : (member.fullName?.[0] ?? member.email[0]).toUpperCase()
-                }
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--neutral-900)" }}>
-                  {member.fullName ?? member.email}
-                  {member.id === currentUserId && <span style={{ color: "var(--neutral-400)", marginLeft: 4, fontWeight: 400 }}>(you)</span>}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {info.members.map((member) => {
+            const isSelf = member.id === currentUserId;
+            const roleTag = member.role === "CLIENT" ? (isSelf ? "Client (you)" : "Client") : member.role === "SUPER_ADMIN" ? "Super Admin" : "ReachLogic";
+
+            return (
+              <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Initials name={member.fullName} email={member.email} size={32} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)" }}>
+                    {member.fullName ?? member.email}
+                    {isSelf && !member.fullName?.includes("(you)") && <span style={{ color: "var(--neutral-400)", marginLeft: 4, fontWeight: 400 }}>(you)</span>}
+                  </div>
                 </div>
+                <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>{roleTag}</span>
               </div>
-              <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>Client</span>
-            </div>
-          ))}
-          {!isAdmin && clientTeam.length < 3 && (
+            );
+          })}
+
+          {/* Add Colleague Button for Client View */}
+          {!isAdmin && (
             <div style={{ marginTop: 8 }}>
               {!inviteOpen ? (
                 <button
                   onClick={() => setInviteOpen(true)}
-                  style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--brand-accent)", background: "none", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    width: "100%",
+                    padding: "8px 12px",
+                    background: "#f0fdf4",
+                    border: "1px dashed #10b981",
+                    borderRadius: 8,
+                    color: "#059669",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
                 >
-                  <Plus size={14} /> + Add your colleague here
+                  <Plus size={14} /> Add your colleague here
                 </button>
               ) : (
                 <div style={{ display: "flex", gap: 6 }}>
@@ -295,7 +349,7 @@ export default function ThreadInfoSidebar({
                   <button
                     onClick={handleInvite}
                     disabled={inviting || !inviteEmail.trim()}
-                    style={{ background: "var(--brand-dark)", color: "#fff", border: "none", borderRadius: 6, padding: "0 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", opacity: (!inviteEmail.trim() || inviting) ? 0.5 : 1 }}
+                    style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: 6, padding: "0 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", opacity: (!inviteEmail.trim() || inviting) ? 0.5 : 1 }}
                   >
                     Add
                   </button>

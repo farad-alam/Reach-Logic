@@ -15,10 +15,10 @@ export async function GET(req: NextRequest) {
     let threads;
 
     if (role === "SUPER_ADMIN") {
-      if (!clientId) return NextResponse.json({ error: "clientId required" }, { status: 400 });
       threads = await prisma.thread.findMany({
-        where: { clientId },
+        where: clientId ? { clientId } : {},
         include: {
+          client: { select: { id: true, fullName: true, email: true } },
           members: { include: { user: { select: { id: true, fullName: true, email: true, avatarUrl: true, role: true } } } },
           messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
         },
@@ -28,13 +28,13 @@ export async function GET(req: NextRequest) {
       threads = await prisma.thread.findMany({
         where: { clientId: session.user.id },
         include: {
+          client: { select: { id: true, fullName: true, email: true } },
           members: { include: { user: { select: { id: true, fullName: true, email: true, avatarUrl: true, role: true } } } },
           messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
         },
         orderBy: { createdAt: "asc" },
       });
     } else if (role === "TEAM_MEMBER") {
-      // Team members see only threads they're assigned to
       const memberships = await prisma.threadMember.findMany({
         where: { userId: session.user.id },
         select: { threadId: true },
@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
       threads = await prisma.thread.findMany({
         where: { id: { in: threadIds }, ...(clientId ? { clientId } : {}) },
         include: {
+          client: { select: { id: true, fullName: true, email: true } },
           members: { include: { user: { select: { id: true, fullName: true, email: true, avatarUrl: true, role: true } } } },
           messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
         },

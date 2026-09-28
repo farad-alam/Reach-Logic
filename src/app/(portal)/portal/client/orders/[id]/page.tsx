@@ -108,12 +108,12 @@ export default async function ClientOrderDetailPage({ params }: { params: Promis
         
         {/* Step 1: Submitted */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: currentStep >= 1 ? "var(--brand-dark)" : "var(--neutral-100)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Check size={16} />
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: currentStep >= 1 ? "var(--brand-dark)" : "var(--neutral-100)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Check size={18} />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)" }}>Submitted</div>
-            <div style={{ fontSize: 11, color: "var(--neutral-500)", whiteSpace: "nowrap" }}>{fmtShortDate(order.createdAt)}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--neutral-900)" }}>Submitted</div>
+            <div style={{ fontSize: 13, color: "var(--neutral-500)", whiteSpace: "nowrap" }}>{fmtShortDate(order.createdAt)}</div>
           </div>
         </div>
 
@@ -121,12 +121,12 @@ export default async function ClientOrderDetailPage({ params }: { params: Promis
 
         {/* Step 2: In Progress */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: currentStep >= 2 ? "var(--brand-dark)" : "var(--neutral-100)", color: currentStep >= 2 ? "#fff" : "var(--neutral-400)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-            {currentStep >= 2 ? <Check size={16} /> : "2"}
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: currentStep >= 2 ? "var(--brand-dark)" : "var(--neutral-100)", color: currentStep >= 2 ? "#fff" : "var(--neutral-400)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+            {currentStep >= 2 ? <Check size={18} /> : "2"}
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: currentStep >= 2 ? "var(--neutral-900)" : "var(--neutral-400)" }}>In Progress</div>
-            <div style={{ fontSize: 11, color: "var(--neutral-500)", whiteSpace: "nowrap" }}>{currentStep < 2 ? "After approval" : ""}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: currentStep >= 2 ? "var(--neutral-900)" : "var(--neutral-400)" }}>In Progress</div>
+            <div style={{ fontSize: 13, color: "var(--neutral-500)", whiteSpace: "nowrap" }}>{currentStep < 2 ? "Once Payment Received" : ""}</div>
           </div>
         </div>
 
@@ -134,11 +134,11 @@ export default async function ClientOrderDetailPage({ params }: { params: Promis
 
         {/* Step 3: Completed */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: currentStep >= 3 ? "var(--brand-dark)" : "var(--neutral-100)", color: currentStep >= 3 ? "#fff" : "var(--neutral-500)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-            {currentStep >= 3 ? <Check size={16} /> : "3"}
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: currentStep >= 3 ? "var(--brand-dark)" : "var(--neutral-100)", color: currentStep >= 3 ? "#fff" : "var(--neutral-500)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+            {currentStep >= 3 ? <Check size={18} /> : "3"}
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: currentStep >= 3 ? "var(--neutral-900)" : "var(--neutral-400)" }}>Completed</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: currentStep >= 3 ? "var(--neutral-900)" : "var(--neutral-400)" }}>Completed</div>
           </div>
         </div>
       </div>

@@ -7,6 +7,9 @@ interface ClientData {
   id: string;
   fullName: string | null;
   email: string;
+  country?: string | null;
+  state?: string | null;
+  timezone?: string | null;
   isActive: boolean;
   createdAt: Date;
   orders: { status: string; amount: string | null }[];
@@ -18,6 +21,15 @@ interface InviteData {
   email: string;
   createdAt: Date;
   expiresAt: Date;
+}
+
+function formatLocalTime(tz: string | null | undefined) {
+  if (!tz) return null;
+  try {
+    return new Date().toLocaleTimeString("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", hour12: true });
+  } catch (e) {
+    return null;
+  }
 }
 
 export default function ClientTable({
@@ -96,10 +108,11 @@ export default function ClientTable({
         <thead>
           <tr>
             <th>CLIENT</th>
+            <th>COUNTRY</th>
+            <th>STATE</th>
+            <th>TIME ZONE</th>
             <th>ORDERS</th>
             <th>TOTAL VALUE</th>
-            <th>PAID</th>
-            <th>DUE</th>
             <th>STATUS</th>
             <th></th>
           </tr>
@@ -154,6 +167,21 @@ export default function ClientTable({
                       </div>
                     </div>
                   </td>
+                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.country || "—"}</td>
+                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.state || "—"}</td>
+                  <td>
+                    {client.timezone ? (
+                      <div>
+                        <div style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>
+                          {client.timezone}
+                        </div>
+                        <div style={{ fontSize: 12, color: "var(--neutral-500)", display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                          {formatLocalTime(client.timezone) ? `${formatLocalTime(client.timezone)} local time` : "local time"}
+                        </div>
+                      </div>
+                    ) : "—"}
+                  </td>
                   <td>
                     <span style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>
                       {client.orders.length}
@@ -176,12 +204,6 @@ export default function ClientTable({
                   </td>
                   <td style={{ fontWeight: 700, color: "var(--neutral-900)", fontSize: 14 }}>
                     {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalValue)}
-                  </td>
-                  <td style={{ fontWeight: 700, color: "#12c494", fontSize: 14 }}>
-                    {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(paid)}
-                  </td>
-                  <td style={{ fontWeight: 700, color: "#d97706", fontSize: 14 }}>
-                    {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(due)}
                   </td>
                   <td>
                     <span
@@ -241,12 +263,13 @@ export default function ClientTable({
                       </div>
                     </div>
                   </td>
+                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>—</td>
+                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>—</td>
+                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>—</td>
                   <td>
                     <span style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>0</span>
                   </td>
                   <td style={{ fontWeight: 700, color: "var(--neutral-900)", fontSize: 14 }}>$0.00</td>
-                  <td style={{ fontWeight: 700, color: "#12c494", fontSize: 14 }}>$0.00</td>
-                  <td style={{ fontWeight: 700, color: "#d97706", fontSize: 14 }}>$0.00</td>
                   <td>
                     <span
                       style={{
