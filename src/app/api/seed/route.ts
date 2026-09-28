@@ -4,7 +4,7 @@ import * as bcrypt from "bcryptjs";
 
 export async function GET() {
   try {
-    const email = "admin@reachlogic.net";
+    const email = "hasan@reachlogic.net";
     const existing = await prisma.user.findUnique({ where: { email } });
     
     if (existing) {
