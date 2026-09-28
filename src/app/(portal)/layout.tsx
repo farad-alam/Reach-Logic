@@ -1,21 +1,7 @@
-// src/app/(portal)/layout.tsx — Root portal layout (no marketing navbar/footer)
+// src/app/(portal)/layout.tsx — Root portal layout
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
 import "../globals.css";
 import "./portal.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  style: ["normal", "italic"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -23,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | ReachLogic Portal",
   },
   description: "ReachLogic Client Management Portal",
-  robots: { index: false, follow: false }, // Don't index portal pages
+  robots: { index: false, follow: false },
 };
 
 export default function PortalLayout({
@@ -31,14 +17,5 @@ export default function PortalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
-      <body
-        style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
-        className="antialiased"
-      >
-        {children}
-      </body>
-    </html>
-  );
+  return <div style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>{children}</div>;
 }
