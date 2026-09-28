@@ -33,3 +33,69 @@ export function calcInvoiceTotal(
 ): number {
   return lineItems.reduce((sum, item) => sum + item.quantity * item.rate, 0);
 }
+
+interface AutoInvoiceOptions {
+  orderId: string;
+  clientId: string;
+  serviceTitle: string;
+  amount: number | null; // null = awaiting quote → $0 placeholder
+  billingName?: string | null;
+  billingEmail?: string | null;
+  billingCompany?: string | null;
+  billingStreet?: string | null;
+  billingCity?: string | null;
+  billingState?: string | null;
+  billingZip?: string | null;
+  billingCountry?: string | null;
+}
+
+/**
+ * Auto-create an invoice when a new order is placed.
+ * If amount is null (AWAITING_QUOTE) we create a $0 placeholder invoice
+ * that can be updated later once the quote is agreed.
+ */
+export async function createAutoInvoice(opts: AutoInvoiceOptions): Promise<string> {
+  const {
+    orderId, clientId, serviceTitle, amount,
+    billingName, billingEmail, billingCompany,
+    billingStreet, billingCity, billingState, billingZip, billingCountry,
+  } = opts;
+
+  const invoiceNumber = await getNextInvoiceNumber();
+  const rate = amount ?? 0;
+
+  // Build address string
+  const addressParts = [billingStreet, billingCity, billingState, billingZip, billingCountry].filter(Boolean);
+  const billingAddress = addressParts.length > 0 ? addressParts.join(", ") : null;
+
+  // Due date = 30 days from today
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 30);
+
+  const invoice = await prisma.invoice.create({
+    data: {
+      invoiceNumber,
+      dueDate,
+      clientId,
+      orderId,
+      isLocked: false,
+      billingName: billingName || null,
+      billingEmail: billingEmail || null,
+      billingCompany: billingCompany || null,
+      billingAddress,
+      notes: amount == null ? "Amount to be confirmed once quote is agreed." : null,
+    },
+  });
+
+  await prisma.invoiceLineItem.create({
+    data: {
+      invoiceId: invoice.id,
+      description: serviceTitle,
+      quantity: 1,
+      rate,
+      amount: rate,
+    },
+  });
+
+  return invoice.id;
+}

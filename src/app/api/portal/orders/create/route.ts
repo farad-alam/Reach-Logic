@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { notify } from "@/lib/notifications";
+import { createAutoInvoice } from "@/lib/invoices";
+import { notifyInvoiceCreated } from "@/lib/notifications";
 
 const schema = z.object({
   serviceTitle: z.string().min(1, "Service title is required").max(150),
@@ -104,8 +106,33 @@ export async function POST(req: NextRequest) {
     // Fetch client separately (avoid implicit transaction from nested include)
     const client = await prisma.user.findUnique({
       where: { id: clientId },
-      select: { fullName: true, email: true },
+      select: { fullName: true, email: true, company: true },
     });
+
+    // Auto-create invoice for the new order
+    try {
+      const invoiceId = await createAutoInvoice({
+        orderId: order.id,
+        clientId,
+        serviceTitle: order.serviceTitle,
+        amount: order.amount ? Number(order.amount) : null,
+        billingName: client?.fullName,
+        billingEmail: client?.email,
+        billingCompany: client?.company,
+        billingStreet: order.billingStreet,
+        billingCity: order.billingCity,
+        billingState: order.billingState,
+        billingZip: order.billingZip,
+        billingCountry: order.billingCountry,
+      });
+      // Notify client about new invoice (non-blocking)
+      notifyInvoiceCreated(invoiceId).catch((err) =>
+        console.error("[orders/create] invoice notify failed:", err)
+      );
+    } catch (invErr) {
+      // Invoice creation failure is non-fatal — order still succeeds
+      console.error("[orders/create] auto-invoice failed (non-fatal):", invErr);
+    }
 
     // Find super admins to notify
     const admins = await prisma.user.findMany({

@@ -255,6 +255,100 @@ export async function sendPaidInvoiceEmail(invoiceId: string) {
   }
 }
 
+/**
+ * Send a payment-received email for ANY payment (partial or full).
+ * Shows Total Invoice / Amount Paid This Payment / Total Paid / Balance Due.
+ */
+export async function sendPaymentReceivedEmail(invoiceId: string, amountJustPaid: number) {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: {
+      client: { select: { id: true, email: true, fullName: true } },
+      order: { select: { serviceTitle: true } },
+      lineItems: true,
+    },
+  });
+  if (!invoice) return;
+
+  const total = invoice.lineItems.reduce((sum, item) => sum + Number(item.amount), 0);
+  const totalPaid = Number(invoice.amountPaid || 0);
+  const balanceDue = Math.max(0, total - totalPaid);
+
+  const fmt = (n: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const fmtDate = (d: Date) =>
+    new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(d);
+
+  const actionUrl = `${BASE_URL}/portal/client/invoices/${invoice.id}`;
+  const clientName = invoice.billingName || invoice.client.fullName || invoice.client.email;
+  const projectName = invoice.order?.serviceTitle ?? "Your Project";
+  const isFullyPaid = balanceDue === 0;
+
+  const html =
+    `<!DOCTYPE html><html>` +
+    `<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">` +
+    `<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 24px;">` +
+    `<table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e5e5;">` +
+    // Header
+    `<tr><td style="background:#042f28;padding:24px 32px;text-align:center;">` +
+    `<span style="font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.02em;">ReachLogic</span>` +
+    `<p style="color:#a3c5bf;margin:4px 0 0;font-size:14px;">${isFullyPaid ? "Payment Receipt — Paid in Full" : "Payment Received"}</p>` +
+    `</td></tr>` +
+    // Body
+    `<tr><td style="padding:32px;">` +
+    `<h2 style="margin:0 0 8px;font-size:20px;font-weight:700;color:#0d0d0d;">` +
+    (isFullyPaid ? "Thank you — Invoice Fully Paid! 🎉" : "Payment Received") +
+    `</h2>` +
+    `<p style="margin:0 0 8px;font-size:14px;color:#6b6b6b;">Hi ${clientName},</p>` +
+    `<p style="margin:0 0 28px;font-size:14px;color:#6b6b6b;line-height:1.6;">` +
+    `We've recorded a payment of <strong style="color:#0d0d0d;">${fmt(amountJustPaid)}</strong> for ` +
+    `Invoice <strong style="color:#0d0d0d;">#${invoice.invoiceNumber}</strong> (${projectName}).` +
+    (isFullyPaid ? " Your invoice is now fully paid — thank you!" : ` The remaining balance is <strong style="color:#ea580c;">${fmt(balanceDue)}</strong>.`) +
+    `</p>` +
+    // Summary card
+    `<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:10px;border:1px solid #e5e5e5;margin-bottom:28px;">` +
+    `<tr><td style="padding:20px 24px;">` +
+    `<div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;">Invoice Summary</div>` +
+    // Row: Total Invoice
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e5e5;font-size:14px;">` +
+    `<span style="color:#6b7280;">Total Invoice Amount</span><span style="font-weight:700;color:#111827;">${fmt(total)}</span></div>` +
+    // Row: This payment
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e5e5;font-size:14px;">` +
+    `<span style="color:#6b7280;">Amount Paid (this payment)</span><span style="font-weight:700;color:#16a34a;">${fmt(amountJustPaid)}</span></div>` +
+    // Row: Total paid
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e5e5;font-size:14px;">` +
+    `<span style="color:#6b7280;">Total Paid to Date</span><span style="font-weight:700;color:#16a34a;">${fmt(totalPaid)}</span></div>` +
+    // Row: Balance due
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;font-size:15px;">` +
+    `<span style="font-weight:700;color:#111827;">Balance Due</span>` +
+    `<span style="font-weight:800;color:${isFullyPaid ? "#16a34a" : "#ea580c"};font-size:18px;">${isFullyPaid ? "PAID ✓" : fmt(balanceDue)}</span></div>` +
+    `</td></tr></table>` +
+    // Date
+    `<p style="margin:0 0 24px;font-size:13px;color:#9ca3af;">Payment recorded on ${fmtDate(new Date())} · Invoice #${invoice.invoiceNumber}</p>` +
+    // CTA
+    `<a href="${actionUrl}" style="display:inline-block;background:#042f28;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;">View Invoice in Portal →</a>` +
+    `</td></tr>` +
+    // Footer
+    `<tr><td style="padding:20px 32px;background:#fafafa;border-top:1px solid #e5e5e5;text-align:center;">` +
+    `<p style="margin:0;font-size:12px;color:#a3a3a3;">ReachLogic · hello@reachlogic.net · www.reachlogic.net</p>` +
+    `</td></tr>` +
+    `</table></td></tr></table>` +
+    `</body></html>`;
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: invoice.client.email,
+      subject: isFullyPaid
+        ? `Invoice ${invoice.invoiceNumber} — Fully Paid ✓`
+        : `Payment of ${fmt(amountJustPaid)} Received — Invoice ${invoice.invoiceNumber}`,
+      html,
+    });
+  } catch (err) {
+    console.error("[sendPaymentReceivedEmail] Error:", err);
+  }
+}
+
 /** Notify the admin(s) when a user accepts their invitation */
 export async function notifyInviteAccepted(acceptedUserId: string) {
   const accepted = await prisma.user.findUnique({

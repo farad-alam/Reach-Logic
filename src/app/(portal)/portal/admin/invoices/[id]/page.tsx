@@ -3,10 +3,10 @@ import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { ArrowLeft, User, Calendar, CheckCircle2, Lock } from "lucide-react";
-import InvoiceActions from "./InvoiceActions";
+import { ArrowLeft, CheckCircle2, Lock } from "lucide-react";
 import DownloadPdfButton from "@/components/portal/DownloadPdfButton";
 import InvoiceDocument from "@/components/portal/InvoiceDocument";
+import RecordPaymentPanel from "./RecordPaymentPanel";
 
 export const metadata = { title: "Invoice Details" };
 
@@ -34,9 +34,11 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
   if (!invoice) notFound();
 
   const total = invoice.lineItems.reduce((sum, item) => sum + Number(item.amount), 0);
+  const amountPaid = invoice.isPaid ? total : Number(invoice.amountPaid || 0);
 
   return (
     <div className="portal-page">
+      {/* Top nav bar */}
       <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }} data-html2canvas-ignore="true">
         <Link href="/portal/admin/invoices" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--neutral-500)", textDecoration: "none" }}>
           <ArrowLeft size={14} /> Back to Invoices
@@ -51,7 +53,6 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
           ) : (
             <span className="badge badge-unpaid" style={{ padding: "6px 12px", fontSize: 14 }}>Unpaid</span>
           )}
-          <InvoiceActions invoiceId={invoice.id} isPaid={invoice.isPaid} isLocked={invoice.isLocked} />
           <DownloadPdfButton targetId="invoice-document" filename={`Invoice_${invoice.invoiceNumber}.pdf`} />
         </div>
       </div>
@@ -88,6 +89,16 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
           amount: Number(item.amount),
         }))}
         notes={invoice.notes}
+      />
+
+      {/* Manage Payments Panel */}
+      <RecordPaymentPanel
+        invoiceId={invoice.id}
+        invoiceNumber={invoice.invoiceNumber}
+        total={total}
+        amountPaid={amountPaid}
+        isPaid={invoice.isPaid}
+        isLocked={invoice.isLocked}
       />
     </div>
   );

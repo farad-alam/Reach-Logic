@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { notify, sendPaidInvoiceEmail } from "@/lib/notifications";
+import { notify, sendPaidInvoiceEmail, sendPaymentReceivedEmail } from "@/lib/notifications";
 
 const schema = z.object({
   action: z.enum(["mark_sent", "mark_paid", "mark_overdue", "cancel", "reopen", "record_payment", "resend_email", "delete_payment"]),
@@ -88,30 +88,38 @@ export async function PATCH(
     const updated = await prisma.invoice.update({ where: { id }, data: updateData });
 
     // Notifications for paid actions
-    if (action === "mark_paid" || (action === "record_payment" && updated.isPaid)) {
-      await sendPaidInvoiceEmail(invoice.id);
-      const thread = await prisma.thread.findFirst({ where: { clientId: invoice.clientId, name: "General" } })
-        ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId } });
-      if (thread) {
-        await prisma.message.create({
-          data: {
-            threadId: thread.id,
-            body: `💳 Payment recorded for Invoice ${invoice.invoiceNumber}. Thank you!`,
-            type: "SYSTEM",
-            metadata: { invoiceId: id, event: "invoice_paid" },
-          },
+    if (action === "mark_paid" || action === "record_payment") {
+      // Always send payment email (partial or full) with Total/Paid/Due
+      sendPaymentReceivedEmail(invoice.id, amount ?? (action === "mark_paid" ? total : 0)).catch(
+        (err) => console.error("[invoices/payment email]", err)
+      );
+
+      // If fully paid, also post to thread
+      if (action === "mark_paid" || (action === "record_payment" && updated.isPaid)) {
+        const thread = await prisma.thread.findFirst({ where: { clientId: invoice.clientId, name: "General" } })
+          ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId } });
+        if (thread) {
+          await prisma.message.create({
+            data: {
+              threadId: thread.id,
+              body: `💳 Payment recorded for Invoice ${invoice.invoiceNumber}. Thank you!`,
+              type: "SYSTEM",
+              metadata: { invoiceId: id, event: "invoice_paid" },
+            },
+          });
+        }
+      } else if (action === "record_payment" && !updated.isPaid) {
+        // Partial payment in-app notification
+        const fmtAmt = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+        await notify({
+          userId: invoice.clientId,
+          type: "INVOICE_PAID",
+          title: `Partial Payment Recorded: ${invoice.invoiceNumber}`,
+          body: `A payment of ${fmtAmt(amount ?? 0)} has been recorded for Invoice ${invoice.invoiceNumber}.`,
+          link: `/portal/client/invoices/${invoice.id}`,
+          sendEmail: false, // email already sent via sendPaymentReceivedEmail
         });
       }
-    } else if (action === "record_payment" && !updated.isPaid) {
-      // Partial payment notification
-      const fmt = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-      await notify({
-        userId: invoice.clientId,
-        type: "INVOICE_PAID",
-        title: `Partial Payment Recorded: ${invoice.invoiceNumber}`,
-        body: `A payment of ${fmt(amount ?? 0)} has been recorded for Invoice ${invoice.invoiceNumber}.`,
-        link: `/portal/client/invoices/${invoice.id}`,
-      });
     }
 
     return NextResponse.json({ ok: true, invoice: updated });
