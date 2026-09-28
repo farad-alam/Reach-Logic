@@ -81,7 +81,7 @@ export default function ClientChatPage({
 
       {/* Right: info sidebar */}
       {selectedThreadId && (
-        <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} isAdmin={false} />
+        <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} userRole="CLIENT" />
       )}
     </div>
   );

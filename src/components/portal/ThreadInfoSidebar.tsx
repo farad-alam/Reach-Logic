@@ -86,12 +86,16 @@ function Initials({ name, email, size = 44 }: { name: string | null; email: stri
 export default function ThreadInfoSidebar({
   threadId,
   currentUserId,
-  isAdmin = false,
+  userRole = "CLIENT",
 }: {
   threadId: string;
   currentUserId: string;
-  isAdmin?: boolean;
+  userRole?: "SUPER_ADMIN" | "TEAM_MEMBER" | "CLIENT";
 }) {
+  const isSuperAdmin = userRole === "SUPER_ADMIN";
+  const isTeamMember = userRole === "TEAM_MEMBER";
+  const isClient = userRole === "CLIENT";
+  const isStaff = isSuperAdmin || isTeamMember;
   const [info, setInfo] = useState<ThreadInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -180,22 +184,26 @@ export default function ThreadInfoSidebar({
       {/* Client card */}
       <div className="info-section">
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-          <Initials name={info.client.fullName} email={info.client.email} size={44} />
+          <Initials name={info.client.fullName} email={isTeamMember ? "C" : info.client.email} size={44} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: "var(--neutral-900)" }}>{info.client.fullName ?? info.client.email}</div>
-            <div style={{ fontSize: 12, color: "var(--neutral-500)" }}>{info.client.email}</div>
-            {!isAdmin && <div style={{ fontSize: 11, color: "var(--neutral-400)", marginTop: 2 }}>Since {fmtDate(info.client.createdAt)}</div>}
+            <div style={{ fontWeight: 700, fontSize: 15, color: "var(--neutral-900)" }}>
+              {info.client.fullName || (isTeamMember ? "Client" : info.client.email)}
+            </div>
+            {!isTeamMember && (
+              <div style={{ fontSize: 12, color: "var(--neutral-500)" }}>{info.client.email}</div>
+            )}
+            {isClient && <div style={{ fontSize: 11, color: "var(--neutral-400)", marginTop: 2 }}>Since {fmtDate(info.client.createdAt)}</div>}
           </div>
         </div>
-        {isAdmin && (
+        {isSuperAdmin && (
           <Link href={`/portal/admin/clients/${info.client.id}`} style={{ fontSize: 12, color: "var(--brand-accent)", display: "flex", alignItems: "center", gap: 4, textDecoration: "none", fontWeight: 600 }}>
             View profile <ExternalLink size={12} />
           </Link>
         )}
       </div>
 
-      {/* TEAM / ADMIN VIEW: Client Info */}
-      {isAdmin && (
+      {/* SUPER_ADMIN VIEW: Client Info */}
+      {isSuperAdmin && (
         <div className="info-section">
           <div className="info-section-label">CLIENT INFO</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 13, marginBottom: 12 }}>
@@ -231,7 +239,7 @@ export default function ThreadInfoSidebar({
       )}
 
       {/* CLIENT VIEW: Payment Status Card */}
-      {!isAdmin && info.payments && (
+      {isClient && info.payments && (
         <div className="info-section">
           <div className="info-section-label">PAYMENT STATUS</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
@@ -253,8 +261,8 @@ export default function ThreadInfoSidebar({
         </div>
       )}
 
-      {/* TEAM / ADMIN VIEW: Projects in this Thread */}
-      {isAdmin && info.orders.length > 0 && (
+      {/* STAFF VIEW: Projects in this Thread */}
+      {isStaff && info.orders.length > 0 && (
         <div className="info-section">
           <div className="info-section-label">PROJECTS IN THIS THREAD</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -295,7 +303,7 @@ export default function ThreadInfoSidebar({
       )}
 
       {/* CLIENT VIEW: Your Team (ReachLogic) */}
-      {!isAdmin && agencyTeam.length > 0 && (
+      {isClient && agencyTeam.length > 0 && (
         <div className="info-section">
           <div className="info-section-label">YOUR TEAM</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -327,10 +335,10 @@ export default function ThreadInfoSidebar({
 
             return (
               <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Initials name={member.fullName} email={member.email} size={32} />
+                <Initials name={member.fullName} email={isTeamMember && member.role === "CLIENT" ? "C" : member.email} size={32} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)" }}>
-                    {member.fullName ?? member.email}
+                    {member.fullName || (isTeamMember && member.role === "CLIENT" ? "Client" : member.email)}
                     {isSelf && !member.fullName?.includes("(you)") && <span style={{ color: "var(--neutral-400)", marginLeft: 4, fontWeight: 400 }}>(you)</span>}
                   </div>
                 </div>
@@ -340,7 +348,7 @@ export default function ThreadInfoSidebar({
           })}
 
           {/* Add Colleague Button for Client View */}
-          {!isAdmin && (
+          {isClient && (
             <div style={{ marginTop: 8 }}>
               {!inviteOpen ? (
                 <button
@@ -370,7 +378,7 @@ export default function ThreadInfoSidebar({
                     placeholder="Colleague email..."
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
-                    style={{ flex: 1, minWidth: 0, padding: "6px 8px", fontSize: 12, borderRadius: 6, border: "1px solid var(--neutral-200)", outline: "none" }}
+                    style={{ flex: 1, minWidth: 0, padding: "6px 8px", fontSize: 12, borderRadius: 6, border: "1px solid var(--neutral-200)", outline: "none", color: "var(--neutral-900)" }}
                   />
                   <button
                     onClick={handleInvite}
@@ -385,7 +393,7 @@ export default function ThreadInfoSidebar({
           )}
 
           {/* Add Team Member Button for Admin View */}
-          {isAdmin && (
+          {isSuperAdmin && (
             <div style={{ marginTop: 8 }}>
               {!addTeamOpen ? (
                 <button
@@ -415,7 +423,7 @@ export default function ThreadInfoSidebar({
                     placeholder="Team member email..."
                     value={teamEmail}
                     onChange={(e) => setTeamEmail(e.target.value)}
-                    style={{ flex: 1, minWidth: 0, padding: "6px 8px", fontSize: 12, borderRadius: 6, border: "1px solid var(--neutral-200)", outline: "none" }}
+                    style={{ flex: 1, minWidth: 0, padding: "6px 8px", fontSize: 12, borderRadius: 6, border: "1px solid var(--neutral-200)", outline: "none", color: "var(--neutral-900)" }}
                   />
                   <button
                     onClick={handleAddTeam}

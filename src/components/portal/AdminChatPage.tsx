@@ -258,7 +258,7 @@ export default function AdminChatPage({
 
       {/* Right: Info sidebar */}
       {selectedThreadId && (
-        <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} isAdmin />
+        <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} userRole="SUPER_ADMIN" />
       )}
 
       {/* Create Thread Modal */}

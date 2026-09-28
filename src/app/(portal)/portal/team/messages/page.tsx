@@ -55,7 +55,7 @@ export default async function TeamMessagesPage({
                 {activeThread.name}
               </div>
               <div style={{ fontSize: 12, color: "var(--neutral-500)", paddingLeft: 26 }}>
-                {activeThread.client.fullName ?? activeThread.client.email} · {activeThread.members.length} people in this thread
+                {activeThread.client.fullName || "Client"} · {activeThread.members.length} people in this thread
               </div>
             </div>
 
@@ -76,7 +76,7 @@ export default async function TeamMessagesPage({
 
       {/* Right: Info Sidebar */}
       {activeThread && (
-        <ThreadInfoSidebar threadId={activeThread.id} currentUserId={session.user.id!} isAdmin />
+        <ThreadInfoSidebar threadId={activeThread.id} currentUserId={session.user.id!} userRole="TEAM_MEMBER" />
       )}
     </div>
   );
