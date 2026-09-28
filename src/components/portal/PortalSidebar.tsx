@@ -91,9 +91,14 @@ export default function PortalSidebar({
   return (
     <aside className="portal-sidebar">
       {/* Logo */}
-      <div className="portal-sidebar-logo">
-        <span className="portal-sidebar-logo-text">ReachLogic</span>
-        <span className="portal-sidebar-logo-badge">Portal</span>
+      <div style={{ padding: "20px 20px 0 20px", marginBottom: "30px", display: "flex", flexDirection: "column" }}>
+        <Link href={`/portal/${role.toLowerCase()}`} style={{ display: "block" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="ReachLogic" style={{ height: 32, objectFit: "contain", objectPosition: "left" }} />
+        </Link>
+        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, marginTop: 8, fontWeight: 600 }}>
+          {role === "SUPER_ADMIN" ? "Admin Portal" : role === "TEAM_MEMBER" ? "Team Portal" : "Client Portal"}
+        </span>
       </div>
 
       {/* Navigation */}
@@ -137,8 +142,10 @@ export default function PortalSidebar({
           )}
         </div>
         <div className="portal-sidebar-user-info">
-          <div className="portal-sidebar-user-name">{userName || userEmail}</div>
-          <div className="portal-sidebar-user-role">{roleLabel[role]}</div>
+          <div className="portal-sidebar-user-name">{userName || "User"}</div>
+          <div className="portal-sidebar-user-role" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {userEmail}
+          </div>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/portal/login" })}

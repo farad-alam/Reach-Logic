@@ -108,7 +108,8 @@ export async function validateInviteToken(token: string) {
 export async function acceptInvitation(
   token: string,
   fullName: string,
-  passwordHash: string
+  passwordHash: string,
+  timezone?: string
 ): Promise<{ ok: boolean; userId?: string; role?: string; error?: string }> {
   const check = await validateInviteToken(token);
   if (!check.valid || !check.invitation) return { ok: false, error: check.reason };
@@ -120,6 +121,7 @@ export async function acceptInvitation(
     data: {
       email: invitation.email,
       fullName: fullName.trim(),
+      timezone: timezone ? timezone.trim() : null,
       passwordHash,
       role: invitation.role,
       isActive: true,

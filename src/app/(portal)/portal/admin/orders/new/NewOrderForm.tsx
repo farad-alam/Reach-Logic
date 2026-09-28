@@ -26,6 +26,10 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
   const [isThreadDropdownOpen, setIsThreadDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [isCreateThreadModalOpen, setIsCreateThreadModalOpen] = useState(false);
+  const [newThreadName, setNewThreadName] = useState("");
+  const [creatingThread, setCreatingThread] = useState(false);
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -68,29 +72,34 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
     fetchThreads(clientId);
   }, [clientId]);
 
-  async function handleCreateNewThread() {
-    const name = window.prompt("Enter new thread name (e.g. Website Redesign):");
-    if (!name || !name.trim()) return;
+  function handleCreateNewThread() {
+    setIsCreateThreadModalOpen(true);
+    setIsThreadDropdownOpen(false);
+  }
+
+  async function submitCreateThread() {
+    if (!newThreadName || !newThreadName.trim()) return;
     
-    setThreadsLoading(true);
+    setCreatingThread(true);
     try {
       const res = await fetch("/api/portal/threads/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId, name: name.trim() }),
+        body: JSON.stringify({ clientId, name: newThreadName.trim() }),
       });
       const data = await res.json();
-      if (res.ok && data.threadId) {
-        await fetchThreads(clientId, data.threadId);
-        setIsThreadDropdownOpen(false);
+      if (res.ok && data.thread) {
+        await fetchThreads(clientId, data.thread.id);
+        setIsCreateThreadModalOpen(false);
+        setNewThreadName("");
       } else {
         alert(data.error || "Failed to create thread.");
-        setThreadsLoading(false);
       }
     } catch (e) {
       console.error(e);
       alert("Error creating thread.");
-      setThreadsLoading(false);
+    } finally {
+      setCreatingThread(false);
     }
   }
 
@@ -310,6 +319,48 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
           </button>
         </div>
       </form>
+
+      {/* Create Thread Modal */}
+      {isCreateThreadModalOpen && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0, 
+          background: "rgba(0,0,0,0.5)", zIndex: 100,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          <div style={{ background: "#fff", borderRadius: 12, padding: 24, width: 400, maxWidth: "90%", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--neutral-900)", marginBottom: 16 }}>Create New Thread</h3>
+            <div className="form-group">
+              <label className="form-label">Thread Name</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="e.g. Website Redesign"
+                value={newThreadName}
+                onChange={(e) => setNewThreadName(e.target.value)}
+                onKeyDown={(e) => { if(e.key === "Enter") { e.preventDefault(); submitCreateThread(); } }}
+                autoFocus
+              />
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 24 }}>
+              <button 
+                className="btn btn-outline" 
+                onClick={() => { setIsCreateThreadModalOpen(false); setNewThreadName(""); }}
+                disabled={creatingThread}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                style={{ background: "var(--brand-dark)", borderColor: "var(--brand-dark)" }}
+                onClick={submitCreateThread}
+                disabled={!newThreadName.trim() || creatingThread}
+              >
+                {creatingThread ? <Loader2 size={16} className="animate-spin" /> : "Create"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

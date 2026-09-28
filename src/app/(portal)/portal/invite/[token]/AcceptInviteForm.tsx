@@ -14,6 +14,7 @@ interface Props {
 export default function AcceptInviteForm({ token, email, role, inviterName }: Props) {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
+  const [timezone, setTimezone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -38,7 +39,7 @@ export default function AcceptInviteForm({ token, email, role, inviterName }: Pr
       const res = await fetch("/api/portal/invite/accept", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, fullName: fullName.trim(), password }),
+        body: JSON.stringify({ token, fullName: fullName.trim(), timezone: timezone.trim(), password }),
       });
 
       const data = await res.json();
@@ -83,12 +84,21 @@ export default function AcceptInviteForm({ token, email, role, inviterName }: Pr
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label className="form-label" htmlFor="fullName">Full name</label>
+          <label className="form-label" htmlFor="fullName">Name</label>
           <div style={{ position:"relative" }}>
             <User size={15} style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"var(--neutral-400)", pointerEvents:"none" }} />
             <input id="fullName" type="text" className="form-input" style={{ paddingLeft:36 }}
               value={fullName} onChange={e => setFullName(e.target.value)}
-              placeholder="Your full name" required />
+              placeholder="First Name + Last Name" required />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="timezone">Time Zone <span style={{ color: "var(--neutral-400)", fontWeight: 400 }}>(optional)</span></label>
+          <div style={{ position:"relative" }}>
+            <input id="timezone" type="text" className="form-input"
+              value={timezone} onChange={e => setTimezone(e.target.value)}
+              placeholder="e.g. EST, GMT+1, etc." />
           </div>
         </div>
 
