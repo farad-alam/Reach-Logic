@@ -97,6 +97,10 @@ export default function ThreadInfoSidebar({
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+  
+  const [teamEmail, setTeamEmail] = useState("");
+  const [addingTeam, setAddingTeam] = useState(false);
+  const [addTeamOpen, setAddTeamOpen] = useState(false);
 
   const fetchInfo = () => {
     setLoading(true);
@@ -129,6 +133,28 @@ export default function ThreadInfoSidebar({
       }
     } finally {
       setInviting(false);
+    }
+  }
+
+  async function handleAddTeam() {
+    if (!teamEmail.trim() || addingTeam) return;
+    setAddingTeam(true);
+    try {
+      const res = await fetch(`/api/portal/threads/${threadId}/add-team-member`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: teamEmail.trim() })
+      });
+      if (res.ok) {
+        setTeamEmail("");
+        setAddTeamOpen(false);
+        fetchInfo();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to add team member.");
+      }
+    } finally {
+      setAddingTeam(false);
     }
   }
 
@@ -350,6 +376,51 @@ export default function ThreadInfoSidebar({
                     onClick={handleInvite}
                     disabled={inviting || !inviteEmail.trim()}
                     style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: 6, padding: "0 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", opacity: (!inviteEmail.trim() || inviting) ? 0.5 : 1 }}
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Add Team Member Button for Admin View */}
+          {isAdmin && (
+            <div style={{ marginTop: 8 }}>
+              {!addTeamOpen ? (
+                <button
+                  onClick={() => setAddTeamOpen(true)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    width: "100%",
+                    padding: "8px 12px",
+                    background: "#f8fafc",
+                    border: "1px dashed #6366f1",
+                    borderRadius: 8,
+                    color: "#4f46e5",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  <Plus size={14} /> Add Team Member
+                </button>
+              ) : (
+                <div style={{ display: "flex", gap: 6 }}>
+                  <input
+                    type="email"
+                    placeholder="Team member email..."
+                    value={teamEmail}
+                    onChange={(e) => setTeamEmail(e.target.value)}
+                    style={{ flex: 1, minWidth: 0, padding: "6px 8px", fontSize: 12, borderRadius: 6, border: "1px solid var(--neutral-200)", outline: "none" }}
+                  />
+                  <button
+                    onClick={handleAddTeam}
+                    disabled={addingTeam || !teamEmail.trim()}
+                    style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 6, padding: "0 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", opacity: (!teamEmail.trim() || addingTeam) ? 0.5 : 1 }}
                   >
                     Add
                   </button>
