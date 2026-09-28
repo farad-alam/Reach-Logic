@@ -6,9 +6,14 @@ import { Loader2, ShoppingBag } from "lucide-react";
 interface Props {
   clientId: string;
   clientName: string;
+  clientProfile?: {
+    address: string | null;
+    state: string | null;
+    country: string | null;
+  };
 }
 
-export default function CreateOrderForm({ clientId, clientName }: Props) {
+export default function CreateOrderForm({ clientId, clientName, clientProfile }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -17,6 +22,11 @@ export default function CreateOrderForm({ clientId, clientName }: Props) {
     description: "",
     startDate: "",
     endDate: "",
+    billingStreet: clientProfile?.address || "",
+    billingCity: "",
+    billingState: clientProfile?.state || "",
+    billingZip: "",
+    billingCountry: clientProfile?.country || "",
   });
 
   function set(field: keyof typeof form) {
@@ -116,8 +126,75 @@ export default function CreateOrderForm({ clientId, clientName }: Props) {
         <div className="auth-error" style={{ marginBottom: 12 }}>{error}</div>
       )}
 
-      <div style={{ fontSize: 12, color: "var(--neutral-400)", marginBottom: 14 }}>
-        Order will be created with status <strong>Awaiting Quote</strong>. You can set the price from the order detail page.
+      {/* Billing Address Section */}
+      <div style={{ marginTop: 24, marginBottom: 20 }}>
+        <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--neutral-900)", marginBottom: 12, borderBottom: "1px solid var(--neutral-100)", paddingBottom: 8 }}>
+          Billing Address
+        </h3>
+        <div className="form-group">
+          <label className="form-label" htmlFor="billingStreet">Street Address</label>
+          <input
+            id="billingStreet"
+            type="text"
+            className="form-input"
+            value={form.billingStreet}
+            onChange={set("billingStreet")}
+            placeholder="123 Main St"
+            required
+          />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="billingCity">City</label>
+            <input
+              id="billingCity"
+              type="text"
+              className="form-input"
+              value={form.billingCity}
+              onChange={set("billingCity")}
+              placeholder="New York"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="billingState">State / Province</label>
+            <input
+              id="billingState"
+              type="text"
+              className="form-input"
+              value={form.billingState}
+              onChange={set("billingState")}
+              placeholder="NY"
+              required
+            />
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="billingZip">ZIP / Postal Code</label>
+            <input
+              id="billingZip"
+              type="text"
+              className="form-input"
+              value={form.billingZip}
+              onChange={set("billingZip")}
+              placeholder="10001"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="billingCountry">Country</label>
+            <input
+              id="billingCountry"
+              type="text"
+              className="form-input"
+              value={form.billingCountry}
+              onChange={set("billingCountry")}
+              placeholder="United States"
+              required
+            />
+          </div>
+        </div>
       </div>
 
       <button

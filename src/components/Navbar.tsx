@@ -133,10 +133,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             <Link
               href="/portal/login"
-              className="text-sm font-semibold transition-colors duration-300 hover:text-white"
-              style={{ color: "rgba(255,255,255,0.8)" }}
+              className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105"
+              style={{
+                background: "linear-gradient(135deg, #085e51, #0aad92)",
+                color: "#fff",
+                boxShadow: "0 0 20px rgba(10,173,146,0.3)",
+              }}
             >
-              Login
+              Client Login
             </Link>
             <button
               onClick={() => handleNavClick("/contact")}
@@ -214,7 +218,7 @@ export default function Navbar() {
             opacity: menuOpen ? 1 : 0,
           }}
         >
-          Login
+          Client Login
         </button>
         <button
           onClick={() => handleNavClick("/contact")}

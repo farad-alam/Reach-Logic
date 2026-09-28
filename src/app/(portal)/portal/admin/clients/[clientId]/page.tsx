@@ -295,7 +295,15 @@ export default async function ClientDetailPage({
             <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--neutral-900)", marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
               <ShoppingBag size={14} /> Create Order for {client.fullName ?? client.email}
             </h2>
-            <CreateOrderForm clientId={client.id} clientName={client.fullName ?? client.email} />
+            <CreateOrderForm
+              clientId={client.id}
+              clientName={client.fullName ?? client.email}
+              clientProfile={{
+                address: client.address,
+                state: client.state,
+                country: client.country,
+              }}
+            />
           </div>
         </div>
       </div>
