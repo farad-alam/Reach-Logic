@@ -3,23 +3,11 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { Users, Plus, Mail } from "lucide-react";
-import PendingInvitesList from "@/components/portal/PendingInvitesList";
+import { Users, Plus } from "lucide-react";
+import ClientTable from "./ClientTable";
 
 export const metadata = { title: "Clients" };
 
-function getInitials(name: string | null | undefined, email: string | null | undefined) {
-  if (name && name.trim()) {
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length > 0) {
-      return parts.map((p) => p[0]?.toUpperCase() ?? "").join("").slice(0, 2);
-    }
-  }
-  if (email && email.trim()) {
-    return email.trim()[0]?.toUpperCase() ?? "C";
-  }
-  return "C";
-}
 
 export default async function ClientsPage() {
   const session = await auth();
@@ -30,7 +18,7 @@ export default async function ClientsPage() {
     orderBy: { createdAt: "desc" },
     include: {
       clientOrders: { select: { id: true, status: true, amount: true } },
-      clientThreads: { select: { id: true }, take: 1 },
+      clientInvoices: { select: { isPaid: true, amountPaid: true, lineItems: { select: { amount: true } } } },
     },
   });
 
@@ -41,7 +29,26 @@ export default async function ClientsPage() {
     select: { id: true, email: true, createdAt: true, expiresAt: true },
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
+  const clientData = clients.map((c) => ({
+    id: c.id,
+    fullName: c.fullName,
+    email: c.email,
+    isActive: c.isActive,
+    createdAt: c.createdAt,
+    orders: c.clientOrders.map((o) => ({ status: o.status, amount: o.amount ? o.amount.toString() : null })),
+    invoices: c.clientInvoices.map((i) => ({
+      isPaid: i.isPaid,
+      amountPaid: i.amountPaid ? i.amountPaid.toString() : null,
+      lineItems: i.lineItems.map((li) => ({ amount: li.amount.toString() })),
+    })),
+  }));
+
+  const inviteData = pendingInvites.map((i) => ({
+    id: i.id,
+    email: i.email,
+    createdAt: i.createdAt,
+    expiresAt: i.expiresAt,
+  }));
 
   return (
     <div className="portal-page">
@@ -58,7 +65,7 @@ export default async function ClientsPage() {
         </Link>
       </div>
 
-      {clients.length === 0 ? (
+      {clientData.length === 0 && inviteData.length === 0 ? (
         <div className="card">
           <div className="empty-state">
             <Users size={40} className="empty-state-icon" />
@@ -72,94 +79,8 @@ export default async function ClientsPage() {
           </div>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="portal-table">
-            <thead>
-              <tr>
-                <th>Client</th>
-                <th>Orders</th>
-                <th>Total Value</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((client) => {
-                const totalValue = client.clientOrders.reduce(
-                  (s, o) => s + Number(o.amount ?? 0),
-                  0
-                );
-                const activeOrders = client.clientOrders.filter(
-                  (o) => o.status === "IN_PROGRESS" || o.status === "PENDING"
-                ).length;
-
-                return (
-                  <tr key={client.id}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div
-                          style={{
-                            width: 34,
-                            height: 34,
-                            borderRadius: "50%",
-                            background: "var(--brand-mid)",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 13,
-                            fontWeight: 600,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {getInitials(client.fullName, client.email)}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 500, color: "var(--neutral-900)" }}>
-                            {client.fullName ?? "—"}
-                          </div>
-                          <div style={{ fontSize: 12, color: "var(--neutral-500)", display: "flex", alignItems: "center", gap: 4 }}>
-                            <Mail size={11} /> {client.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <span style={{ fontWeight: 500 }}>{client.clientOrders.length}</span>
-                      {activeOrders > 0 && (
-                        <span className="badge badge-progress" style={{ marginLeft: 6 }}>
-                          {activeOrders} active
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ fontWeight: 500 }}>
-                      {totalValue > 0
-                        ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalValue)
-                        : "—"}
-                    </td>
-                    <td>
-                      <span className={client.isActive ? "badge badge-completed" : "badge badge-cancelled"}>
-                        {client.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <Link href={`/portal/admin/clients/${client.id}`} className="btn btn-outline btn-sm">
-                        View
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <ClientTable initialClients={clientData} initialInvites={inviteData} />
       )}
-
-      <PendingInvitesList
-        invites={pendingInvites}
-        role="CLIENT"
-        baseUrl={baseUrl}
-      />
     </div>
   );
 }
