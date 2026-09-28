@@ -9,6 +9,7 @@ const schema = z.object({
   token: z.string().min(1),
   fullName: z.string().min(2).max(80),
   timezone: z.string().optional(),
+  country: z.string().optional(),
   password: z.string().min(8).max(128),
 });
 
@@ -24,10 +25,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { token, fullName, password, timezone } = parsed.data;
+    const { token, fullName, password, timezone, country } = parsed.data;
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const result = await acceptInvitation(token, fullName, passwordHash, timezone);
+    const result = await acceptInvitation(token, fullName, passwordHash, timezone, country);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 400 });

@@ -1574,3 +1574,117 @@
   padding: 7px 14px;
   font-size: 13px;
 }
+
+/* ─── Split Screen Invite ─── */
+.invite-split-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+.invite-split-left {
+  flex: 0 0 42%;
+  background: var(--brand-dark);
+  padding: 60px 80px;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+.invite-split-right {
+  flex: 1;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+.invite-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 80px;
+}
+.invite-brand-logo svg {
+  width: 44px;
+  height: 44px;
+}
+.invite-brand-title {
+  font-family: var(--font-fraunces), serif;
+  font-size: 42px;
+  line-height: 1.15;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+.invite-brand-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  margin-bottom: 40px;
+  max-width: 380px;
+}
+.invite-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.invite-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+}
+.invite-footer-url {
+  margin-top: auto;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 900px) {
+  .invite-split-shell {
+    flex-direction: column;
+  }
+  .invite-split-left {
+    flex: none;
+    padding: 40px 24px;
+  }
+  .invite-brand-logo {
+    margin-bottom: 40px;
+  }
+  .invite-split-right {
+    padding: 24px;
+  }
+}
+
+.invite-auth-card {
+  background: #fff;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+  padding: 48px;
+}
+
+.form-group-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.invite-auth-title {
+  font-family: var(--font-fraunces), serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--neutral-900);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+.invite-auth-sub {
+  font-size: 13px;
+  color: var(--neutral-500);
+  margin-bottom: 24px;
+}

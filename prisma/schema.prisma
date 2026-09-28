@@ -65,6 +65,7 @@ model User {
   company      String?
   phone        String?
   address      String?
+  country      String?
   timezone     String?
   avatarUrl    String?
   role         UserRole @default(CLIENT)

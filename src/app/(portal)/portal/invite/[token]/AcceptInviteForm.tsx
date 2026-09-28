@@ -2,7 +2,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Loader2, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 
 interface Props {
   token: string;
@@ -13,17 +13,24 @@ interface Props {
 
 export default function AcceptInviteForm({ token, email, role, inviterName }: Props) {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [country, setCountry] = useState("");
   const [timezone, setTimezone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
-  const [showPass, setShowPass] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!agreeTerms) {
+      setError("You must agree to the Terms of Service.");
+      return;
+    }
 
     if (password.length < 8) {
       setError("Password must be at least 8 characters.");
@@ -36,10 +43,11 @@ export default function AcceptInviteForm({ token, email, role, inviterName }: Pr
 
     setLoading(true);
     try {
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
       const res = await fetch("/api/portal/invite/accept", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, fullName: fullName.trim(), timezone: timezone.trim(), password }),
+        body: JSON.stringify({ token, fullName, timezone: timezone.trim(), country: country.trim(), password }),
       });
 
       const data = await res.json();
@@ -59,79 +67,111 @@ export default function AcceptInviteForm({ token, email, role, inviterName }: Pr
     }
   }
 
-  const roleLabel = role === "CLIENT" ? "client" : "team member";
-
   return (
-    <div className="auth-card">
-      <div className="auth-logo">
-        <div style={{ display:"inline-flex", alignItems:"center", gap:8 }}>
-          <div style={{ width:36, height:36, background:"var(--brand-dark)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#12c494" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <span style={{ fontFamily:"var(--font-fraunces)", fontSize:20, fontWeight:700, color:"var(--neutral-900)", letterSpacing:"-0.03em" }}>ReachLogic</span>
-        </div>
-      </div>
-
-      <h1 className="auth-title">Set up your account</h1>
-      <p className="auth-sub">
-        <strong>{inviterName}</strong> invited you as a {roleLabel}.<br/>
-        <span style={{ color:"var(--neutral-400)" }}>{email}</span>
-      </p>
+    <div className="invite-auth-card">
+      <h1 className="invite-auth-title">Create your account</h1>
+      <p className="invite-auth-sub">Fields marked * are required.</p>
 
       {error && <div className="auth-error">{error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="form-label" htmlFor="fullName">Name</label>
-          <div style={{ position:"relative" }}>
-            <User size={15} style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"var(--neutral-400)", pointerEvents:"none" }} />
-            <input id="fullName" type="text" className="form-input" style={{ paddingLeft:36 }}
-              value={fullName} onChange={e => setFullName(e.target.value)}
-              placeholder="First Name + Last Name" required />
+        {/* Email Field - Disabled */}
+        <div className="form-group" style={{ marginBottom: 20 }}>
+          <label className="form-label">Email</label>
+          <div style={{ position: "relative" }}>
+            <input 
+              type="text" 
+              className="form-input" 
+              value={email} 
+              disabled 
+              style={{ backgroundColor: "var(--neutral-50)", color: "var(--neutral-500)", paddingRight: 40 }}
+            />
+            <Lock size={15} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "var(--neutral-400)", pointerEvents: "none" }} />
+          </div>
+          <span className="form-hint" style={{ marginTop: 4 }}>From your invitation, can't be changed</span>
+        </div>
+
+        {/* Name Grid */}
+        <div className="form-group-grid" style={{ marginBottom: 20 }}>
+          <div>
+            <label className="form-label" htmlFor="firstName">First Name <span style={{color: 'var(--danger)'}}>*</span></label>
+            <input id="firstName" type="text" className="form-input"
+              value={firstName} onChange={e => setFirstName(e.target.value)}
+              placeholder="e.g. John" required />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="lastName">Last Name <span style={{color: 'var(--danger)'}}>*</span></label>
+            <input id="lastName" type="text" className="form-input"
+              value={lastName} onChange={e => setLastName(e.target.value)}
+              placeholder="e.g. Smith" required />
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="timezone">Time Zone <span style={{ color: "var(--neutral-400)", fontWeight: 400 }}>(optional)</span></label>
-          <div style={{ position:"relative" }}>
-            <input id="timezone" type="text" className="form-input"
-              value={timezone} onChange={e => setTimezone(e.target.value)}
-              placeholder="e.g. EST, GMT+1, etc." />
+        {/* Location Grid */}
+        <div className="form-group-grid" style={{ marginBottom: 20 }}>
+          <div>
+            <label className="form-label" htmlFor="country">Country <span style={{color: 'var(--danger)'}}>*</span></label>
+            <select id="country" className="form-input" value={country} onChange={e => setCountry(e.target.value)} required>
+              <option value="" disabled>Select country</option>
+              <option value="United States">United States</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="Bangladesh">Bangladesh</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label className="form-label" htmlFor="timezone">Time Zone <span style={{color: 'var(--danger)'}}>*</span></label>
+            <select id="timezone" className="form-input" value={timezone} onChange={e => setTimezone(e.target.value)} required>
+              <option value="" disabled>Select timezone</option>
+              <option value="EST">(UTC-05:00) Eastern Time</option>
+              <option value="CST">(UTC-06:00) Central Time</option>
+              <option value="MST">(UTC-07:00) Mountain Time</option>
+              <option value="PST">(UTC-08:00) Pacific Time</option>
+              <option value="GMT">(UTC+00:00) Greenwich Mean Time</option>
+              <option value="CET">(UTC+01:00) Central European Time</option>
+              <option value="BST">(UTC+06:00) Bangladesh Time</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="password">Create a password</label>
-          <div style={{ position:"relative" }}>
-            <Lock size={15} style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"var(--neutral-400)", pointerEvents:"none" }} />
-            <input id="password" type={showPass ? "text" : "password"} className="form-input"
-              style={{ paddingLeft:36, paddingRight:40 }}
+        {/* Password Grid */}
+        <div className="form-group-grid" style={{ marginBottom: 24 }}>
+          <div>
+            <label className="form-label" htmlFor="password">Password <span style={{color: 'var(--danger)'}}>*</span></label>
+            <input id="password" type="password" className="form-input"
               value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="Min. 8 characters" required minLength={8} />
-            <button type="button" onClick={() => setShowPass(!showPass)}
-              style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", background:"transparent", border:"none", cursor:"pointer", color:"var(--neutral-400)", display:"flex", padding:2 }}>
-              {showPass ? <EyeOff size={16}/> : <Eye size={16}/>}
-            </button>
+              placeholder="At least 8 characters" required minLength={8} />
           </div>
-          <span className="form-hint">At least 8 characters.</span>
+          <div>
+            <label className="form-label" htmlFor="confirmPass">Confirm Password <span style={{color: 'var(--danger)'}}>*</span></label>
+            <input id="confirmPass" type="password" className="form-input"
+              value={confirmPass} onChange={e => setConfirmPass(e.target.value)}
+              placeholder="Repeat password" required />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="confirmPass">Confirm password</label>
-          <div style={{ position:"relative" }}>
-            <Lock size={15} style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"var(--neutral-400)", pointerEvents:"none" }} />
-            <input id="confirmPass" type="password" className="form-input" style={{ paddingLeft:36 }}
-              value={confirmPass} onChange={e => setConfirmPass(e.target.value)}
-              placeholder="Repeat your password" required />
-          </div>
+        {/* Terms Checkbox */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+          <input 
+            type="checkbox" 
+            id="terms" 
+            checked={agreeTerms} 
+            onChange={(e) => setAgreeTerms(e.target.checked)}
+            style={{ width: 16, height: 16, cursor: 'pointer', accentColor: 'var(--brand-dark)' }} 
+            required 
+          />
+          <label htmlFor="terms" style={{ fontSize: 13, color: 'var(--neutral-600)', cursor: 'pointer' }}>
+            I agree to the <a href="/terms-of-service" style={{ color: 'var(--brand-accent)', textDecoration: 'underline' }}>Terms of Service</a> and <a href="/privacy-policy" style={{ color: 'var(--brand-accent)', textDecoration: 'underline' }}>Privacy Policy</a> <span style={{color: 'var(--danger)'}}>*</span>
+          </label>
         </div>
 
         <button type="submit" className="btn btn-primary"
-          style={{ width:"100%", justifyContent:"center", marginTop:8, height:42 }}
+          style={{ width: "100%", justifyContent: "center", height: 48, fontSize: 15, background: 'var(--brand-dark)', color: '#fff', border: 'none' }}
           disabled={loading}>
-          {loading ? <Loader2 size={16} className="animate-spin"/> : "Create my account"}
+          {loading ? <Loader2 size={18} className="animate-spin"/> : "Create Account"}
         </button>
       </form>
     </div>
