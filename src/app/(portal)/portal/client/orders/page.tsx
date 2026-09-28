@@ -15,7 +15,7 @@ const statusColors: Record<string, string> = {
   CANCELLED: "badge badge-cancelled",
 };
 const statusLabels: Record<string, string> = {
-  AWAITING_QUOTE: "Awaiting Quote",
+  AWAITING_QUOTE: "Payment Required",
   PENDING: "Pending",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",
@@ -78,7 +78,7 @@ export default async function ClientOrdersPage() {
                 <tr key={order.id}>
                   <td style={{ fontWeight: 500 }}>{order.serviceTitle}</td>
                   <td style={{ fontWeight: 500 }}>
-                    {order.amount ? fmt(Number(order.amount)) : <span style={{ color: "var(--neutral-400)" }}>Awaiting Quote</span>}
+                    {order.amount ? fmt(Number(order.amount)) : <span style={{ color: "var(--neutral-400)" }}>Payment Required</span>}
                   </td>
                   <td><span className={statusColors[order.status]}>{statusLabels[order.status]}</span></td>
                   <td style={{ fontSize: 13, color: "var(--neutral-500)" }}>{fmtDate(order.createdAt)}</td>
