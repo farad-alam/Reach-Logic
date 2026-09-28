@@ -104,9 +104,9 @@ export default function InvoiceDocument({
         <div className="invoice-grid">
           {/* Bill To */}
           <div>
-            <div className="invoice-bill-label">Bill To</div>
-            <div className="invoice-bill-name">{billToName}</div>
-            <div className="invoice-bill-detail">
+            <div className="invoice-bill-label" style={{ color: "#0a8c6a" }}>Bill To</div>
+            <div className="invoice-bill-name" style={{ color: "#0d0d0d" }}>{billToName}</div>
+            <div className="invoice-bill-detail" style={{ color: "#6b6b6b" }}>
               {billingCompany && <div>{billingCompany}</div>}
               {billingAddress
                 ? billingAddress.split("\n").map((line, i) => <div key={i}>{line}</div>)
@@ -125,22 +125,22 @@ export default function InvoiceDocument({
             <table className="invoice-meta-table">
               <tbody>
                 <tr>
-                  <td>Invoice Date</td>
-                  <td>{fmtDate(createdAt)}</td>
+                  <td style={{ color: "#6b6b6b" }}>Invoice Date</td>
+                  <td style={{ color: "#0d0d0d" }}>{fmtDate(createdAt)}</td>
                 </tr>
                 <tr>
-                  <td>Due Date</td>
-                  <td>{fmtDate(dueDate)}</td>
+                  <td style={{ color: "#6b6b6b" }}>Due Date</td>
+                  <td style={{ color: "#0d0d0d" }}>{fmtDate(dueDate)}</td>
                 </tr>
                 {isPaid && paidAt && (
                   <tr>
-                    <td>Paid On</td>
-                    <td>{fmtDate(paidAt)}</td>
+                    <td style={{ color: "#6b6b6b" }}>Paid On</td>
+                    <td style={{ color: "#0d0d0d" }}>{fmtDate(paidAt)}</td>
                   </tr>
                 )}
                 {orderNumber && (
                   <tr>
-                    <td>Order No.</td>
+                    <td style={{ color: "#6b6b6b" }}>Order No.</td>
                     <td style={{ color: "var(--brand-accent)" }}>{orderNumber}</td>
                   </tr>
                 )}
@@ -153,26 +153,26 @@ export default function InvoiceDocument({
         <table className="invoice-table">
           <thead>
             <tr>
-              <th>Project Title / Description</th>
-              <th>QTY</th>
-              <th>Rate</th>
-              <th>Amount</th>
+              <th style={{ color: "#042f28" }}>Project Title / Description</th>
+              <th style={{ color: "#042f28" }}>QTY</th>
+              <th style={{ color: "#042f28" }}>Rate</th>
+              <th style={{ color: "#042f28" }}>Amount</th>
             </tr>
           </thead>
           <tbody>
             {lineItems.map((item) => (
               <tr key={item.id}>
                 <td>
-                  <span className="invoice-item-title">{item.description}</span>
+                  <span className="invoice-item-title" style={{ color: "#0d0d0d" }}>{item.description}</span>
                   {(orderStartDate || orderEndDate) && (
-                    <span className="invoice-item-sub">
+                    <span className="invoice-item-sub" style={{ color: "#6b6b6b" }}>
                       As discussed · {fmtShort(orderStartDate)} to {fmtShort(orderEndDate)}
                     </span>
                   )}
                 </td>
-                <td>{Number(item.quantity)}</td>
-                <td>{fmt(item.rate)}</td>
-                <td style={{ fontWeight: 600 }}>{fmt(item.amount)}</td>
+                <td style={{ color: "#0d0d0d" }}>{Number(item.quantity)}</td>
+                <td style={{ color: "#0d0d0d" }}>{fmt(item.rate)}</td>
+                <td style={{ fontWeight: 600, color: "#0d0d0d" }}>{fmt(item.amount)}</td>
               </tr>
             ))}
           </tbody>
@@ -182,25 +182,25 @@ export default function InvoiceDocument({
         <div className="invoice-totals-row">
           {/* Totals block */}
           <div className="invoice-totals-right">
-            <div className="invoice-total-block">
+            <div className="invoice-total-block" style={{ color: "#fff" }}>
               <span>Total (USD)</span>
               <span className="invoice-total-amount">{fmt(total)}</span>
             </div>
             {isPaid && (
               <>
                 <div className="invoice-totals-sub-row">
-                  <span className="invoice-totals-sub-paid">Amount Paid</span>
-                  <span className="invoice-totals-sub-paid">{fmt(total)}</span>
+                  <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>Amount Paid</span>
+                  <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>{fmt(total)}</span>
                 </div>
                 <div className="invoice-totals-sub-row">
-                  <span className="invoice-totals-sub-due">Balance Due</span>
-                  <span className="invoice-totals-sub-due">{fmt(0)}</span>
+                  <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>Balance Due</span>
+                  <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>{fmt(0)}</span>
                 </div>
               </>
             )}
             {!isPaid && (
               <div className="invoice-totals-sub-row">
-                <span className="invoice-totals-sub-due">Balance Due</span>
+                <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>Balance Due</span>
                 <span style={{ fontWeight: 600, color: "var(--neutral-900)" }}>{fmt(total)}</span>
               </div>
             )}
