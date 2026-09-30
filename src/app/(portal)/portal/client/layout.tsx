@@ -17,7 +17,9 @@ export default async function ClientLayout({
     select: { role: true, fullName: true, email: true, avatarUrl: true },
   });
 
-  if (!user || user.role !== "CLIENT") redirect("/portal/login");
+  if (!user || (user.role !== "CLIENT" && user.role !== "CLIENT_COLLEAGUE")) {
+    redirect("/portal/login");
+  }
 
   const unreadCount = await prisma.notification.count({
     where: { userId: session.user.id, isRead: false },

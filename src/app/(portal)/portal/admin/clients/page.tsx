@@ -19,6 +19,13 @@ export default async function ClientsPage() {
     include: {
       clientOrders: { select: { id: true, status: true, amount: true } },
       clientInvoices: { select: { isPaid: true, amountPaid: true, lineItems: { select: { amount: true } } } },
+      clientColleagues: {
+        include: {
+          colleague: { select: { id: true, fullName: true, email: true, isActive: true } },
+          thread: { select: { name: true } },
+        },
+        orderBy: { invitedAt: "desc" },
+      },
     },
   });
 
@@ -44,6 +51,15 @@ export default async function ClientsPage() {
       amountPaid: i.amountPaid ? i.amountPaid.toString() : null,
       lineItems: i.lineItems.map((li) => ({ amount: li.amount.toString() })),
     })),
+    colleagues: c.clientColleagues.map((cc) => ({
+      id: cc.colleague.id,
+      fullName: cc.colleague.fullName,
+      email: cc.colleague.email,
+      isActive: cc.colleague.isActive,
+      threadName: cc.thread.name,
+      status: cc.status,
+      invitedAt: cc.invitedAt,
+    })),
   }));
 
   const inviteData = pendingInvites.map((i) => ({
@@ -60,6 +76,7 @@ export default async function ClientsPage() {
           <h1 className="page-header-title">Clients</h1>
           <p className="page-header-sub">
             {clients.length} client{clients.length !== 1 ? "s" : ""}
+            {clientData.some((c) => c.colleagues.length > 0) && ` · ${clientData.reduce((acc, curr) => acc + curr.colleagues.length, 0)} colleague${clientData.reduce((acc, curr) => acc + curr.colleagues.length, 0) !== 1 ? "s" : ""}`}
             {pendingInvites.length > 0 && ` · ${pendingInvites.length} pending invitation${pendingInvites.length !== 1 ? "s" : ""}`}
           </p>
         </div>

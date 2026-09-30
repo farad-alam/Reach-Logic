@@ -1,7 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import Link from "next/link";
-import { Mail, RefreshCw, X } from "lucide-react";
+import { Mail, RefreshCw, X, ChevronDown, ChevronUp, Users } from "lucide-react";
+
+interface ColleagueData {
+  id: string;
+  fullName: string | null;
+  email: string;
+  isActive: boolean;
+  threadName: string;
+  status: string;
+  invitedAt: Date;
+}
 
 interface ClientData {
   id: string;
@@ -14,6 +24,7 @@ interface ClientData {
   createdAt: Date;
   orders: { status: string; amount: string | null }[];
   invoices: { isPaid: boolean; amountPaid: string | null; lineItems: { amount: string }[] }[];
+  colleagues: ColleagueData[];
 }
 
 interface InviteData {
@@ -40,7 +51,18 @@ export default function ClientTable({
   initialInvites: InviteData[];
 }) {
   const [invites, setInvites] = useState(initialInvites);
+  const [clients, setClients] = useState(initialClients);
   const [loading, setLoading] = useState<Record<string, string>>({});
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  function toggleRow(id: string) {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   async function revoke(inviteId: string) {
     setLoading((p) => ({ ...p, [inviteId]: "revoke" }));
@@ -80,6 +102,30 @@ export default function ClientTable({
     }
   }
 
+  async function removeColleague(colleagueId: string) {
+    if (!confirm("Are you sure you want to remove this colleague?")) return;
+    setLoading((p) => ({ ...p, [colleagueId]: "remove" }));
+    
+    const res = await fetch(`/api/portal/colleagues/${colleagueId}/remove`, {
+      method: "DELETE",
+    });
+    
+    if (res.ok) {
+      setClients((prev) => prev.map(c => ({
+        ...c,
+        colleagues: c.colleagues.filter(col => col.id !== colleagueId)
+      })));
+    } else {
+      alert("Failed to remove colleague");
+    }
+    
+    setLoading((p) => {
+      const n = { ...p };
+      delete n[colleagueId];
+      return n;
+    });
+  }
+
   function getInitials(name: string | null | undefined, email: string | null | undefined) {
     if (name && name.trim()) {
       const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -94,7 +140,7 @@ export default function ClientTable({
   }
 
   const combined = [
-    ...initialClients.map((c) => ({ type: "CLIENT" as const, data: c, date: new Date(c.createdAt) })),
+    ...clients.map((c) => ({ type: "CLIENT" as const, data: c, date: new Date(c.createdAt) })),
     ...invites.map((i) => ({ type: "INVITE" as const, data: i, date: new Date(i.createdAt) })),
   ].sort((a, b) => b.date.getTime() - a.date.getTime());
 
@@ -112,6 +158,7 @@ export default function ClientTable({
             <th>STATE</th>
             <th>TIME ZONE</th>
             <th>ORDERS</th>
+            <th>COLLEAGUES</th>
             <th>TOTAL VALUE</th>
             <th>STATUS</th>
             <th></th>
@@ -134,101 +181,196 @@ export default function ClientTable({
                   paid += Number(inv.amountPaid);
                 }
               }
-              const due = Math.max(0, totalValue - paid);
+              const isExpanded = expandedRows.has(client.id);
 
               return (
-                <tr key={`client-${client.id}`}>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <div
-                        style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: "50%",
-                          background: "var(--brand-dark)",
-                          color: "#fff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 13,
-                          fontWeight: 600,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {getInitials(client.fullName, client.email)}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 700, color: "var(--neutral-900)", fontSize: 14 }}>
-                          {client.fullName ?? "—"}
+                <Fragment key={`client-${client.id}`}>
+                  <tr>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: "50%",
+                            background: "var(--brand-dark)",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 13,
+                            fontWeight: 600,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {getInitials(client.fullName, client.email)}
                         </div>
-                        <div style={{ fontSize: 12, color: "var(--neutral-500)", display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-                          <Mail size={12} /> {client.email}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.country || "—"}</td>
-                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.state || "—"}</td>
-                  <td>
-                    {client.timezone ? (
-                      <div>
-                        <div style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>
-                          {client.timezone}
-                        </div>
-                        <div style={{ fontSize: 12, color: "var(--neutral-500)", display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                          {formatLocalTime(client.timezone) ? `${formatLocalTime(client.timezone)} local time` : "local time"}
+                        <div>
+                          <div style={{ fontWeight: 700, color: "var(--neutral-900)", fontSize: 14 }}>
+                            {client.fullName ?? "—"}
+                          </div>
+                          <div style={{ fontSize: 12, color: "var(--neutral-500)", display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                            <Mail size={12} /> {client.email}
+                          </div>
                         </div>
                       </div>
-                    ) : "—"}
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>
-                      {client.orders.length}
-                    </span>
-                    {activeOrders > 0 && (
+                    </td>
+                    <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.country || "—"}</td>
+                    <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.state || "—"}</td>
+                    <td>
+                      {client.timezone ? (
+                        <div>
+                          <div style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>
+                            {client.timezone}
+                          </div>
+                          <div style={{ fontSize: 12, color: "var(--neutral-500)", display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            {formatLocalTime(client.timezone) ? `${formatLocalTime(client.timezone)} local time` : "local time"}
+                          </div>
+                        </div>
+                      ) : "—"}
+                    </td>
+                    <td>
+                      <span style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>
+                        {client.orders.length}
+                      </span>
+                      {activeOrders > 0 && (
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            padding: "2px 8px",
+                            borderRadius: 12,
+                            background: "#e8f5f0",
+                            color: "#12c494",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {activeOrders} active
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      {client.colleagues.length === 0 ? (
+                        <span style={{ color: "var(--neutral-400)", fontSize: 14 }}>0</span>
+                      ) : (
+                        <button
+                          onClick={() => toggleRow(client.id)}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            padding: "4px 8px",
+                            borderRadius: 6,
+                            background: isExpanded ? "#085e51" : "#e8f5f0",
+                            color: isExpanded ? "#fff" : "#085e51",
+                            fontSize: 13,
+                            fontWeight: 600,
+                            border: "none",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <Users size={14} /> {client.colleagues.length} {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+                      )}
+                    </td>
+                    <td style={{ fontWeight: 700, color: "var(--neutral-900)", fontSize: 14 }}>
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalValue)}
+                    </td>
+                    <td>
                       <span
                         style={{
-                          marginLeft: 8,
-                          padding: "2px 8px",
-                          borderRadius: 12,
-                          background: "#e8f5f0",
-                          color: "#12c494",
+                          padding: "4px 10px",
+                          borderRadius: 6,
+                          background: client.isActive ? "#e8f5f0" : "#fee2e2",
+                          color: client.isActive ? "#12c494" : "#ef4444",
                           fontSize: 12,
                           fontWeight: 600,
                         }}
                       >
-                        {activeOrders} active
+                        {client.isActive ? "Active" : "Inactive"}
                       </span>
-                    )}
-                  </td>
-                  <td style={{ fontWeight: 700, color: "var(--neutral-900)", fontSize: 14 }}>
-                    {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalValue)}
-                  </td>
-                  <td>
-                    <span
-                      style={{
-                        padding: "4px 10px",
-                        borderRadius: 6,
-                        background: client.isActive ? "#e8f5f0" : "#fee2e2",
-                        color: client.isActive ? "#12c494" : "#ef4444",
-                        fontSize: 12,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {client.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: "right" }}>
-                    <Link
-                      href={`/portal/admin/clients/${client.id}`}
-                      className="btn btn-outline btn-sm"
-                      style={{ background: "#fff", borderColor: "var(--neutral-200)", color: "var(--neutral-700)" }}
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <Link
+                        href={`/portal/admin/clients/${client.id}`}
+                        className="btn btn-outline btn-sm"
+                        style={{ background: "#fff", borderColor: "var(--neutral-200)", color: "var(--neutral-700)" }}
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                  
+                  {isExpanded && (
+                    <tr>
+                      <td colSpan={9} style={{ padding: "0 20px 20px 20px", background: "#f8fafc", borderBottom: "1px solid var(--neutral-200)" }}>
+                        <div style={{ background: "#fff", borderRadius: 8, border: "1px solid var(--neutral-200)", overflow: "hidden" }}>
+                          <div style={{ padding: "12px 16px", background: "#f8fafc", borderBottom: "1px solid var(--neutral-200)", fontSize: 13, fontWeight: 600, color: "var(--brand-dark)", display: "flex", alignItems: "center", gap: 8 }}>
+                            <Users size={14} /> Colleagues added by {client.fullName ?? "client"} ({client.colleagues.length})
+                          </div>
+                          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <thead>
+                              <tr>
+                                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--neutral-500)", borderBottom: "1px solid var(--neutral-100)" }}>NAME</th>
+                                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--neutral-500)", borderBottom: "1px solid var(--neutral-100)" }}>EMAIL</th>
+                                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--neutral-500)", borderBottom: "1px solid var(--neutral-100)" }}>THREAD ACCESS</th>
+                                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--neutral-500)", borderBottom: "1px solid var(--neutral-100)" }}>ADDED ON</th>
+                                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "var(--neutral-500)", borderBottom: "1px solid var(--neutral-100)" }}>STATUS</th>
+                                <th style={{ padding: "12px 16px", textAlign: "right", fontSize: 11, fontWeight: 600, color: "var(--neutral-500)", borderBottom: "1px solid var(--neutral-100)" }}></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {client.colleagues.map((col, idx) => {
+                                // Group by colleague ID if we have multiple threads, but here they are flattened.
+                                // It's fine to show a row per thread access as per the image
+                                return (
+                                  <tr key={`colleague-${col.id}-${idx}`}>
+                                    <td style={{ padding: "12px 16px", borderBottom: "1px solid var(--neutral-100)" }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#f1f5f9", color: "var(--neutral-700)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600 }}>
+                                          {getInitials(col.fullName, col.email)}
+                                        </div>
+                                        <span style={{ fontWeight: 600, fontSize: 13, color: "var(--neutral-900)" }}>{col.fullName}</span>
+                                      </div>
+                                    </td>
+                                    <td style={{ padding: "12px 16px", fontSize: 13, color: "var(--neutral-600)", borderBottom: "1px solid var(--neutral-100)" }}>{col.email}</td>
+                                    <td style={{ padding: "12px 16px", borderBottom: "1px solid var(--neutral-100)" }}>
+                                      <span style={{ padding: "2px 8px", borderRadius: 4, background: "#eff6ff", color: "#3b82f6", fontSize: 12, fontWeight: 500 }}>
+                                        {col.threadName}
+                                      </span>
+                                    </td>
+                                    <td style={{ padding: "12px 16px", fontSize: 13, color: "var(--neutral-500)", borderBottom: "1px solid var(--neutral-100)" }}>
+                                      {new Date(col.invitedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </td>
+                                    <td style={{ padding: "12px 16px", borderBottom: "1px solid var(--neutral-100)" }}>
+                                      <span style={{
+                                        padding: "2px 8px", borderRadius: 12, fontSize: 12, fontWeight: 500,
+                                        background: col.status === "ACTIVE" ? "#e8f5f0" : "#fef3c7",
+                                        color: col.status === "ACTIVE" ? "#12c494" : "#d97706",
+                                      }}>
+                                        {col.status === "ACTIVE" ? "Active" : "Invited"}
+                                      </span>
+                                    </td>
+                                    <td style={{ padding: "12px 16px", textAlign: "right", borderBottom: "1px solid var(--neutral-100)" }}>
+                                      <button 
+                                        style={{ background: "none", border: "none", color: "#ef4444", fontSize: 13, fontWeight: 500, cursor: "pointer" }}
+                                        onClick={() => removeColleague(col.id)}
+                                        disabled={!!loading[col.id]}
+                                      >
+                                        {loading[col.id] ? "Removing..." : "Remove"}
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               );
             } else {
               const invite = item.data as InviteData;
@@ -269,6 +411,7 @@ export default function ClientTable({
                   <td>
                     <span style={{ fontWeight: 600, color: "var(--neutral-900)", fontSize: 14 }}>0</span>
                   </td>
+                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>—</td>
                   <td style={{ fontWeight: 700, color: "var(--neutral-900)", fontSize: 14 }}>$0.00</td>
                   <td>
                     <span

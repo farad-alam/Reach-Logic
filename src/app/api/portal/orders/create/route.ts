@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   }
   
   const role = (session.user as { role?: string }).role;
-  if (role !== "CLIENT" && role !== "SUPER_ADMIN") {
+  if (role !== "CLIENT" && role !== "SUPER_ADMIN" && role !== "CLIENT_COLLEAGUE") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -80,6 +80,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Client not found." }, { status: 404 });
       }
       clientId = bodyClientId;
+    } else if (role === "CLIENT_COLLEAGUE") {
+      // Find the original client who invited this colleague
+      const relationship = await prisma.clientColleague.findFirst({
+        where: { colleagueId: session.user.id },
+        select: { clientId: true },
+      });
+      if (!relationship) {
+        return NextResponse.json({ error: "Client association not found." }, { status: 404 });
+      }
+      clientId = relationship.clientId;
     } else {
       clientId = session.user.id;
     }

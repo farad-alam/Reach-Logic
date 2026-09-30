@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Plus, PenLine, Users, Check, ChevronLeft, ChevronRight, MessageSquare, X, FileText } from "lucide-react";
+import { ChevronDown, Plus, PenLine, Users, Check, ChevronLeft, ChevronRight, MessageSquare, X, FileText, Trash2 } from "lucide-react";
 import MessageThread from "@/components/portal/MessageThread";
 import ThreadInfoSidebar from "@/components/portal/ThreadInfoSidebar";
 
@@ -63,6 +63,7 @@ export default function AdminChatPage({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newThreadName, setNewThreadName] = useState("");
   const [renameValue, setRenameValue] = useState("");
   const [modalLoading, setModalLoading] = useState(false);
@@ -137,6 +138,22 @@ export default function AdminChatPage({
     setModalLoading(false);
     setShowRenameModal(false);
     setRenameValue("");
+  }
+
+  async function deleteThread() {
+    if (!selectedThreadId) return;
+    setModalLoading(true);
+    const res = await fetch(`/api/portal/threads/${selectedThreadId}/delete`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (data.ok) {
+      const remaining = threads.filter((t) => t.id !== selectedThreadId);
+      setThreads(remaining);
+      setSelectedThreadId(remaining.length > 0 ? remaining[0].id : null);
+    }
+    setModalLoading(false);
+    setShowDeleteModal(false);
   }
 
   return (
@@ -218,6 +235,9 @@ export default function AdminChatPage({
                   </button>
                   <button className="thread-drop-action" onClick={() => { setShowMembersModal(true); setThreadDropOpen(false); }} disabled={!selectedThreadId}>
                     <Users size={13} /> Manage members
+                  </button>
+                  <button className="thread-drop-action text-red-500" onClick={() => { setShowDeleteModal(true); setThreadDropOpen(false); }} disabled={!selectedThreadId} style={{ color: "#ef4444" }}>
+                    <Trash2 size={13} /> Delete this thread
                   </button>
                 </div>
               )}
@@ -312,6 +332,35 @@ export default function AdminChatPage({
               <button className="btn btn-outline btn-sm" onClick={() => setShowRenameModal(false)}>Cancel</button>
               <button className="btn btn-primary btn-sm" onClick={renameThread} disabled={modalLoading || !renameValue.trim()}>
                 {modalLoading ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Delete Thread</h3>
+              <button onClick={() => setShowDeleteModal(false)}><X size={18} /></button>
+            </div>
+            <div className="modal-body">
+              <p style={{ fontSize: 14, color: "var(--neutral-600)", lineHeight: 1.5 }}>
+                Are you sure you want to delete <strong>{selectedThread?.name}</strong>? 
+                This will permanently remove the thread and all associated messages. This action cannot be undone.
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-outline btn-sm" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button 
+                className="btn btn-sm" 
+                onClick={deleteThread} 
+                disabled={modalLoading}
+                style={{ background: "#ef4444", color: "white", border: "none" }}
+              >
+                {modalLoading ? "Deleting…" : "Delete"}
               </button>
             </div>
           </div>

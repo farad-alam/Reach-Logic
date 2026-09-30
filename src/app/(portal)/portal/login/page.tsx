@@ -11,7 +11,7 @@ export default async function LoginPage() {
     const role = (session.user as any).role;
     if (role === "SUPER_ADMIN") {
       redirect("/portal/admin");
-    } else if (role === "CLIENT") {
+    } else if (role === "CLIENT" || role === "CLIENT_COLLEAGUE") {
       redirect("/portal/client");
     } else if (role === "TEAM_MEMBER") {
       redirect("/portal/team/messages");

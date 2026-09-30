@@ -56,6 +56,7 @@ enum UserRole {
   SUPER_ADMIN
   TEAM_MEMBER
   CLIENT
+  CLIENT_COLLEAGUE
 }
 
 model User {
@@ -88,8 +89,29 @@ model User {
   sentMessages       Message[]
   notifications      Notification[]
   clientThreads      Thread[]
+  clientColleagues   ClientColleague[] @relation("ClientColleagues")
+  colleagueOf        ClientColleague[] @relation("ColleagueOf")
 
   @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// CLIENT COLLEAGUES
+// ─────────────────────────────────────────────
+
+model ClientColleague {
+  id          String   @id @default(cuid())
+  clientId    String   // The original client who invited
+  client      User     @relation("ClientColleagues", fields: [clientId], references: [id])
+  colleagueId String   // The colleague user
+  colleague   User     @relation("ColleagueOf", fields: [colleagueId], references: [id])
+  threadId    String   // The specific thread they were added to
+  thread      Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  status      String   @default("INVITED") // "INVITED" | "ACTIVE"
+  invitedAt   DateTime @default(now())
+
+  @@unique([clientId, colleagueId, threadId])
+  @@map("client_colleagues")
 }
 
 // ─────────────────────────────────────────────
@@ -231,6 +253,7 @@ model Thread {
   members  ThreadMember[]
   messages Message[]
   orders   Order[]
+  colleagues ClientColleague[]
 
   @@index([clientId])
   @@map("threads")

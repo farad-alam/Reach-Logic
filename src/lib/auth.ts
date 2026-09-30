@@ -47,6 +47,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
 
+        // If the user is a CLIENT_COLLEAGUE, mark their invitations as active
+        if (user.role === "CLIENT_COLLEAGUE") {
+          await prisma.clientColleague.updateMany({
+            where: { colleagueId: user.id, status: "INVITED" },
+            data: { status: "ACTIVE" },
+          });
+        }
+
         return {
           id: user.id,
           email: user.email,
