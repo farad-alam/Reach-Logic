@@ -14,9 +14,11 @@ export default function TawkToChat() {
   const widgetId = process.env.NEXT_PUBLIC_TAWK_WIDGET_ID;
 
   if (!propertyId || !widgetId || propertyId === "YOUR_PROPERTY_ID") {
-    // Return null while the ID is not set, so we don't load a broken script
+    console.warn("Tawk.to is missing propertyId or widgetId. Check your .env.local file and restart your dev server!");
     return null;
   }
+  
+  console.log("Tawk.to widget is loading with Property ID:", propertyId);
 
   return (
     <Script
@@ -31,7 +33,11 @@ export default function TawkToChat() {
           s1.src='https://embed.tawk.to/${propertyId}/${widgetId}';
           s1.charset='UTF-8';
           s1.setAttribute('crossorigin','*');
-          s0.parentNode.insertBefore(s1,s0);
+          if (s0 && s0.parentNode) {
+            s0.parentNode.insertBefore(s1,s0);
+          } else {
+            document.head.appendChild(s1);
+          }
           })();
         `,
       }}

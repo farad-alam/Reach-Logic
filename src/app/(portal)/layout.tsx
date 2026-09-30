@@ -12,10 +12,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+import TawkToChat from "@/components/TawkToChat";
+
 export default function PortalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>{children}</div>;
+  return (
+    <div style={{ fontFamily: "var(--font-inter), system-ui, sans-serif", height: "100vh" }}>
+      {children}
+      <TawkToChat />
+    </div>
+  );
 }
