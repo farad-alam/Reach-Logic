@@ -1060,7 +1060,7 @@
 /* Full-page chat workspace */
 .admin-chat-shell {
   display: grid;
-  grid-template-columns: auto 1fr 280px;
+  grid-template-columns: 1fr 280px;
   height: calc(100vh - 1px);
   overflow: hidden;
   background: #fff;

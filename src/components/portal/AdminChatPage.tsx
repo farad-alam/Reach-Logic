@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Plus, PenLine, Users, Check, ChevronLeft, ChevronRight, MessageSquare, X, FileText, Trash2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Plus, PenLine, Users, X, MessageSquare, Trash2 } from "lucide-react";
 import MessageThread from "@/components/portal/MessageThread";
 import ThreadInfoSidebar from "@/components/portal/ThreadInfoSidebar";
 
@@ -47,22 +48,21 @@ export default function AdminChatPage({
   clients,
   currentUserId,
   initialClientId,
+  initialThreadId,
 }: {
   clients: ClientRow[];
   currentUserId: string;
   initialClientId?: string;
+  initialThreadId?: string;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(initialClientId ?? clients[0]?.id ?? null);
-  
-  // Tree state
-  const [expandedClients, setExpandedClients] = useState<Set<string>>(
-    new Set(initialClientId ? [initialClientId] : [clients[0]?.id ?? ""])
-  );
-  const [threadsByClient, setThreadsByClient] = useState<Record<string, Thread[]>>({});
-  const [loadingClients, setLoadingClients] = useState<Set<string>>(new Set());
-  
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const selectedClientId = searchParams.get("clientId") ?? initialClientId ?? null;
+  const selectedThreadId = searchParams.get("threadId") ?? initialThreadId ?? null;
+
+  const [activeThreads, setActiveThreads] = useState<Thread[]>([]);
+  const [loadingThreads, setLoadingThreads] = useState(false);
 
   // Thread management modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -73,49 +73,35 @@ export default function AdminChatPage({
   const [renameValue, setRenameValue] = useState("");
   const [modalLoading, setModalLoading] = useState(false);
 
-  // Load threads for expanded clients
+  const navigate = useCallback((clientId: string | null, threadId: string | null) => {
+    const params = new URLSearchParams();
+    if (clientId) params.set("clientId", clientId);
+    if (threadId) params.set("threadId", threadId);
+    router.push(`/portal/admin/messages?${params.toString()}`);
+  }, [router]);
+
+  // Load threads when clientId changes
   useEffect(() => {
-    expandedClients.forEach((clientId) => {
-      if (clientId && !threadsByClient[clientId] && !loadingClients.has(clientId)) {
-        setLoadingClients((prev) => new Set(prev).add(clientId));
-        fetch(`/api/portal/threads?clientId=${clientId}`)
-          .then((r) => r.json())
-          .then((data) => {
-            const list: Thread[] = data.threads ?? [];
-            setThreadsByClient((prev) => ({ ...prev, [clientId]: list }));
-            
-            // If this is the selected client and we don't have a thread selected, select the most recent one
-            if (clientId === selectedClientId && !selectedThreadId) {
-              const sorted = [...list].sort((a, b) => {
-                const da = a.messages[0]?.createdAt ? new Date(a.messages[0].createdAt).getTime() : 0;
-                const db = b.messages[0]?.createdAt ? new Date(b.messages[0].createdAt).getTime() : 0;
-                return db - da;
-              });
-              setSelectedThreadId(sorted[0]?.id ?? null);
-            }
-          })
-          .finally(() => {
-            setLoadingClients((prev) => {
-              const next = new Set(prev);
-              next.delete(clientId);
-              return next;
-            });
+    if (!selectedClientId) { setActiveThreads([]); return; }
+    setLoadingThreads(true);
+    fetch(`/api/portal/threads?clientId=${selectedClientId}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const list: Thread[] = data.threads ?? [];
+        setActiveThreads(list);
+        // Auto-select most recent thread if none selected
+        if (!selectedThreadId && list.length > 0) {
+          const sorted = [...list].sort((a, b) => {
+            const da = a.messages[0]?.createdAt ? new Date(a.messages[0].createdAt).getTime() : 0;
+            const db = b.messages[0]?.createdAt ? new Date(b.messages[0].createdAt).getTime() : 0;
+            return db - da;
           });
-      }
-    });
+          navigate(selectedClientId, sorted[0].id);
+        }
+      })
+      .finally(() => setLoadingThreads(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expandedClients, selectedClientId]);
-
-  const toggleClientExpanded = (clientId: string) => {
-    setExpandedClients((prev) => {
-      const next = new Set(prev);
-      if (next.has(clientId)) next.delete(clientId);
-      else next.add(clientId);
-      return next;
-    });
-  };
-
-  const activeThreads = selectedClientId ? (threadsByClient[selectedClientId] || []) : [];
+  }, [selectedClientId]);
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
   const selectedThread = activeThreads.find((t) => t.id === selectedThreadId);
@@ -130,12 +116,8 @@ export default function AdminChatPage({
     });
     const data = await res.json();
     if (data.ok && data.thread) {
-      setThreadsByClient((prev) => {
-        const list = prev[selectedClientId] || [];
-        return { ...prev, [selectedClientId]: [...list, data.thread] };
-      });
-      setSelectedThreadId(data.thread.id);
-      setExpandedClients((prev) => new Set(prev).add(selectedClientId));
+      setActiveThreads((prev) => [...prev, data.thread]);
+      navigate(selectedClientId, data.thread.id);
     }
     setModalLoading(false);
     setShowCreateModal(false);
@@ -143,7 +125,7 @@ export default function AdminChatPage({
   }
 
   async function renameThread() {
-    if (!renameValue.trim() || !selectedThreadId || !selectedClientId) return;
+    if (!renameValue.trim() || !selectedThreadId) return;
     setModalLoading(true);
     const res = await fetch(`/api/portal/threads/${selectedThreadId}/rename`, {
       method: "PATCH",
@@ -152,13 +134,7 @@ export default function AdminChatPage({
     });
     const data = await res.json();
     if (data.ok) {
-      setThreadsByClient((prev) => {
-        const list = prev[selectedClientId] || [];
-        return {
-          ...prev,
-          [selectedClientId]: list.map((t) => t.id === selectedThreadId ? { ...t, name: data.thread.name } : t)
-        };
-      });
+      setActiveThreads((prev) => prev.map((t) => t.id === selectedThreadId ? { ...t, name: data.thread.name } : t));
     }
     setModalLoading(false);
     setShowRenameModal(false);
@@ -173,14 +149,9 @@ export default function AdminChatPage({
     });
     const data = await res.json();
     if (data.ok) {
-      setThreadsByClient((prev) => {
-        const list = prev[selectedClientId] || [];
-        const remaining = list.filter((t) => t.id !== selectedThreadId);
-        if (selectedThreadId === selectedThreadId) { // Need to update selectedThreadId asynchronously or here
-           setSelectedThreadId(remaining.length > 0 ? remaining[0].id : null);
-        }
-        return { ...prev, [selectedClientId]: remaining };
-      });
+      const remaining = activeThreads.filter((t) => t.id !== selectedThreadId);
+      setActiveThreads(remaining);
+      navigate(selectedClientId, remaining.length > 0 ? remaining[0].id : null);
     }
     setModalLoading(false);
     setShowDeleteModal(false);
@@ -188,95 +159,6 @@ export default function AdminChatPage({
 
   return (
     <div className="admin-chat-shell">
-      {/* Left: Client list sidebar */}
-      <div className={`chat-client-sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
-        <div className="chat-client-sidebar-header">
-          {sidebarOpen && <span className="chat-sidebar-label">Conversations</span>}
-          <button className="sidebar-toggle-btn" onClick={() => setSidebarOpen((v) => !v)}>
-            {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-          </button>
-        </div>
-        <div className="chat-client-list">
-          {/* Accordion Tree view */}
-          <div className="chat-client-tree">
-            {clients.map((client) => {
-              const isExpanded = expandedClients.has(client.id);
-              const clientThreads = threadsByClient[client.id] || [];
-              const isLoading = loadingClients.has(client.id);
-              
-              return (
-                <div key={client.id} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-                  <button
-                    className={`chat-client-header ${selectedClientId === client.id ? "active" : ""}`}
-                    onClick={() => {
-                      setSelectedClientId(client.id);
-                      if (!isExpanded) toggleClientExpanded(client.id);
-                    }}
-                  >
-                    <div style={{ position: "relative", flexShrink: 0 }}>
-                      <Initials name={client.fullName} email={client.email} size={28} />
-                      {(client.unread ?? 0) > 0 && (
-                        <span className="client-unread-dot">{client.unread! > 9 ? "9+" : client.unread}</span>
-                      )}
-                    </div>
-                    {sidebarOpen && (
-                      <>
-                        <div className="chat-client-name">{client.fullName || client.email}</div>
-                        <div className="chat-client-actions" onClick={(e) => e.stopPropagation()}>
-                          <button onClick={(e) => { e.stopPropagation(); setSelectedClientId(client.id); setShowCreateModal(true); }}>
-                            <Plus size={14} />
-                          </button>
-                          <button onClick={(e) => { e.stopPropagation(); toggleClientExpanded(client.id); }}>
-                            <ChevronDown size={14} style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s" }} />
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </button>
-
-                  {/* Threads for this client */}
-                  {isExpanded && sidebarOpen && (
-                    <div className="chat-thread-tree-list">
-                      {isLoading ? (
-                        <div style={{ padding: "8px 20px", fontSize: 12, color: "var(--neutral-400)" }}>Loading...</div>
-                      ) : clientThreads.length === 0 ? (
-                        <div style={{ padding: "8px 20px", fontSize: 12, color: "var(--neutral-400)" }}>No threads</div>
-                      ) : (
-                        clientThreads.map((t) => (
-                          <div
-                            key={t.id}
-                            className={`chat-thread-item ${t.id === selectedThreadId ? "active" : ""}`}
-                            onClick={() => {
-                              setSelectedClientId(client.id);
-                              setSelectedThreadId(t.id);
-                            }}
-                          >
-                            <div className="thread-dot" />
-                            <div className="chat-thread-name">{t.name}</div>
-                            
-                            {/* Hover context menu */}
-                            <div className="thread-kebab-menu" onClick={(e) => e.stopPropagation()}>
-                              <div style={{ display: "flex", gap: 2 }}>
-                                <button className="thread-kebab-btn" onClick={(e) => { e.stopPropagation(); setSelectedThreadId(t.id); setSelectedClientId(client.id); setRenameValue(t.name); setShowRenameModal(true); }}>
-                                  <PenLine size={12} />
-                                </button>
-                                <button className="thread-kebab-btn" onClick={(e) => { e.stopPropagation(); setSelectedThreadId(t.id); setSelectedClientId(client.id); setShowDeleteModal(true); }}>
-                                  <Trash2 size={12} color="#ef4444" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
       {/* Center: Chat area */}
       <div className="chat-center">
         {/* Chat topbar */}
@@ -298,19 +180,35 @@ export default function AdminChatPage({
               <>
                 <Initials name={selectedClient.fullName} email={selectedClient.email} size={36} />
                 <div className="breadcrumb-text">
-                  <div className="breadcrumb-title">
-                    {selectedClient.fullName || selectedClient.email}
+                  <div className="breadcrumb-title">{selectedClient.fullName || selectedClient.email}</div>
+                  <div className="breadcrumb-subtitle">
+                    {loadingThreads ? "Loading threads…" : "Select a thread from the sidebar"}
                   </div>
-                  <div className="breadcrumb-subtitle">Select a thread</div>
                 </div>
               </>
             ) : (
-              <div className="breadcrumb-title">Select a Client</div>
+              <div className="breadcrumb-title" style={{ color: "var(--neutral-400)" }}>Select a client from the sidebar</div>
             )}
           </div>
 
           {selectedClientId && (
             <div style={{ display: "flex", gap: 10 }}>
+              <button className="btn btn-outline btn-sm" onClick={() => { setShowCreateModal(true); }} disabled={!selectedClientId}>
+                <Plus size={14} /> New Thread
+              </button>
+              {selectedThread && (
+                <>
+                  <button className="btn btn-outline btn-sm" title="Rename" onClick={() => { setRenameValue(selectedThread.name); setShowRenameModal(true); }}>
+                    <PenLine size={14} />
+                  </button>
+                  <button className="btn btn-outline btn-sm" title="Manage members" onClick={() => setShowMembersModal(true)}>
+                    <Users size={14} />
+                  </button>
+                  <button className="btn btn-outline btn-sm" title="Delete thread" onClick={() => setShowDeleteModal(true)} style={{ color: "#ef4444" }}>
+                    <Trash2 size={14} />
+                  </button>
+                </>
+              )}
               <a href={`/portal/admin/invoices/new?clientId=${selectedClientId}`} className="btn btn-outline btn-sm">Create Invoice</a>
               <a href={`/portal/admin/orders/new?clientId=${selectedClientId}`} className="btn btn-primary btn-sm">+ New Order</a>
             </div>
@@ -322,12 +220,12 @@ export default function AdminChatPage({
           {!selectedClientId ? (
             <div className="chat-empty-state">
               <MessageSquare size={40} color="var(--neutral-300)" />
-              <div>Select a client to start messaging</div>
+              <div>Select a client from the sidebar to start messaging</div>
             </div>
           ) : !selectedThreadId ? (
             <div className="chat-empty-state">
               <MessageSquare size={40} color="var(--neutral-300)" />
-              <div>{loadingClients.has(selectedClientId) ? "Loading threads…" : "No threads yet — create one by clicking + on the client row"}</div>
+              <div>{loadingThreads ? "Loading threads…" : "No threads yet — click '+ New Thread' above"}</div>
             </div>
           ) : (
             <MessageThread key={selectedThreadId} threadId={selectedThreadId} currentUserId={currentUserId} />
@@ -427,18 +325,12 @@ export default function AdminChatPage({
       )}
 
       {/* Manage Members Modal */}
-      {showMembersModal && selectedThreadId && selectedClientId && (
+      {showMembersModal && selectedThreadId && (
         <ManageMembersModal
           threadId={selectedThreadId}
           thread={selectedThread!}
           onClose={() => setShowMembersModal(false)}
-          onUpdate={(updated) => setThreadsByClient((prev) => {
-            const list = prev[selectedClientId] || [];
-            return {
-              ...prev,
-              [selectedClientId]: list.map((t) => t.id === updated.id ? updated : t)
-            };
-          })}
+          onUpdate={(updated) => setActiveThreads((prev) => prev.map((t) => t.id === updated.id ? updated : t))}
         />
       )}
     </div>

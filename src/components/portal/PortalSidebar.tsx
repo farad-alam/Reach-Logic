@@ -305,8 +305,21 @@ export default function PortalSidebar({
                       <div>
                         {groupedThreads.map((group) => (
                           <div key={group.clientId} style={{ marginBottom: 8 }}>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", padding: "6px 12px 2px 12px" }}>
-                              {group.clientName}
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 12px 2px 12px" }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                                {group.clientName}
+                              </div>
+                              <button
+                                onClick={() => {
+                                  router.push(`${messagesBaseRoute}?clientId=${group.clientId}`);
+                                }}
+                                title="New thread"
+                                style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.4)", padding: "2px 4px", display: "flex", alignItems: "center", borderRadius: 4 }}
+                                onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+                              >
+                                <Plus size={12} />
+                              </button>
                             </div>
                             {group.threads.map((t) => {
                               const isThreadActive = activeThreadId ? activeThreadId === t.id : pathname.includes(t.id);

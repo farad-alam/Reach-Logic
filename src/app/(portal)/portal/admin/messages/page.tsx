@@ -9,12 +9,12 @@ export const metadata = { title: "Messages" };
 export default async function AdminMessagesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string }>;
+  searchParams: Promise<{ clientId?: string; threadId?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/portal/login");
   
-  const { clientId } = await searchParams;
+  const { clientId, threadId } = await searchParams;
 
   // Fetch all clients with their thread summary
   const clients = await prisma.user.findMany({
@@ -49,6 +49,7 @@ export default async function AdminMessagesPage({
         clients={clientsWithUnread}
         currentUserId={session.user.id}
         initialClientId={clientId}
+        initialThreadId={threadId}
       />
     </div>
   );
