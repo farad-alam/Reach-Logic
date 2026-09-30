@@ -90,6 +90,130 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
+function ClientSidebarGroup({
+  group,
+  activeThreadId,
+  pathname,
+  messagesBaseRoute,
+  router
+}: {
+  group: { clientId: string; clientName: string; threads: ThreadItem[]; unreadCount: number };
+  activeThreadId: string | null;
+  pathname: string;
+  messagesBaseRoute: string;
+  router: any;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const hasActiveChild = group.threads.some(t => activeThreadId ? activeThreadId === t.id : pathname.includes(t.id));
+  
+  useEffect(() => {
+    if (hasActiveChild) {
+      setExpanded(true);
+    }
+  }, [hasActiveChild]);
+
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "8px 10px",
+          background: hasActiveChild && !expanded ? "rgba(255,255,255,0.05)" : "transparent",
+          border: "none",
+          borderRadius: 8,
+          cursor: "pointer",
+          color: "#fff",
+          transition: "background 0.2s",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = hasActiveChild && !expanded ? "rgba(255,255,255,0.05)" : "transparent"; }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#fff", color: "var(--brand-dark)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+            {getInitials(group.clientName)}
+          </div>
+          <span style={{ fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {group.clientName}
+          </span>
+          {group.unreadCount > 0 && (
+            <span style={{ background: "#ef4444", color: "#fff", fontSize: 11, fontWeight: 600, padding: "2px 6px", borderRadius: 10 }}>
+              {group.unreadCount}
+            </span>
+          )}
+        </div>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`${messagesBaseRoute}?clientId=${group.clientId}`);
+            }}
+            style={{ 
+              width: 20, height: 20, borderRadius: 4, border: "1px solid rgba(255,255,255,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "rgba(255,255,255,0.7)"
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.7)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}
+          >
+            <Plus size={12} />
+          </div>
+          <div style={{ color: "rgba(255,255,255,0.5)", display: "flex" }}>
+            <ChevronDown size={14} style={{ transform: expanded ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s" }} />
+          </div>
+        </div>
+      </button>
+
+      {expanded && (
+        <div style={{ paddingLeft: 14, paddingTop: 4, position: "relative" }}>
+          {/* Connecting line */}
+          <div style={{ position: "absolute", left: 23, top: 0, bottom: 8, width: 1, background: "rgba(255,255,255,0.1)" }} />
+          
+          {group.threads.map((t) => {
+            const isThreadActive = activeThreadId ? activeThreadId === t.id : pathname.includes(t.id);
+            return (
+              <Link
+                key={t.id}
+                href={`${messagesBaseRoute}?clientId=${group.clientId}&threadId=${t.id}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "6px 10px 6px 20px",
+                  fontSize: 13,
+                  color: isThreadActive ? "#fff" : "rgba(255,255,255,0.7)",
+                  background: isThreadActive ? "rgba(255,255,255,0.12)" : "transparent",
+                  borderRadius: 6,
+                  textDecoration: "none",
+                  marginBottom: 2,
+                  fontWeight: isThreadActive ? 600 : 400,
+                  transition: "background 0.15s, color 0.15s"
+                }}
+                onMouseEnter={(e) => { if (!isThreadActive) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#fff"; } }}
+                onMouseLeave={(e) => { if (!isThreadActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; } }}
+              >
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: isThreadActive ? "var(--brand-accent)" : "rgba(255,255,255,0.3)" }} />
+                <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {t.name}
+                </span>
+                {(t.unread ?? 0) > 0 && (
+                  <span style={{ background: "#ef4444", color: "#fff", fontSize: 10, fontWeight: 600, padding: "2px 5px", borderRadius: 10 }}>
+                    {t.unread}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PortalSidebar({
   role,
   userName,
@@ -153,19 +277,23 @@ export default function PortalSidebar({
   }
 
   // Group threads by client for ADMIN / TEAM_MEMBER
-  const groupedThreads: { clientId: string; clientName: string; threads: ThreadItem[] }[] = [];
+  const groupedThreads: { clientId: string; clientName: string; threads: ThreadItem[]; unreadCount: number }[] = [];
   if (role !== "CLIENT") {
-    const map = new Map<string, { clientName: string; threads: ThreadItem[] }>();
+    const map = new Map<string, { clientName: string; threads: ThreadItem[]; unreadCount: number }>();
     threads.forEach((t) => {
       const cId = t.clientId || "unknown";
       const cName = t.client?.fullName || t.client?.email || "CLIENT";
       if (!map.has(cId)) {
-        map.set(cId, { clientName: cName, threads: [] });
+        map.set(cId, { clientName: cName, threads: [], unreadCount: 0 });
       }
-      map.get(cId)!.threads.push(t);
+      const group = map.get(cId)!;
+      group.threads.push(t);
+      if (t.unread && t.unread > 0) {
+        group.unreadCount += t.unread;
+      }
     });
     map.forEach((val, key) => {
-      groupedThreads.push({ clientId: key, clientName: val.clientName, threads: val.threads });
+      groupedThreads.push({ clientId: key, clientName: val.clientName, threads: val.threads, unreadCount: val.unreadCount });
     });
   }
 
@@ -302,55 +430,16 @@ export default function PortalSidebar({
                         </form>
                       </div>
                     ) : (
-                      <div>
+                      <div style={{ padding: "4px 8px" }}>
                         {groupedThreads.map((group) => (
-                          <div key={group.clientId} style={{ marginBottom: 8 }}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 12px 2px 12px" }}>
-                              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                                {group.clientName}
-                              </div>
-                              <button
-                                onClick={() => {
-                                  router.push(`${messagesBaseRoute}?clientId=${group.clientId}`);
-                                }}
-                                title="New thread"
-                                style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.4)", padding: "2px 4px", display: "flex", alignItems: "center", borderRadius: 4 }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
-                              >
-                                <Plus size={12} />
-                              </button>
-                            </div>
-                            {group.threads.map((t) => {
-                              const isThreadActive = activeThreadId ? activeThreadId === t.id : pathname.includes(t.id);
-                              return (
-                                <Link
-                                  key={t.id}
-                                  href={`${messagesBaseRoute}?clientId=${group.clientId}&threadId=${t.id}`}
-                                  className={`portal-subnav-link ${isThreadActive ? "active" : ""}`}
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 8,
-                                    padding: "6px 12px 6px 16px",
-                                    fontSize: 13,
-                                    color: isThreadActive ? "#fff" : "rgba(255,255,255,0.7)",
-                                    background: isThreadActive ? "rgba(255,255,255,0.12)" : "transparent",
-                                    borderRadius: 6,
-                                    textDecoration: "none",
-                                    marginBottom: 2,
-                                    fontWeight: isThreadActive ? 600 : 400,
-                                  }}
-                                >
-                                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: isThreadActive ? "var(--brand-accent)" : "rgba(255,255,255,0.4)" }} />
-                                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {t.name}
-                                  </span>
-                                  {(t.unread ?? 0) > 0 && <span className="portal-nav-badge">{t.unread}</span>}
-                                </Link>
-                              );
-                            })}
-                          </div>
+                          <ClientSidebarGroup
+                            key={group.clientId}
+                            group={group}
+                            activeThreadId={activeThreadId}
+                            pathname={pathname}
+                            messagesBaseRoute={messagesBaseRoute}
+                            router={router}
+                          />
                         ))}
                       </div>
                     )}
