@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { ShoppingBag, Plus } from "lucide-react";
 
-export const metadata = { title: "My Orders" };
+export const metadata = { title: "My All Projects" };
 
 const statusColors: Record<string, string> = {
   AWAITING_QUOTE: "badge badge-awaiting",
@@ -34,7 +34,7 @@ export default async function ClientOrdersPage() {
   if (!session?.user?.id) redirect("/portal/login");
 
   const orders = await prisma.order.findMany({
-    where: { clientId: session.user.id },
+    where: { clientId: session.user.id, deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 
@@ -42,7 +42,7 @@ export default async function ClientOrdersPage() {
     <div className="portal-page">
       <div className="page-header">
         <div>
-          <h1 className="page-header-title">My Orders</h1>
+          <h1 className="page-header-title">My All Projects</h1>
           <p className="page-header-sub">{orders.length} total project{orders.length !== 1 ? "s" : ""}</p>
         </div>
         <Link href="/portal/client/orders/new" className="btn btn-primary">
@@ -54,7 +54,7 @@ export default async function ClientOrdersPage() {
         <div className="card">
           <div className="empty-state">
             <ShoppingBag size={40} className="empty-state-icon" />
-            <div className="empty-state-title">No orders yet</div>
+            <div className="empty-state-title">No projects yet</div>
             <p className="empty-state-text">Ready to get started? Create a new project request and we'll provide a quote.</p>
             <Link href="/portal/client/orders/new" className="btn btn-primary" style={{ marginTop: 8 }}>
               Start New Project

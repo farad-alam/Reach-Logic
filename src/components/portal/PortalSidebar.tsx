@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronRight,
   Plus,
+  Trash2,
 } from "lucide-react";
 
 interface NavItem {
@@ -56,11 +57,12 @@ const adminNav: NavItem[] = [
   { href: "/portal/admin/team", label: "Team", icon: <UserCog size={16} /> },
   { href: "/portal/admin/notifications", label: "Notifications", icon: <Bell size={16} /> },
   { href: "/portal/admin/settings", label: "Settings", icon: <Settings size={16} /> },
+  { href: "/portal/admin/trash", label: "Trash", icon: <Trash2 size={16} /> },
 ];
 
 const clientNav: NavItem[] = [
   { href: "/portal/client", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
-  { href: "/portal/client/orders", label: "My Orders", icon: <ShoppingBag size={16} /> },
+  { href: "/portal/client/orders", label: "My All Projects", icon: <ShoppingBag size={16} /> },
   { href: "/portal/client/invoices", label: "Invoices", icon: <FileText size={16} /> },
   { href: "/portal/client/messages", label: "Messages", icon: <MessageSquare size={16} /> },
   { href: "/portal/client/notifications", label: "Notifications", icon: <Bell size={16} /> },

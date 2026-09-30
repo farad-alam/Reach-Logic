@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { ArrowLeft, Calendar, MessageSquare, Check } from "lucide-react";
 
-export const metadata = { title: "Order Details" };
+export const metadata = { title: "Project Details" };
 
 const statusLabels: Record<string, string> = {
   AWAITING_QUOTE: "Awaiting Approval",
@@ -64,7 +64,7 @@ export default async function ClientOrderDetailPage({ params }: { params: Promis
     <div className="portal-page" style={{ maxWidth: 1200 }}>
       <div style={{ marginBottom: 20 }}>
         <Link href="/portal/client/orders" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--neutral-500)", textDecoration: "none", fontWeight: 500 }}>
-          <ArrowLeft size={14} /> Back to My Orders
+          <ArrowLeft size={14} /> Back to My All Projects
         </Link>
       </div>
 
@@ -74,7 +74,7 @@ export default async function ClientOrderDetailPage({ params }: { params: Promis
             {order.serviceTitle}
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--neutral-500)" }}>
-            <span>Order #{order.id.slice(0, 8).toUpperCase()}</span>
+            <span>Project #{order.id.slice(0, 8).toUpperCase()}</span>
             <span>·</span>
             <span>Requested on {fmtDate(order.createdAt)}</span>
             {order.thread && (
@@ -150,7 +150,7 @@ export default async function ClientOrderDetailPage({ params }: { params: Promis
             {order.amount ? fmt(Number(order.amount)) : "$0.00"}
           </div>
           <div style={{ fontSize: 12, color: "var(--neutral-400)" }}>
-            Final amount is confirmed when the order is approved.
+            Final amount is confirmed when the project is approved.
           </div>
         </div>
         
@@ -193,7 +193,7 @@ export default async function ClientOrderDetailPage({ params }: { params: Promis
             <div style={{ fontSize: 15, fontWeight: 700, color: "var(--neutral-900)", marginBottom: 16 }}>Related Invoices</div>
             {order.invoices.length === 0 ? (
               <div style={{ padding: 16, border: "1px dashed var(--neutral-200)", borderRadius: 8, fontSize: 13, color: "var(--neutral-500)" }}>
-                No invoices yet. You'll get an invoice by email once this order is approved.
+                No invoices yet. You'll get an invoice by email once this project is approved.
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

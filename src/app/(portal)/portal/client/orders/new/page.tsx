@@ -1,7 +1,7 @@
 // src/app/(portal)/portal/client/orders/new/page.tsx
 import NewOrderForm from "./NewOrderForm";
 
-export const metadata = { title: "New Order" };
+export const metadata = { title: "Create New Project" };
 
 export default function NewOrderPage() {
   return (

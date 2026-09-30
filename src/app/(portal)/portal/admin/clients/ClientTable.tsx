@@ -2,6 +2,7 @@
 import { useState, Fragment } from "react";
 import Link from "next/link";
 import { Mail, RefreshCw, X, ChevronDown, ChevronUp, Users } from "lucide-react";
+import DeleteRowAction from "@/components/portal/DeleteRowAction";
 
 interface ColleagueData {
   id: string;
@@ -292,13 +293,16 @@ export default function ClientTable({
                       </span>
                     </td>
                     <td style={{ textAlign: "right" }}>
-                      <Link
-                        href={`/portal/admin/clients/${client.id}`}
-                        className="btn btn-outline btn-sm"
-                        style={{ background: "#fff", borderColor: "var(--neutral-200)", color: "var(--neutral-700)" }}
-                      >
-                        View
-                      </Link>
+                      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                        <Link
+                          href={`/portal/admin/clients/${client.id}`}
+                          className="btn btn-outline btn-sm"
+                          style={{ background: "#fff", borderColor: "var(--neutral-200)", color: "var(--neutral-700)" }}
+                        >
+                          View
+                        </Link>
+                        <DeleteRowAction type="client" id={client.id} />
+                      </div>
                     </td>
                   </tr>
                   

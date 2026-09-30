@@ -23,6 +23,8 @@ interface Message {
     fullName: string | null;
     email: string;
     avatarUrl: string | null;
+    role?: string;
+    designation?: string | null;
   } | null;
   attachments?: Attachment[];
 }
@@ -232,7 +234,11 @@ export default function MessageThread({
                     {!isOwn && (
                       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", paddingLeft: 4 }}>
                         {msg.sender?.fullName?.split(" ")[0] ?? msg.sender?.email}
-                        <span style={{ fontWeight: 400, color: "var(--neutral-400)", marginLeft: 6 }}>ReachLogic</span>
+                        <span style={{ fontWeight: 400, color: "var(--neutral-400)", marginLeft: 6 }}>
+                          {msg.sender?.designation ? msg.sender.designation : 
+                            ((msg.sender?.role === "SUPER_ADMIN" || msg.sender?.role === "TEAM_MEMBER") ? "ReachLogic Team" : 
+                            (msg.sender?.role === "CLIENT" ? "Client" : "Colleague"))}
+                        </span>
                       </div>
                     )}
                     <div className="message-content">

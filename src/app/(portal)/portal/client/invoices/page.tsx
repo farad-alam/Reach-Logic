@@ -3,8 +3,8 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { FileText, CheckCircle2, Download } from "lucide-react";
-import InvoiceListDownloadButton from "@/components/portal/InvoiceListDownloadButton";
+import { FileText, CheckCircle2 } from "lucide-react";
+
 
 export const metadata = { title: "Invoices" };
 
@@ -20,7 +20,7 @@ export default async function ClientInvoicesPage() {
   if (!session?.user?.id) redirect("/portal/login");
 
   const invoices = await prisma.invoice.findMany({
-    where: { clientId: session.user.id },
+    where: { clientId: session.user.id, deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: {
       order: { select: { serviceTitle: true } },
@@ -60,14 +60,14 @@ export default async function ClientInvoicesPage() {
           <table className="portal-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead style={{ background: "var(--neutral-50)", borderBottom: "1px solid var(--neutral-200)", textTransform: "uppercase", fontSize: 11, fontWeight: 700, color: "var(--neutral-500)", letterSpacing: "0.05em" }}>
               <tr>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Invoice</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Project</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Total Amount</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Due Date</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Paid</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Due</th>
-                <th style={{ padding: "16px 24px", textAlign: "left" }}>Status</th>
-                <th style={{ padding: "16px 24px", textAlign: "right" }}>Actions</th>
+                <th style={{ padding: "16px 24px", textAlign: "left", whiteSpace: "nowrap" }}>Invoice</th>
+                <th style={{ padding: "16px 24px", textAlign: "left", whiteSpace: "nowrap" }}>Project</th>
+                <th style={{ padding: "16px 24px", textAlign: "left", whiteSpace: "nowrap" }}>Total Amount</th>
+                <th style={{ padding: "16px 24px", textAlign: "left", whiteSpace: "nowrap" }}>Due Date</th>
+                <th style={{ padding: "16px 24px", textAlign: "left", whiteSpace: "nowrap" }}>Paid</th>
+                <th style={{ padding: "16px 24px", textAlign: "left", whiteSpace: "nowrap" }}>Due</th>
+                <th style={{ padding: "16px 24px", textAlign: "left", whiteSpace: "nowrap" }}>Status</th>
+                <th style={{ padding: "16px 24px", textAlign: "right", whiteSpace: "nowrap" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -101,7 +101,6 @@ export default async function ClientInvoicesPage() {
                     </td>
                     <td style={{ padding: "16px 24px", textAlign: "right" }}>
                       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", alignItems: "center" }}>
-                        <InvoiceListDownloadButton invoiceId={inv.id} invoiceNumber={inv.invoiceNumber} />
                         <Link href={`/portal/client/invoices/${inv.id}`} className="btn btn-outline btn-sm">View Details</Link>
                       </div>
                     </td>

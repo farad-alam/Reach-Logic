@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FileText, Plus, CheckCircle2, Download } from "lucide-react";
 import InvoiceManageDropdown from "./InvoiceManageDropdown";
 import AdminInvoiceDownloadButton from "./AdminInvoiceDownloadButton";
+import DeleteRowAction from "@/components/portal/DeleteRowAction";
 
 export const metadata = { title: "Invoices" };
 
@@ -21,6 +22,7 @@ export default async function AdminInvoicesPage() {
   if (!session?.user?.id) redirect("/portal/login");
 
   const invoices = await prisma.invoice.findMany({
+    where: { deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: {
       client: { select: { fullName: true, email: true } },
@@ -123,6 +125,7 @@ export default async function AdminInvoicesPage() {
                           isLocked={inv.isLocked}
                           invoiceNumber={inv.invoiceNumber}
                         />
+                        <DeleteRowAction type="invoice" id={inv.id} />
                       </div>
                     </td>
                   </tr>

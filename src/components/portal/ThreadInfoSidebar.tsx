@@ -10,6 +10,7 @@ interface Member {
   email: string;
   avatarUrl: string | null;
   role: string;
+  designation?: string | null;
 }
 
 interface OrderInfo {
@@ -189,7 +190,7 @@ export default function ThreadInfoSidebar({
             <div style={{ fontWeight: 700, fontSize: 15, color: "var(--neutral-900)" }}>
               {info.client.fullName || (isTeamMember ? "Client" : info.client.email)}
             </div>
-            {!isTeamMember && (
+            {!isClient && !isTeamMember && (
               <div style={{ fontSize: 12, color: "var(--neutral-500)" }}>{info.client.email}</div>
             )}
             {isClient && <div style={{ fontSize: 11, color: "var(--neutral-400)", marginTop: 2 }}>Since {fmtDate(info.client.createdAt)}</div>}
@@ -241,28 +242,27 @@ export default function ThreadInfoSidebar({
       {/* CLIENT VIEW: Payment Status Card */}
       {isClient && info.payments && (
         <div className="info-section">
-          <div className="info-section-label">PAYMENT STATUS</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-            <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 8, padding: "10px 12px" }}>
-              <div style={{ fontSize: 11, color: "#166534", fontWeight: 600, marginBottom: 4 }}>Total Paid</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: "#15803d" }}>{fmt(info.payments.totalPaid)}</div>
+          <div className="info-section-label" style={{ display: "flex", justifyContent: "space-between" }}>
+            PAYMENT STATUS
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+            <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 8, padding: "8px 10px" }}>
+              <div style={{ fontSize: 11, color: "#166534", fontWeight: 600, marginBottom: 2 }}>Paid</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#15803d" }}>{fmt(info.payments.totalPaid)}</div>
             </div>
-            <div style={{ border: "1px solid #fef3c7", background: "#fffbeb", borderRadius: 8, padding: "10px 12px" }}>
-              <div style={{ fontSize: 11, color: "#92400e", fontWeight: 600, marginBottom: 4 }}>Due</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: "#b45309" }}>{fmt(info.payments.totalDue)}</div>
+            <div style={{ border: "1px solid #fef3c7", background: "#fffbeb", borderRadius: 8, padding: "8px 10px" }}>
+              <div style={{ fontSize: 11, color: "#92400e", fontWeight: 600, marginBottom: 2 }}>Due</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#b45309" }}>{fmt(info.payments.totalDue)}</div>
             </div>
           </div>
-          <div style={{ fontSize: 11, color: "var(--neutral-500)", marginBottom: 6 }}>
-            {pct}% of {fmt(info.payments.totalBilled)} billed
-          </div>
-          <div className="info-progress-track" style={{ height: 6, borderRadius: 3, background: "var(--neutral-100)", overflow: "hidden" }}>
+          <div className="info-progress-track" style={{ height: 4, borderRadius: 2, background: "var(--neutral-100)", overflow: "hidden" }}>
             <div className="info-progress-fill" style={{ width: `${Math.min(pct, 100)}%`, height: "100%", background: "#10b981" }} />
           </div>
         </div>
       )}
 
-      {/* STAFF VIEW: Projects in this Thread */}
-      {isStaff && info.orders.length > 0 && (
+      {/* STAFF & CLIENT VIEW: Projects in this Thread */}
+      {(isStaff || isClient) && info.orders.length > 0 && (
         <div className="info-section">
           <div className="info-section-label">PROJECTS IN THIS THREAD</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -302,28 +302,6 @@ export default function ThreadInfoSidebar({
         </div>
       )}
 
-      {/* CLIENT VIEW: Your Team (ReachLogic) */}
-      {isClient && agencyTeam.length > 0 && (
-        <div className="info-section">
-          <div className="info-section-label">YOUR TEAM</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {agencyTeam.map((member) => (
-              <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Initials name={member.fullName} email={member.email} size={32} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)" }}>
-                    {member.fullName ?? member.email.split("@")[0]}
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--neutral-500)" }}>
-                    {member.role === "SUPER_ADMIN" ? "Super Admin" : "Team Member"}
-                  </div>
-                </div>
-                <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>Away</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* IN THIS THREAD (Both Client & Team/Admin Views) */}
       <div className="info-section">
@@ -331,7 +309,15 @@ export default function ThreadInfoSidebar({
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {info.members.map((member) => {
             const isSelf = member.id === currentUserId;
-            const roleTag = member.role === "CLIENT" ? (isSelf ? "Client (you)" : "Client") : member.role === "SUPER_ADMIN" ? "Super Admin" : "ReachLogic";
+            let roleSubtitle = "";
+            
+            if (member.role === "SUPER_ADMIN" || member.role === "TEAM_MEMBER") {
+              roleSubtitle = member.designation ? member.designation : (member.role === "SUPER_ADMIN" ? "ReachLogic Team" : "ReachLogic Team");
+            } else if (member.role === "CLIENT") {
+              roleSubtitle = "Client";
+            } else if (member.role === "CLIENT_COLLEAGUE") {
+              roleSubtitle = "Colleague";
+            }
 
             return (
               <div key={member.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -339,10 +325,12 @@ export default function ThreadInfoSidebar({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-900)" }}>
                     {member.fullName || (isTeamMember && member.role === "CLIENT" ? "Client" : member.email)}
-                    {isSelf && !member.fullName?.includes("(you)") && <span style={{ color: "var(--neutral-400)", marginLeft: 4, fontWeight: 400 }}>(you)</span>}
+                    {isSelf && !member.fullName?.includes("(you)") && <span style={{ color: "var(--neutral-500)", marginLeft: 4, fontWeight: 400 }}>(you)</span>}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--neutral-500)" }}>
+                    {roleSubtitle}
                   </div>
                 </div>
-                <span style={{ fontSize: 11, color: "var(--neutral-400)" }}>{roleTag}</span>
               </div>
             );
           })}

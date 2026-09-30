@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
+import DeleteRowAction from "@/components/portal/DeleteRowAction";
 
 export const metadata = { title: "Orders" };
 
@@ -34,6 +35,7 @@ export default async function OrdersPage() {
   if (!session?.user?.id) redirect("/portal/login");
 
   const orders = await prisma.order.findMany({
+    where: { deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: {
       client: { select: { fullName: true, email: true } },
@@ -93,7 +95,10 @@ export default async function OrdersPage() {
                   <td><span className={statusColors[order.status]}>{statusLabels[order.status]}</span></td>
                   <td style={{ fontSize: 13, color: "var(--neutral-500)" }}>{fmtDate(order.createdAt)}</td>
                   <td style={{ textAlign: "right" }}>
-                    <Link href={`/portal/admin/orders/${order.id}`} className="btn btn-outline btn-sm">Manage</Link>
+                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                      <Link href={`/portal/admin/orders/${order.id}`} className="btn btn-outline btn-sm">Manage</Link>
+                      <DeleteRowAction type="order" id={order.id} />
+                    </div>
                   </td>
                 </tr>
               ))}

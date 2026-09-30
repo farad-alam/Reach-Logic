@@ -70,9 +70,11 @@ model User {
   country      String?
   timezone     String?
   avatarUrl    String?
+  designation  String?
   role         UserRole @default(CLIENT)
   passwordHash String?
   isActive     Boolean  @default(true)
+  deletedAt    DateTime?
   createdAt    DateTime @default(now())
 
   // Auth.js relations
@@ -165,6 +167,7 @@ model Order {
   billingZip     String?
   billingCountry String?
 
+  deletedAt    DateTime?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -196,6 +199,7 @@ model Invoice {
   amountPaid    Decimal   @db.Decimal(10, 2) @default(0) // Tracks partial payments
   notes         String?
   isLocked      Boolean   @default(false) // true when order → COMPLETED or CANCELLED
+  deletedAt     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

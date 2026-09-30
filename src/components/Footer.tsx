@@ -301,20 +301,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      
-      {/* Floating Chat Button */}
-      <button 
-        onClick={handleChatToggle}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center z-50 transition-all duration-300 hover:scale-110"
-        style={{ 
-          background: "#061311", 
-          border: "2px dashed #0aad92",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.3)" 
-        }}
-        aria-label="Toggle Chat"
-      >
-        <MessageSquare size={24} color="#0aad92" />
-      </button>
     </footer>
   );
 }

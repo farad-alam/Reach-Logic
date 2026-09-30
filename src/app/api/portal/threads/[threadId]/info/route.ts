@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ thr
       include: {
         client: { select: { id: true, fullName: true, email: true, avatarUrl: true, company: true, createdAt: true } },
         members: {
-          include: { user: { select: { id: true, fullName: true, email: true, avatarUrl: true, role: true } } },
+          include: { user: { select: { id: true, fullName: true, email: true, avatarUrl: true, role: true, designation: true } } },
         },
         orders: {
           select: { id: true, serviceTitle: true, status: true, startDate: true, endDate: true, amount: true },

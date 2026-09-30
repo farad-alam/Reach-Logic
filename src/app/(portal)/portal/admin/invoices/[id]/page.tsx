@@ -7,6 +7,8 @@ import { ArrowLeft, CheckCircle2, Lock } from "lucide-react";
 import DownloadPdfButton from "@/components/portal/DownloadPdfButton";
 import InvoiceDocument from "@/components/portal/InvoiceDocument";
 import RecordPaymentPanel from "./RecordPaymentPanel";
+import InvoiceDeleteButton from "./InvoiceDeleteButton";
+import EditInvoiceForm from "./EditInvoiceForm";
 
 export const metadata = { title: "Invoice Details" };
 
@@ -53,6 +55,27 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
           ) : (
             <span className="badge badge-unpaid" style={{ padding: "6px 12px", fontSize: 14 }}>Unpaid</span>
           )}
+          
+          <EditInvoiceForm 
+            invoiceId={invoice.id} 
+            initialData={{
+              dueDate: invoice.dueDate,
+              notes: invoice.notes,
+              isPaid: invoice.isPaid,
+              paidAt: invoice.paidAt,
+              amountPaid: invoice.amountPaid ? invoice.amountPaid.toString() : "",
+              billingName: invoice.billingName,
+              billingEmail: invoice.billingEmail,
+              billingCompany: invoice.billingCompany,
+              billingAddress: invoice.billingAddress,
+              lineItems: invoice.lineItems.map(item => ({
+                description: item.description,
+                quantity: item.quantity.toString(),
+                rate: item.rate.toString(),
+              })),
+            }}
+          />
+
           <DownloadPdfButton targetId="invoice-document" filename={`Invoice_${invoice.invoiceNumber}.pdf`} />
         </div>
       </div>
@@ -101,6 +124,10 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
         isPaid={invoice.isPaid}
         isLocked={invoice.isLocked}
       />
+
+      <div style={{ marginTop: 40, borderTop: "1px solid var(--neutral-200)", paddingTop: 24, display: "flex", justifyContent: "flex-end" }}>
+        <InvoiceDeleteButton invoiceId={invoice.id} />
+      </div>
     </div>
   );
 }

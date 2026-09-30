@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       where: whereClause,
       orderBy: { createdAt: "asc" },
       include: {
-        sender: { select: { id: true, fullName: true, avatarUrl: true, email: true } },
+        sender: { select: { id: true, fullName: true, avatarUrl: true, email: true, role: true, designation: true } },
         attachments: true,
       },
     });

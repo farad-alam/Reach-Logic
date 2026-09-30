@@ -10,6 +10,7 @@ import {
 import CreateOrderForm from "./CreateOrderForm";
 import EditClientForm from "./EditClientForm";
 import DeactivateClientButton from "./DeactivateClientButton";
+import ClientDeleteButton from "./ClientDeleteButton";
 
 export const metadata = { title: "Client Detail" };
 
@@ -168,6 +169,7 @@ export default async function ClientDetailPage({
             }}
           />
           <DeactivateClientButton clientId={clientId} isActive={client.isActive} />
+          <ClientDeleteButton clientId={clientId} />
           <Link href={`/portal/admin/messages/${clientId}`} className="btn btn-outline btn-sm">
             <MessageSquare size={13} /> Message
           </Link>

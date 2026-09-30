@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/portal/admin/purge-deleted",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}

@@ -86,7 +86,7 @@ export default async function ClientDashboard() {
         <div className="stat-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <div className="stat-card-label">Active Orders</div>
+              <div className="stat-card-label">Active Projects</div>
               <div className="stat-card-value">{activeOrders}</div>
             </div>
             <div style={{ background: "var(--neutral-100)", padding: 10, borderRadius: 8 }}>
@@ -111,10 +111,9 @@ export default async function ClientDashboard() {
       </div>
 
       <div className="grid-2">
-        {/* Recent Orders */}
         <div className="card card-sm" style={{ padding: 0 }}>
           <div style={{ padding: "18px 20px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--neutral-100)" }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: "var(--neutral-900)" }}>Your Orders</span>
+            <span style={{ fontWeight: 600, fontSize: 14, color: "var(--neutral-900)" }}>Your Projects</span>
             <Link href="/portal/client/orders" style={{ fontSize: 12, color: "var(--brand-accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
               View all <ChevronRight size={12} />
             </Link>
@@ -122,7 +121,7 @@ export default async function ClientDashboard() {
           {orders.length === 0 ? (
             <div className="empty-state" style={{ padding: "32px 20px" }}>
               <ShoppingBag size={28} color="var(--neutral-300)" />
-              <span style={{ fontSize: 13, color: "var(--neutral-400)", marginBottom: 12 }}>You have no orders yet</span>
+              <span style={{ fontSize: 13, color: "var(--neutral-400)", marginBottom: 12 }}>You have no projects yet</span>
               <Link href="/portal/client/orders/new" className="btn btn-outline btn-sm">Start New Project</Link>
             </div>
           ) : (

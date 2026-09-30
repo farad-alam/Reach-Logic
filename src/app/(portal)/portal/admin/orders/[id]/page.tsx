@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, CheckCircle2, User } from "lucide-react";
 import OrderStatusForm from "./OrderStatusForm";
 import OrderQuoteForm from "./OrderQuoteForm";
+import OrderDeleteButton from "./OrderDeleteButton";
+import EditOrderForm from "./EditOrderForm";
 
 export const metadata = { title: "Manage Order" };
 
@@ -43,6 +45,24 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         <div>
           <h1 className="page-header-title">Manage Order: {order.serviceTitle}</h1>
           <p className="page-header-sub">Requested on {fmtDate(order.createdAt)}</p>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <EditOrderForm 
+            orderId={order.id} 
+            initialData={{
+              serviceTitle: order.serviceTitle,
+              description: order.description,
+              startDate: order.startDate,
+              endDate: order.endDate,
+              amount: order.amount ? order.amount.toString() : null,
+              status: order.status,
+              billingStreet: order.billingStreet,
+              billingCity: order.billingCity,
+              billingState: order.billingState,
+              billingZip: order.billingZip,
+              billingCountry: order.billingCountry,
+            }}
+          />
         </div>
       </div>
 
@@ -121,6 +141,10 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             </div>
           )}
         </div>
+      </div>
+
+      <div style={{ marginTop: 40, borderTop: "1px solid var(--neutral-200)", paddingTop: 24, display: "flex", justifyContent: "flex-end" }}>
+        <OrderDeleteButton orderId={order.id} />
       </div>
     </div>
   );

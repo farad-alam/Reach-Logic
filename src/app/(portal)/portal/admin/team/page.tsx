@@ -7,6 +7,7 @@ import { UserCog, UserPlus, Mail, Calendar } from "lucide-react";
 import DeactivateButton from "./DeactivateButton";
 import ReactivateButton from "./ReactivateButton";
 import PendingInvitesList from "@/components/portal/PendingInvitesList";
+import DesignationDropdown from "./DesignationDropdown";
 
 export const metadata = { title: "Team" };
 
@@ -28,6 +29,7 @@ export default async function TeamPage() {
       isActive: true,
       avatarUrl: true,
       createdAt: true,
+      designation: true,
       threadMemberships: { select: { id: true } },
     },
   });
@@ -39,6 +41,8 @@ export default async function TeamPage() {
   });
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
+
+  const allDesignations = Array.from(new Set(team.map(m => m.designation).filter(Boolean))) as string[];
 
   return (
     <div className="portal-page">
@@ -64,6 +68,11 @@ export default async function TeamPage() {
         </div>
       ) : (
         <div className="card card-sm" style={{ padding: 0 }}>
+          <div style={{ display: "flex", padding: "12px 18px", borderBottom: "1px solid var(--neutral-100)", fontSize: 11, fontWeight: 700, color: "var(--neutral-500)", letterSpacing: "0.05em" }}>
+            <div style={{ flex: 1 }}>TEAM MEMBER</div>
+            <div style={{ width: 240 }}>DESIGNATION</div>
+            <div style={{ width: 100, textAlign: "right", marginRight: 140 }}>THREADS</div>
+          </div>
           {team.map((member, i) => (
             <div
               key={member.id}
@@ -111,17 +120,28 @@ export default async function TeamPage() {
                 </div>
               </div>
 
+              {/* Designation */}
+              <div style={{ width: 240, flexShrink: 0 }}>
+                <DesignationDropdown 
+                  userId={member.id} 
+                  currentDesignation={member.designation} 
+                  existingDesignations={allDesignations} 
+                />
+              </div>
+
               {/* Threads assigned */}
-              <div style={{ fontSize: 12, color: "var(--neutral-400)", textAlign: "right", flexShrink: 0 }}>
+              <div style={{ width: 100, fontSize: 13, color: "var(--neutral-500)", textAlign: "right", flexShrink: 0 }}>
                 {member.threadMemberships.length} thread{member.threadMemberships.length !== 1 ? "s" : ""}
               </div>
 
               {/* Deactivate / Reactivate */}
-              {member.isActive ? (
-                <DeactivateButton userId={member.id} />
-              ) : (
-                <ReactivateButton userId={member.id} />
-              )}
+              <div style={{ width: 120, display: "flex", justifyContent: "flex-end", flexShrink: 0 }}>
+                {member.isActive ? (
+                  <DeactivateButton userId={member.id} />
+                ) : (
+                  <ReactivateButton userId={member.id} />
+                )}
+              </div>
             </div>
           ))}
         </div>

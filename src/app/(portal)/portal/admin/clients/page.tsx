@@ -14,7 +14,7 @@ export default async function ClientsPage() {
   if (!session?.user?.id) redirect("/portal/login");
 
   const clients = await prisma.user.findMany({
-    where: { role: "CLIENT" },
+    where: { role: "CLIENT", deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: {
       clientOrders: { select: { id: true, status: true, amount: true } },

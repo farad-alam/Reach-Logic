@@ -63,7 +63,7 @@ export default function ClientChatPage({
             {selectedThread?.name ?? "Messages"}
           </div>
           <Link href="/portal/client/orders/new" className="btn btn-primary btn-sm" style={{ padding: "6px 14px", fontSize: 13, borderRadius: 6 }}>
-            + New Order
+            + Create New Project
           </Link>
         </div>
 
