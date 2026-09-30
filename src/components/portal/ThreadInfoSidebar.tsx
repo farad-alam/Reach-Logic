@@ -239,11 +239,23 @@ export default function ThreadInfoSidebar({
         </div>
       )}
 
-      {/* CLIENT VIEW: Payment Status Card */}
-      {isClient && info.payments && (
+      {/* PAYMENT STATUS Card */}
+      {(isClient || isSuperAdmin) && info.payments && (
         <div className="info-section">
-          <div className="info-section-label" style={{ display: "flex", justifyContent: "space-between" }}>
-            PAYMENT STATUS
+          <div className="info-section-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>PAYMENTS</span>
+            {isSuperAdmin && (
+              <span style={{
+                background: "#fdf4e3",
+                color: "#b45309",
+                padding: "2px 6px",
+                borderRadius: 4,
+                fontSize: 9,
+                fontWeight: 800,
+              }}>
+                SUPER ADMIN ONLY
+              </span>
+            )}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
             <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 8, padding: "8px 10px" }}>
@@ -380,7 +392,7 @@ export default function ThreadInfoSidebar({
             </div>
           )}
 
-          {/* Add Team Member Button for Admin View */}
+        {/* Add Team Member Button for Admin View */}
           {isSuperAdmin && (
             <div style={{ marginTop: 8 }}>
               {!addTeamOpen ? (
@@ -393,16 +405,16 @@ export default function ThreadInfoSidebar({
                     gap: 6,
                     width: "100%",
                     padding: "8px 12px",
-                    background: "#f8fafc",
-                    border: "1px dashed #6366f1",
+                    background: "#fff",
+                    border: "1px dashed var(--brand-mid)",
                     borderRadius: 8,
-                    color: "#4f46e5",
+                    color: "var(--brand-dark)",
                     fontSize: 12,
                     fontWeight: 600,
                     cursor: "pointer",
                   }}
                 >
-                  <Plus size={14} /> Add Team Member
+                  <Plus size={14} /> Assign team member
                 </button>
               ) : (
                 <div style={{ display: "flex", gap: 6 }}>

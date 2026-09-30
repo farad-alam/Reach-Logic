@@ -54,10 +54,15 @@ export default function AdminChatPage({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(initialClientId ?? clients[0]?.id ?? null);
-  const [threads, setThreads] = useState<Thread[]>([]);
+  
+  // Tree state
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(
+    new Set(initialClientId ? [initialClientId] : [clients[0]?.id ?? ""])
+  );
+  const [threadsByClient, setThreadsByClient] = useState<Record<string, Thread[]>>({});
+  const [loadingClients, setLoadingClients] = useState<Set<string>>(new Set());
+  
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const [threadDropOpen, setThreadDropOpen] = useState(false);
-  const [loadingThreads, setLoadingThreads] = useState(false);
 
   // Thread management modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -68,42 +73,52 @@ export default function AdminChatPage({
   const [renameValue, setRenameValue] = useState("");
   const [modalLoading, setModalLoading] = useState(false);
 
-  const dropRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on outside click
+  // Load threads for expanded clients
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (dropRef.current && !dropRef.current.contains(e.target as Node)) {
-        setThreadDropOpen(false);
+    expandedClients.forEach((clientId) => {
+      if (clientId && !threadsByClient[clientId] && !loadingClients.has(clientId)) {
+        setLoadingClients((prev) => new Set(prev).add(clientId));
+        fetch(`/api/portal/threads?clientId=${clientId}`)
+          .then((r) => r.json())
+          .then((data) => {
+            const list: Thread[] = data.threads ?? [];
+            setThreadsByClient((prev) => ({ ...prev, [clientId]: list }));
+            
+            // If this is the selected client and we don't have a thread selected, select the most recent one
+            if (clientId === selectedClientId && !selectedThreadId) {
+              const sorted = [...list].sort((a, b) => {
+                const da = a.messages[0]?.createdAt ? new Date(a.messages[0].createdAt).getTime() : 0;
+                const db = b.messages[0]?.createdAt ? new Date(b.messages[0].createdAt).getTime() : 0;
+                return db - da;
+              });
+              setSelectedThreadId(sorted[0]?.id ?? null);
+            }
+          })
+          .finally(() => {
+            setLoadingClients((prev) => {
+              const next = new Set(prev);
+              next.delete(clientId);
+              return next;
+            });
+          });
       }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandedClients, selectedClientId]);
 
-  // Load threads when client changes
-  useEffect(() => {
-    if (!selectedClientId) return;
-    setLoadingThreads(true);
-    setSelectedThreadId(null);
-    fetch(`/api/portal/threads?clientId=${selectedClientId}`)
-      .then((r) => r.json())
-      .then((data) => {
-        const list: Thread[] = data.threads ?? [];
-        setThreads(list);
-        // Select thread with most recent activity
-        const sorted = [...list].sort((a, b) => {
-          const da = a.messages[0]?.createdAt ? new Date(a.messages[0].createdAt).getTime() : 0;
-          const db = b.messages[0]?.createdAt ? new Date(b.messages[0].createdAt).getTime() : 0;
-          return db - da;
-        });
-        setSelectedThreadId(sorted[0]?.id ?? null);
-      })
-      .finally(() => setLoadingThreads(false));
-  }, [selectedClientId]);
+  const toggleClientExpanded = (clientId: string) => {
+    setExpandedClients((prev) => {
+      const next = new Set(prev);
+      if (next.has(clientId)) next.delete(clientId);
+      else next.add(clientId);
+      return next;
+    });
+  };
+
+  const activeThreads = selectedClientId ? (threadsByClient[selectedClientId] || []) : [];
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
-  const selectedThread = threads.find((t) => t.id === selectedThreadId);
+  const selectedThread = activeThreads.find((t) => t.id === selectedThreadId);
 
   async function createThread() {
     if (!newThreadName.trim() || !selectedClientId) return;
@@ -115,8 +130,12 @@ export default function AdminChatPage({
     });
     const data = await res.json();
     if (data.ok && data.thread) {
-      setThreads((prev) => [...prev, data.thread]);
+      setThreadsByClient((prev) => {
+        const list = prev[selectedClientId] || [];
+        return { ...prev, [selectedClientId]: [...list, data.thread] };
+      });
       setSelectedThreadId(data.thread.id);
+      setExpandedClients((prev) => new Set(prev).add(selectedClientId));
     }
     setModalLoading(false);
     setShowCreateModal(false);
@@ -124,7 +143,7 @@ export default function AdminChatPage({
   }
 
   async function renameThread() {
-    if (!renameValue.trim() || !selectedThreadId) return;
+    if (!renameValue.trim() || !selectedThreadId || !selectedClientId) return;
     setModalLoading(true);
     const res = await fetch(`/api/portal/threads/${selectedThreadId}/rename`, {
       method: "PATCH",
@@ -133,7 +152,13 @@ export default function AdminChatPage({
     });
     const data = await res.json();
     if (data.ok) {
-      setThreads((prev) => prev.map((t) => t.id === selectedThreadId ? { ...t, name: data.thread.name } : t));
+      setThreadsByClient((prev) => {
+        const list = prev[selectedClientId] || [];
+        return {
+          ...prev,
+          [selectedClientId]: list.map((t) => t.id === selectedThreadId ? { ...t, name: data.thread.name } : t)
+        };
+      });
     }
     setModalLoading(false);
     setShowRenameModal(false);
@@ -141,16 +166,21 @@ export default function AdminChatPage({
   }
 
   async function deleteThread() {
-    if (!selectedThreadId) return;
+    if (!selectedThreadId || !selectedClientId) return;
     setModalLoading(true);
     const res = await fetch(`/api/portal/threads/${selectedThreadId}/delete`, {
       method: "DELETE",
     });
     const data = await res.json();
     if (data.ok) {
-      const remaining = threads.filter((t) => t.id !== selectedThreadId);
-      setThreads(remaining);
-      setSelectedThreadId(remaining.length > 0 ? remaining[0].id : null);
+      setThreadsByClient((prev) => {
+        const list = prev[selectedClientId] || [];
+        const remaining = list.filter((t) => t.id !== selectedThreadId);
+        if (selectedThreadId === selectedThreadId) { // Need to update selectedThreadId asynchronously or here
+           setSelectedThreadId(remaining.length > 0 ? remaining[0].id : null);
+        }
+        return { ...prev, [selectedClientId]: remaining };
+      });
     }
     setModalLoading(false);
     setShowDeleteModal(false);
@@ -167,26 +197,83 @@ export default function AdminChatPage({
           </button>
         </div>
         <div className="chat-client-list">
-          {clients.map((client) => (
-            <button
-              key={client.id}
-              className={`chat-client-row ${selectedClientId === client.id ? "active" : ""}`}
-              onClick={() => setSelectedClientId(client.id)}
-            >
-              <div style={{ position: "relative", flexShrink: 0 }}>
-                <Initials name={client.fullName} email={client.email} size={36} />
-                {(client.unread ?? 0) > 0 && (
-                  <span className="client-unread-dot">{client.unread! > 9 ? "9+" : client.unread}</span>
-                )}
-              </div>
-              {sidebarOpen && (
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div className="chat-client-name">{client.fullName || client.email}</div>
-                  <div className="chat-client-email">{client.email}</div>
+          {/* Accordion Tree view */}
+          <div className="chat-client-tree">
+            {clients.map((client) => {
+              const isExpanded = expandedClients.has(client.id);
+              const clientThreads = threadsByClient[client.id] || [];
+              const isLoading = loadingClients.has(client.id);
+              
+              return (
+                <div key={client.id} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+                  <button
+                    className={`chat-client-header ${selectedClientId === client.id ? "active" : ""}`}
+                    onClick={() => {
+                      setSelectedClientId(client.id);
+                      if (!isExpanded) toggleClientExpanded(client.id);
+                    }}
+                  >
+                    <div style={{ position: "relative", flexShrink: 0 }}>
+                      <Initials name={client.fullName} email={client.email} size={28} />
+                      {(client.unread ?? 0) > 0 && (
+                        <span className="client-unread-dot">{client.unread! > 9 ? "9+" : client.unread}</span>
+                      )}
+                    </div>
+                    {sidebarOpen && (
+                      <>
+                        <div className="chat-client-name">{client.fullName || client.email}</div>
+                        <div className="chat-client-actions" onClick={(e) => e.stopPropagation()}>
+                          <button onClick={(e) => { e.stopPropagation(); setSelectedClientId(client.id); setShowCreateModal(true); }}>
+                            <Plus size={14} />
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); toggleClientExpanded(client.id); }}>
+                            <ChevronDown size={14} style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s" }} />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Threads for this client */}
+                  {isExpanded && sidebarOpen && (
+                    <div className="chat-thread-tree-list">
+                      {isLoading ? (
+                        <div style={{ padding: "8px 20px", fontSize: 12, color: "var(--neutral-400)" }}>Loading...</div>
+                      ) : clientThreads.length === 0 ? (
+                        <div style={{ padding: "8px 20px", fontSize: 12, color: "var(--neutral-400)" }}>No threads</div>
+                      ) : (
+                        clientThreads.map((t) => (
+                          <div
+                            key={t.id}
+                            className={`chat-thread-item ${t.id === selectedThreadId ? "active" : ""}`}
+                            onClick={() => {
+                              setSelectedClientId(client.id);
+                              setSelectedThreadId(t.id);
+                            }}
+                          >
+                            <div className="thread-dot" />
+                            <div className="chat-thread-name">{t.name}</div>
+                            
+                            {/* Hover context menu */}
+                            <div className="thread-kebab-menu" onClick={(e) => e.stopPropagation()}>
+                              <div style={{ display: "flex", gap: 2 }}>
+                                <button className="thread-kebab-btn" onClick={(e) => { e.stopPropagation(); setSelectedThreadId(t.id); setSelectedClientId(client.id); setRenameValue(t.name); setShowRenameModal(true); }}>
+                                  <PenLine size={12} />
+                                </button>
+                                <button className="thread-kebab-btn" onClick={(e) => { e.stopPropagation(); setSelectedThreadId(t.id); setSelectedClientId(client.id); setShowDeleteModal(true); }}>
+                                  <Trash2 size={12} color="#ef4444" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
-            </button>
-          ))}
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -194,59 +281,31 @@ export default function AdminChatPage({
       <div className="chat-center">
         {/* Chat topbar */}
         <div className="chat-topbar">
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
-            {/* Thread dropdown */}
-            <div className="thread-drop-wrapper" ref={dropRef}>
-              <button
-                className="thread-drop-btn"
-                onClick={() => setThreadDropOpen((v) => !v)}
-                disabled={!selectedClientId || loadingThreads}
-              >
-                <MessageSquare size={14} />
-                <span>{selectedThread?.name ?? (loadingThreads ? "Loading…" : "No thread")}</span>
-                <ChevronDown size={14} />
-              </button>
-
-              {threadDropOpen && (
-                <div className="thread-dropdown">
-                  <div className="thread-drop-label">THREADS WITH {selectedClient?.fullName?.toUpperCase() ?? "CLIENT"}</div>
-                  {threads.map((t) => (
-                    <button
-                      key={t.id}
-                      className={`thread-drop-item ${t.id === selectedThreadId ? "active" : ""}`}
-                      onClick={() => { setSelectedThreadId(t.id); setThreadDropOpen(false); }}
-                    >
-                      <MessageSquare size={13} />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 500, fontSize: 13 }}>{t.name}</div>
-                        <div style={{ fontSize: 11, color: "var(--neutral-400)" }}>
-                          {t.members.map((m) => m.user.fullName?.split(" ")[0] ?? m.user.email).join(", ")}
-                        </div>
-                      </div>
-                      {t.id === selectedThreadId && <Check size={13} color="var(--brand-accent)" />}
-                    </button>
-                  ))}
-                  <div className="thread-drop-divider" />
-                  <button className="thread-drop-action" onClick={() => { setShowCreateModal(true); setThreadDropOpen(false); }}>
-                    <Plus size={13} /> Create new thread
-                  </button>
-                  <button className="thread-drop-action" onClick={() => { setRenameValue(selectedThread?.name ?? ""); setShowRenameModal(true); setThreadDropOpen(false); }} disabled={!selectedThreadId}>
-                    <PenLine size={13} /> Rename this thread
-                  </button>
-                  <button className="thread-drop-action" onClick={() => { setShowMembersModal(true); setThreadDropOpen(false); }} disabled={!selectedThreadId}>
-                    <Users size={13} /> Manage members
-                  </button>
-                  <button className="thread-drop-action text-red-500" onClick={() => { setShowDeleteModal(true); setThreadDropOpen(false); }} disabled={!selectedThreadId} style={{ color: "#ef4444" }}>
-                    <Trash2 size={13} /> Delete this thread
-                  </button>
+          <div className="chat-topbar-breadcrumb">
+            {selectedClient && selectedThread ? (
+              <>
+                <Initials name={selectedClient.fullName} email={selectedClient.email} size={36} />
+                <div className="breadcrumb-text">
+                  <div className="breadcrumb-title">
+                    {selectedClient.fullName || selectedClient.email} / {selectedThread.name}
+                  </div>
+                  <div className="breadcrumb-subtitle">
+                    {selectedThread.members.length} people in this thread
+                  </div>
                 </div>
-              )}
-            </div>
-
-            {selectedThread && (
-              <span style={{ fontSize: 12, color: "var(--neutral-500)" }}>
-                {selectedThread.members.length} in thread
-              </span>
+              </>
+            ) : selectedClient ? (
+              <>
+                <Initials name={selectedClient.fullName} email={selectedClient.email} size={36} />
+                <div className="breadcrumb-text">
+                  <div className="breadcrumb-title">
+                    {selectedClient.fullName || selectedClient.email}
+                  </div>
+                  <div className="breadcrumb-subtitle">Select a thread</div>
+                </div>
+              </>
+            ) : (
+              <div className="breadcrumb-title">Select a Client</div>
             )}
           </div>
 
@@ -268,7 +327,7 @@ export default function AdminChatPage({
           ) : !selectedThreadId ? (
             <div className="chat-empty-state">
               <MessageSquare size={40} color="var(--neutral-300)" />
-              <div>{loadingThreads ? "Loading threads…" : "No threads yet — create one above"}</div>
+              <div>{loadingClients.has(selectedClientId) ? "Loading threads…" : "No threads yet — create one by clicking + on the client row"}</div>
             </div>
           ) : (
             <MessageThread key={selectedThreadId} threadId={selectedThreadId} currentUserId={currentUserId} />
@@ -368,12 +427,18 @@ export default function AdminChatPage({
       )}
 
       {/* Manage Members Modal */}
-      {showMembersModal && selectedThreadId && (
+      {showMembersModal && selectedThreadId && selectedClientId && (
         <ManageMembersModal
           threadId={selectedThreadId}
           thread={selectedThread!}
           onClose={() => setShowMembersModal(false)}
-          onUpdate={(updated) => setThreads((prev) => prev.map((t) => t.id === updated.id ? updated : t))}
+          onUpdate={(updated) => setThreadsByClient((prev) => {
+            const list = prev[selectedClientId] || [];
+            return {
+              ...prev,
+              [selectedClientId]: list.map((t) => t.id === updated.id ? updated : t)
+            };
+          })}
         />
       )}
     </div>
