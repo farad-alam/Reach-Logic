@@ -132,30 +132,6 @@ export default function ClientChatPage({
             </div>
 
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-              {/* Thread switcher pills */}
-              {threads.length > 0 && (
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {threads.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => handleSelectThread(t.id)}
-                      style={{
-                        padding: "5px 12px",
-                        borderRadius: 8,
-                        border: `1px solid ${t.id === selectedThreadId ? "var(--brand-dark)" : "var(--neutral-200)"}`,
-                        background: t.id === selectedThreadId ? "var(--brand-dark)" : "#fff",
-                        color: t.id === selectedThreadId ? "#fff" : "var(--neutral-700)",
-                        fontSize: 13,
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {t.name}
-                    </button>
-                  ))}
-                </div>
-              )}
 
               {/* Action buttons */}
               <a
