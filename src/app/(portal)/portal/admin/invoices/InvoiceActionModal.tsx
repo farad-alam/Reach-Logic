@@ -143,4 +143,4 @@ export default function InvoiceActionModal({ invoiceId, invoiceNumber, amountPai
 }
 
 const labelStyle: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" };
-const inputStyle: React.CSSProperties = { width: "100%", padding: "10px 14px", border: "1px solid var(--neutral-200)", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box" };
+const inputStyle: React.CSSProperties = { width: "100%", padding: "10px 14px", border: "1px solid var(--neutral-200)", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box", color: "#111827", background: "#fff", fontFamily: "inherit" };

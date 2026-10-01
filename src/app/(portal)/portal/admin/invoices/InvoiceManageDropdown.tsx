@@ -98,7 +98,7 @@ export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, inv
               value={paymentAmount}
               onChange={(e) => setPaymentAmount(e.target.value)}
               placeholder="e.g. 150.00"
-              style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--neutral-200)", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 20 }}
+              style={{ width: "100%", padding: "10px 14px", border: "1px solid var(--neutral-200)", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 20, color: "#111827", background: "#fff" }}
               autoFocus
             />
             {error && <p style={{ fontSize: 12, color: "#dc2626", marginBottom: 12 }}>{error}</p>}
