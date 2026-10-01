@@ -527,3 +527,97 @@ function buildNotificationEmail({
 </body>
 </html>`;
 }
+
+/** Notification for refunds, voids, and system glitches */
+export async function sendRefundNotificationEmail(invoiceId: string, { refundAmount }: { refundAmount: number }) {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { client: { select: { email: true } }, order: { select: { serviceTitle: true } } },
+  });
+  if (!invoice) return;
+
+  const toEmail = invoice.billingEmail || invoice.client?.email || "";
+  if (!toEmail) return;
+
+  const fmt = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: invoice.currency ?? "USD" }).format(n);
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
+  const { Resend } = await import("resend");
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  await resend.emails.send({
+    from: "ReachLogic <portal@reachlogic.net>",
+    to: toEmail,
+    subject: `Invoice ${invoice.invoiceNumber} — Refund Processed`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #111827;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 4px;">Refund Processed</h1>
+        <p style="color: #6b7280; margin-top: 0;">A refund has been issued for Invoice ${invoice.invoiceNumber}.</p>
+        <table style="width:100%; border-collapse:collapse; margin: 24px 0; font-size: 14px;">
+          <tr><td style="padding:8px 0; color:#6b7280;">Project</td><td style="padding:8px 0; font-weight:600;">${invoice.order?.serviceTitle ?? "—"}</td></tr>
+          <tr><td style="padding:8px 0; color:#6b7280;">Refund Amount</td><td style="padding:8px 0; font-weight:600;">${fmt(refundAmount)}</td></tr>
+          <tr><td style="padding:8px 0; color:#6b7280;">Method</td><td style="padding:8px 0; font-weight:600;">${invoice.refundMethod || "Original Payment Method"}</td></tr>
+        </table>
+        <a href="${BASE_URL}/portal/client/invoices/${invoice.id}" style="display:inline-block; padding:12px 24px; background:#1a3c34; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:14px;">View Invoice Details</a>
+        <p style="margin-top: 32px; font-size: 12px; color: #9ca3af;">Please allow 5-10 business days for the refund to reflect on your statement.</p>
+      </div>
+    `,
+  });
+}
+
+export async function sendVoidNotificationEmail(invoiceId: string, reason: string) {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { client: { select: { email: true } } },
+  });
+  if (!invoice) return;
+
+  const toEmail = invoice.billingEmail || invoice.client?.email || "";
+  if (!toEmail) return;
+
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
+  const { Resend } = await import("resend");
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  await resend.emails.send({
+    from: "ReachLogic <portal@reachlogic.net>",
+    to: toEmail,
+    subject: `Invoice ${invoice.invoiceNumber} — Voided`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #111827;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 4px;">Invoice Voided</h1>
+        <p style="color: #6b7280; margin-top: 0;">Invoice ${invoice.invoiceNumber} has been voided.</p>
+        <p style="margin-top: 16px;"><strong>Reason:</strong> ${reason}</p>
+        <a href="${BASE_URL}/portal/client/invoices/${invoice.id}" style="display:inline-block; margin-top:24px; padding:12px 24px; background:#1a3c34; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:14px;">View Invoice</a>
+      </div>
+    `,
+  });
+}
+
+export async function sendSystemGlitchNotificationEmail(invoiceId: string, reason: string) {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { client: { select: { email: true } } },
+  });
+  if (!invoice) return;
+
+  const toEmail = invoice.billingEmail || invoice.client?.email || "";
+  if (!toEmail) return;
+
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
+  const { Resend } = await import("resend");
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  await resend.emails.send({
+    from: "ReachLogic <portal@reachlogic.net>",
+    to: toEmail,
+    subject: `Invoice ${invoice.invoiceNumber} — Cancelled (System Error)`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #111827;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 4px;">Invoice Cancelled</h1>
+        <p style="color: #6b7280; margin-top: 0;">Invoice ${invoice.invoiceNumber} has been cancelled due to a system error.</p>
+        <p style="margin-top: 16px;"><strong>Note:</strong> ${reason}</p>
+        <a href="${BASE_URL}/portal/client/invoices/${invoice.id}" style="display:inline-block; margin-top:24px; padding:12px 24px; background:#1a3c34; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:14px;">View Invoice</a>
+      </div>
+    `,
+  });
+}

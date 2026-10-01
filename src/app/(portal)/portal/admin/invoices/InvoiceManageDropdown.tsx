@@ -1,20 +1,23 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ChevronDown, Plus, Pencil, CircleDollarSign, Mail, XCircle } from "lucide-react";
+import { Loader2, ChevronDown, Plus, Pencil, CircleDollarSign, Mail, RotateCcw, Ban, Activity } from "lucide-react";
+import InvoiceActionModal from "./InvoiceActionModal";
 
 interface Props {
   invoiceId: string;
   isPaid: boolean;
   isLocked: boolean;
   invoiceNumber: string;
+  amountPaid: number;
 }
 
-export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, invoiceNumber }: Props) {
+export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, invoiceNumber, amountPaid }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [showRecordPayment, setShowRecordPayment] = useState(false);
+  const [showActionModal, setShowActionModal] = useState<"refund" | "void" | "system_glitch" | null>(null);
   const [paymentAmount, setPaymentAmount] = useState("");
   const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
@@ -136,12 +139,6 @@ export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, inv
                 <Pencil size={14} color="var(--neutral-500)" />
                 <span>Edit Invoice (amount, dates, items)</span>
               </a>
-              <button
-                onClick={() => doAction("delete_payment")}
-                style={dropItemStyle}>
-                <CircleDollarSign size={14} color="var(--neutral-500)" />
-                <span>Edit or Delete a Payment</span>
-              </button>
             </>
           )}
           <button
@@ -150,15 +147,40 @@ export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, inv
             <Mail size={14} color="var(--neutral-500)" />
             <span>Resend Invoice Email</span>
           </button>
-          {!isLocked && (
-            <button
-              onClick={() => doAction("cancel")}
-              style={{ ...dropItemStyle, color: "#dc2626" }}>
-              <XCircle size={14} color="#dc2626" />
-              <span>Cancel Invoice</span>
-            </button>
-          )}
+          
+          <div style={{ padding: "10px 16px 4px", fontSize: 10, fontWeight: 700, color: "var(--neutral-400)", textTransform: "uppercase", letterSpacing: "0.06em", background: "#fafafa" }}>
+            Payment received but…
+          </div>
+
+          <button
+            onClick={() => { setOpen(false); setShowActionModal("refund"); }}
+            style={{ ...dropItemStyle, color: "#dc2626" }}>
+            <RotateCcw size={14} color="#dc2626" />
+            <span>Refund (full or partial)</span>
+          </button>
+          <button
+            onClick={() => { setOpen(false); setShowActionModal("void"); }}
+            style={dropItemStyle}>
+            <Ban size={14} color="var(--neutral-500)" />
+            <span>Void</span>
+          </button>
+          <button
+            onClick={() => { setOpen(false); setShowActionModal("system_glitch"); }}
+            style={{ ...dropItemStyle, borderBottom: "none", color: "#6d28d9" }}>
+            <Activity size={14} color="#6d28d9" />
+            <span>System Glitch</span>
+          </button>
         </div>
+      )}
+
+      {showActionModal && (
+        <InvoiceActionModal
+          invoiceId={invoiceId}
+          invoiceNumber={invoiceNumber}
+          amountPaid={amountPaid}
+          action={showActionModal}
+          onClose={() => setShowActionModal(null)}
+        />
       )}
     </div>
   );

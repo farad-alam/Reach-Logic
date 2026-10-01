@@ -114,6 +114,7 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
         notes={invoice.notes}
         amountPaid={amountPaid}
         currency={invoice.currency}
+        invoiceStatus={invoice.invoiceStatus}
       />
 
       {/* Manage Payments Panel */}

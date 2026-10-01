@@ -28,6 +28,7 @@ interface InvoiceDocumentProps {
   transactionId?: string | null;
   amountPaid?: number;
   currency?: string | null;
+  invoiceStatus?: string;
 }
 
 function fmt(n: number | string, curr: string = "USD") {
@@ -69,6 +70,7 @@ export default function InvoiceDocument({
   transactionId,
   amountPaid = 0,
   currency = "USD",
+  invoiceStatus,
 }: InvoiceDocumentProps) {
   const total = lineItems.reduce((sum, item) => sum + Number(item.amount), 0);
   const actualAmountPaid = isPaid ? total : amountPaid;
@@ -76,8 +78,37 @@ export default function InvoiceDocument({
   const billToName = billingName || clientFullName || clientEmail;
   const displayEmail = billingEmail || clientEmail;
 
+  // Render stamp
+  let stampLabel = "";
+  let stampColor = "";
+  if (invoiceStatus === "REFUNDED") { stampLabel = "REFUNDED"; stampColor = "#dc2626"; }
+  else if (invoiceStatus === "PARTIALLY_REFUNDED") { stampLabel = "PARTIALLY REFUNDED"; stampColor = "#ea580c"; }
+  else if (invoiceStatus === "VOID") { stampLabel = "VOID"; stampColor = "#6b7280"; }
+  else if (invoiceStatus === "SYSTEM_GLITCH") { stampLabel = "SYSTEM GLITCH"; stampColor = "#7c3aed"; }
+
   return (
-    <div id="invoice-document" className="invoice-doc">
+    <div id="invoice-document" className="invoice-doc" style={{ position: "relative", overflow: "hidden" }}>
+      
+      {stampLabel && (
+        <div style={{
+          position: "absolute",
+          top: 80,
+          right: 40,
+          transform: "rotate(-15deg)",
+          color: stampColor,
+          border: `4px solid ${stampColor}`,
+          padding: "10px 20px",
+          fontSize: 32,
+          fontWeight: 900,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          opacity: 0.15,
+          pointerEvents: "none",
+          zIndex: 10,
+        }}>
+          {stampLabel}
+        </div>
+      )}
 
       {/* ── HEADER ── */}
       <div className="invoice-header">

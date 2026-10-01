@@ -8,7 +8,9 @@ import { FileText, CheckCircle2 } from "lucide-react";
 
 export const metadata = { title: "Invoices" };
 
-function fmt(n: number) {
+function fmt(n: number | null | undefined, currency: string = "USD") {
+  if (n === null || n === undefined) return "—";
+  if (currency === "BDT") return `৳${Number(n).toFixed(2)}`;
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 }
 function fmtDate(d: Date) {
@@ -80,12 +82,20 @@ export default async function ClientInvoicesPage() {
                   <tr key={inv.id} style={{ borderBottom: "1px solid var(--neutral-100)", fontSize: 13 }}>
                     <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{inv.invoiceNumber}</td>
                     <td style={{ padding: "16px 24px", color: "var(--neutral-600)" }}>{inv.order?.serviceTitle ?? "—"}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{fmt(inv.total)}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "var(--neutral-900)" }}>{fmt(inv.total, inv.currency)}</td>
                     <td style={{ padding: "16px 24px", color: "var(--neutral-500)" }}>{fmtDate(inv.dueDate)}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "#16a34a" }}>{fmt(amountPaid)}</td>
-                    <td style={{ padding: "16px 24px", fontWeight: 700, color: amountDue > 0 ? "#ea580c" : "#6b7280" }}>{fmt(amountDue)}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: "#16a34a" }}>{fmt(amountPaid, inv.currency)}</td>
+                    <td style={{ padding: "16px 24px", fontWeight: 700, color: amountDue > 0 ? "#ea580c" : "#6b7280" }}>{fmt(amountDue, inv.currency)}</td>
                     <td style={{ padding: "16px 24px" }}>
-                      {inv.isPaid ? (
+                      {inv.invoiceStatus === "REFUNDED" ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#fee2e2", color: "#991b1b", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>Refund (Full)</span>
+                      ) : inv.invoiceStatus === "PARTIALLY_REFUNDED" ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#fef3c7", color: "#b45309", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>Partially Refunded</span>
+                      ) : inv.invoiceStatus === "VOID" ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#f3f4f6", color: "#374151", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>Void</span>
+                      ) : inv.invoiceStatus === "SYSTEM_GLITCH" ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#ede9fe", color: "#6d28d9", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>System Glitch</span>
+                      ) : inv.isPaid ? (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#dcfce7", color: "#16a34a", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
                           <CheckCircle2 size={11} /> Paid
                         </span>

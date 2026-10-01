@@ -6,9 +6,16 @@ import { z } from "zod";
 import { notify, sendPaidInvoiceEmail, sendPaymentReceivedEmail } from "@/lib/notifications";
 
 const schema = z.object({
-  action: z.enum(["mark_sent", "mark_paid", "mark_overdue", "cancel", "reopen", "record_payment", "resend_email", "delete_payment"]),
+  action: z.enum(["mark_sent", "mark_paid", "mark_overdue", "cancel", "reopen", "record_payment", "resend_email", "delete_payment", "refund", "void", "system_glitch"]),
   paidAt: z.string().optional(),
   amount: z.number().positive().optional(), // for record_payment
+  refundType: z.enum(["FULL", "PARTIAL"]).optional(),
+  refundAmount: z.number().positive().optional(),
+  refundDate: z.string().optional(),
+  refundMethod: z.string().optional(),
+  reason: z.string().optional(),
+  actionDate: z.string().optional(),
+  emailClient: z.boolean().optional(),
 });
 
 export async function PATCH(
@@ -28,7 +35,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid input.", fieldErrors: parsed.error.flatten().fieldErrors }, { status: 400 });
     }
 
-    const { action, paidAt, amount } = parsed.data;
+    const { action, paidAt, amount, refundType, refundAmount, refundDate, refundMethod, reason, actionDate, emailClient } = parsed.data;
 
     const invoice = await prisma.invoice.findUnique({
       where: { id },
@@ -83,9 +90,76 @@ export async function PATCH(
           return NextResponse.json({ error: "Failed to send email." }, { status: 500 });
         }
         return NextResponse.json({ ok: true, message: "Invoice email resent." });
+      case "refund": {
+        if (!reason) return NextResponse.json({ error: "Reason is required." }, { status: 400 });
+        const refDate = refundDate ? new Date(refundDate) : new Date();
+        const refAmount = refundType === "PARTIAL" ? (refundAmount ?? Number(invoice.amountPaid)) : Number(invoice.amountPaid);
+        if (refAmount > Number(invoice.amountPaid)) return NextResponse.json({ error: "Cannot refund more than paid." }, { status: 400 });
+        
+        updateData = {
+          invoiceStatus: refundType === "FULL" ? "REFUNDED" : "PARTIALLY_REFUNDED",
+          refundType,
+          refundAmount: refAmount,
+          refundDate: refDate,
+          refundMethod,
+          actionReason: reason,
+          actionDate: refDate,
+          actionBy: session.user.id,
+        };
+        break;
+      }
+      case "void": {
+        if (!reason) return NextResponse.json({ error: "Reason is required." }, { status: 400 });
+        const vDate = actionDate ? new Date(actionDate) : new Date();
+        updateData = {
+          invoiceStatus: "VOID",
+          voidDate: vDate,
+          actionReason: reason,
+          actionDate: vDate,
+          actionBy: session.user.id,
+        };
+        break;
+      }
+      case "system_glitch": {
+        if (!reason) return NextResponse.json({ error: "Reason is required." }, { status: 400 });
+        const gDate = actionDate ? new Date(actionDate) : new Date();
+        updateData = {
+          invoiceStatus: "SYSTEM_GLITCH",
+          glitchDate: gDate,
+          actionReason: reason,
+          actionDate: gDate,
+          actionBy: session.user.id,
+        };
+        break;
+      }
     }
 
     const updated = await prisma.invoice.update({ where: { id }, data: updateData });
+
+    // Log to Audit Log
+    if (["refund", "void", "system_glitch"].includes(action)) {
+      await prisma.invoiceAuditLog.create({
+        data: {
+          invoiceId: id,
+          action: action.toUpperCase(),
+          performedBy: session.user.id,
+          metadata: {
+            reason,
+            refundType,
+            refundAmount,
+            refundMethod,
+          },
+        }
+      });
+      
+      // If client email requested
+      if (emailClient) {
+        const { sendRefundNotificationEmail, sendVoidNotificationEmail, sendSystemGlitchNotificationEmail } = await import("@/lib/notifications");
+        if (action === "refund") await sendRefundNotificationEmail(id, { refundAmount: Number(updateData.refundAmount) });
+        if (action === "void") await sendVoidNotificationEmail(id, reason || "");
+        if (action === "system_glitch") await sendSystemGlitchNotificationEmail(id, reason || "");
+      }
+    }
 
     // Notifications for paid actions
     if (action === "mark_paid" || action === "record_payment") {

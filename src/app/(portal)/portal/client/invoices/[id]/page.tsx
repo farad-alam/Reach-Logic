@@ -80,6 +80,7 @@ export default async function ClientInvoiceDetailPage({ params }: { params: Prom
         notes={invoice.notes}
         amountPaid={amountPaid}
         currency={invoice.currency}
+        invoiceStatus={invoice.invoiceStatus}
       />
     </div>
   );

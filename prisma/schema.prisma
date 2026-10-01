@@ -198,6 +198,19 @@ model Order {
 // INVOICES
 // ─────────────────────────────────────────────
 
+enum InvoiceStatus {
+  ACTIVE
+  VOID
+  SYSTEM_GLITCH
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum RefundType {
+  FULL
+  PARTIAL
+}
+
 model Invoice {
   id            String    @id @default(cuid())
   invoiceNumber String    @unique // INV-0001
@@ -208,6 +221,19 @@ model Invoice {
   notes         String?
   isLocked      Boolean   @default(false) // true when order → COMPLETED or CANCELLED
   deletedAt     DateTime?
+  
+  // Refund, Void, System Glitch fields
+  invoiceStatus InvoiceStatus @default(ACTIVE)
+  refundType    RefundType?
+  refundAmount  Decimal?      @db.Decimal(10, 2)
+  refundDate    DateTime?
+  refundMethod  String?
+  voidDate      DateTime?
+  glitchDate    DateTime?
+  actionReason  String?
+  actionDate    DateTime?
+  actionBy      String?
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -226,6 +252,7 @@ model Invoice {
   currency       String  @default("USD")
 
   lineItems InvoiceLineItem[]
+  auditLogs InvoiceAuditLog[]
 
   @@map("invoices")
 }
@@ -249,6 +276,18 @@ model InvoiceCounter {
   lastNum Int @default(0)
 
   @@map("invoice_counter")
+}
+
+model InvoiceAuditLog {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  action      String   
+  performedBy String   
+  performedAt DateTime @default(now())
+  metadata    Json?    
+
+  @@map("invoice_audit_logs")
 }
 
 // ─────────────────────────────────────────────
