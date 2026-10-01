@@ -77,7 +77,7 @@ export default function ClientChatPage({
   }
 
   return (
-    <div className="admin-chat-shell" style={{ gridTemplateColumns: selectedThreadId ? "1fr 280px" : "1fr" }}>
+    <div className="admin-chat-shell">
       {/* Center: Chat area */}
       <div className="chat-center">
         {/* Chat topbar */}
