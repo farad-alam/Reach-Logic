@@ -98,8 +98,8 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
         billingEmail={invoice.billingEmail}
         billingCompany={invoice.billingCompany}
         billingAddress={invoice.billingAddress}
-        clientFullName={invoice.client.fullName}
-        clientEmail={invoice.client.email}
+        clientFullName={invoice.client?.fullName ?? invoice.billingName ?? null}
+        clientEmail={invoice.client?.email ?? invoice.billingEmail ?? ""}
         orderServiceTitle={invoice.order?.serviceTitle ?? null}
         orderNumber={invoice.order ? `ORD-${invoice.order.id.slice(-5).toUpperCase()}` : null}
         orderStartDate={invoice.order?.startDate ?? null}
@@ -113,6 +113,7 @@ export default async function AdminInvoiceDetailPage({ params }: { params: Promi
         }))}
         notes={invoice.notes}
         amountPaid={amountPaid}
+        currency={invoice.currency}
       />
 
       {/* Manage Payments Panel */}

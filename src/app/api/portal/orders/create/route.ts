@@ -20,6 +20,13 @@ const schema = z.object({
   clientId: z.string().min(1).optional(), // only used by SUPER_ADMIN
   threadId: z.string().optional(),
   amount: z.string().optional(),
+  isOffPortal: z.boolean().default(false),
+  offPortalName: z.string().optional(),
+  offPortalEmail: z.string().email().optional(),
+  offPortalCompany: z.string().optional(),
+  offPortalAddress: z.string().optional(),
+  offPortalCountry: z.string().optional(),
+  currency: z.enum(["USD", "BDT"]).default("USD"),
 });
 
 export async function POST(req: NextRequest) {
@@ -54,6 +61,13 @@ export async function POST(req: NextRequest) {
       clientId: bodyClientId,
       threadId,
       amount,
+      isOffPortal,
+      offPortalName,
+      offPortalEmail,
+      offPortalCompany,
+      offPortalAddress,
+      offPortalCountry,
+      currency,
     } = parsed.data;
 
     // For clients, require billing address
@@ -90,6 +104,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Client association not found." }, { status: 404 });
       }
       clientId = relationship.clientId;
+    } else if (isOffPortal) {
+      clientId = session.user.id; // Or leave it as the admin ID for tracking
     } else {
       clientId = session.user.id;
     }
@@ -105,11 +121,18 @@ export async function POST(req: NextRequest) {
         billingState: billingState?.trim() || null,
         billingZip: billingZip?.trim() || null,
         billingCountry: billingCountry?.trim() || null,
-        clientId,
         createdById: session.user.id,
         status: (amount && role === "SUPER_ADMIN") ? "PENDING" : "AWAITING_QUOTE",
         amount: amount ? Number(amount) : null,
         threadId: threadId || null,
+        currency,
+        isOffPortal,
+        offPortalName: offPortalName || null,
+        offPortalEmail: offPortalEmail || null,
+        offPortalCompany: offPortalCompany || null,
+        offPortalAddress: offPortalAddress || null,
+        offPortalCountry: offPortalCountry || null,
+        clientId: isOffPortal ? null : clientId,
       },
     });
 
@@ -134,6 +157,9 @@ export async function POST(req: NextRequest) {
         billingState: order.billingState,
         billingZip: order.billingZip,
         billingCountry: order.billingCountry,
+        isOffPortal: order.isOffPortal,
+        currency: order.currency,
+        billingAddress: order.offPortalAddress,
       });
       // Notify client about new invoice (non-blocking)
       notifyInvoiceCreated(invoiceId).catch((err) =>

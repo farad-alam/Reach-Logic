@@ -60,8 +60,8 @@ enum UserRole {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String    @id @default(cuid())
+  email        String    @unique
   fullName     String?
   company      String?
   phone        String?
@@ -71,21 +71,21 @@ model User {
   timezone     String?
   avatarUrl    String?
   designation  String?
-  role         UserRole @default(CLIENT)
+  role         UserRole  @default(CLIENT)
   passwordHash String?
-  isActive     Boolean  @default(true)
+  isActive     Boolean   @default(true)
   deletedAt    DateTime?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
 
   // Auth.js relations
   accounts Account[]
   sessions Session[]
 
   // CRM relations
-  sentInvitations    Invitation[]   @relation("InvitedBy")
-  receivedInvitation Invitation?    @relation("InvitedUser")
-  createdOrders      Order[]        @relation("OrderCreatedBy")
-  clientOrders       Order[]        @relation("ClientOrders")
+  sentInvitations    Invitation[]      @relation("InvitedBy")
+  receivedInvitation Invitation?       @relation("InvitedUser")
+  createdOrders      Order[]           @relation("OrderCreatedBy")
+  clientOrders       Order[]           @relation("ClientOrders")
   clientInvoices     Invoice[]
   threadMemberships  ThreadMember[]
   sentMessages       Message[]
@@ -103,11 +103,11 @@ model User {
 
 model ClientColleague {
   id          String   @id @default(cuid())
-  clientId    String   // The original client who invited
+  clientId    String // The original client who invited
   client      User     @relation("ClientColleagues", fields: [clientId], references: [id])
-  colleagueId String   // The colleague user
+  colleagueId String // The colleague user
   colleague   User     @relation("ColleagueOf", fields: [colleagueId], references: [id])
-  threadId    String   // The specific thread they were added to
+  threadId    String // The specific thread they were added to
   thread      Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   status      String   @default("INVITED") // "INVITED" | "ACTIVE"
   invitedAt   DateTime @default(now())
@@ -167,12 +167,20 @@ model Order {
   billingZip     String?
   billingCountry String?
 
-  deletedAt    DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  currency         String  @default("USD")
+  isOffPortal      Boolean @default(false)
+  offPortalName    String?
+  offPortalEmail   String?
+  offPortalCompany String?
+  offPortalAddress String?
+  offPortalCountry String?
 
-  clientId String
-  client   User   @relation("ClientOrders", fields: [clientId], references: [id])
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  clientId String?
+  client   User?   @relation("ClientOrders", fields: [clientId], references: [id])
 
   createdById String
   createdBy   User   @relation("OrderCreatedBy", fields: [createdById], references: [id])
@@ -196,7 +204,7 @@ model Invoice {
   dueDate       DateTime
   isPaid        Boolean   @default(false)
   paidAt        DateTime?
-  amountPaid    Decimal   @db.Decimal(10, 2) @default(0) // Tracks partial payments
+  amountPaid    Decimal   @default(0) @db.Decimal(10, 2) // Tracks partial payments
   notes         String?
   isLocked      Boolean   @default(false) // true when order → COMPLETED or CANCELLED
   deletedAt     DateTime?
@@ -206,14 +214,16 @@ model Invoice {
   orderId String?
   order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
-  clientId String
-  client   User   @relation(fields: [clientId], references: [id])
+  clientId String?
+  client   User?   @relation(fields: [clientId], references: [id])
 
   // Billing address (snapshot at invoice time)
   billingName    String?
   billingEmail   String?
   billingCompany String?
   billingAddress String?
+  billingCountry String?
+  currency       String  @default("USD")
 
   lineItems InvoiceLineItem[]
 
@@ -254,9 +264,9 @@ model Thread {
   clientId String
   client   User   @relation(fields: [clientId], references: [id])
 
-  members  ThreadMember[]
-  messages Message[]
-  orders   Order[]
+  members    ThreadMember[]
+  messages   Message[]
+  orders     Order[]
   colleagues ClientColleague[]
 
   @@index([clientId])

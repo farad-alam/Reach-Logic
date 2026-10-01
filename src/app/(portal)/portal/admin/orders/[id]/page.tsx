@@ -70,7 +70,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         <div className="card">
           <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Client</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--neutral-900)", fontWeight: 500 }}>
-            <User size={16} color="var(--brand-accent)" /> {order.client.fullName ?? order.client.email}
+            <User size={16} color="var(--brand-accent)" /> {order.client?.fullName ?? order.client?.email}
           </div>
         </div>
         <div className="card">

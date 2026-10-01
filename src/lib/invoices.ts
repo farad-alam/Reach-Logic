@@ -10,9 +10,13 @@ export async function getNextInvoiceNumber(): Promise<string> {
   const sql = neon(process.env.DATABASE_URL!);
   const rows = await sql`
     INSERT INTO invoice_counter (id, "lastNum")
-    VALUES (1, 1)
+    VALUES (1, 5001)
     ON CONFLICT (id)
-    DO UPDATE SET "lastNum" = invoice_counter."lastNum" + 1
+    DO UPDATE SET "lastNum" = 
+      CASE 
+        WHEN invoice_counter."lastNum" < 5000 THEN 5000 + 1
+        ELSE invoice_counter."lastNum" + 1 
+      END
     RETURNING "lastNum"
   `;
   const lastNum = (rows[0] as { lastNum: number }).lastNum;
@@ -35,10 +39,14 @@ export function calcInvoiceTotal(
 }
 
 interface AutoInvoiceOptions {
-  orderId: string;
-  clientId: string;
+  orderId?: string;
+  clientId?: string | null;
   serviceTitle: string;
-  amount: number | null; // null = awaiting quote → $0 placeholder
+  description?: string;
+  startDate?: Date;
+  endDate?: Date;
+  amount: number | null;
+  currency?: string;
   billingName?: string | null;
   billingEmail?: string | null;
   billingCompany?: string | null;
@@ -47,6 +55,9 @@ interface AutoInvoiceOptions {
   billingState?: string | null;
   billingZip?: string | null;
   billingCountry?: string | null;
+  billingAddress?: string | null;
+  notes?: string | null;
+  isOffPortal?: boolean;
 }
 
 /**
@@ -56,34 +67,43 @@ interface AutoInvoiceOptions {
  */
 export async function createAutoInvoice(opts: AutoInvoiceOptions): Promise<string> {
   const {
-    orderId, clientId, serviceTitle, amount,
+    orderId, clientId, serviceTitle, amount, currency = "USD",
     billingName, billingEmail, billingCompany,
     billingStreet, billingCity, billingState, billingZip, billingCountry,
+    billingAddress: explicitAddress, notes, isOffPortal
   } = opts;
 
   const invoiceNumber = await getNextInvoiceNumber();
   const rate = amount ?? 0;
 
   // Build address string
-  const addressParts = [billingStreet, billingCity, billingState, billingZip, billingCountry].filter(Boolean);
-  const billingAddress = addressParts.length > 0 ? addressParts.join(", ") : null;
+  let billingAddress = explicitAddress || null;
+  if (!billingAddress) {
+    const addressParts = [billingStreet, billingCity, billingState, billingZip, billingCountry].filter(Boolean);
+    if (addressParts.length > 0) billingAddress = addressParts.join(", ");
+  }
 
-  // Due date = 30 days from today
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 30);
+  // Due date = endDate or 30 days from today
+  let dueDate = opts.endDate;
+  if (!dueDate) {
+    dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 30);
+  }
 
   const invoice = await prisma.invoice.create({
     data: {
       invoiceNumber,
       dueDate,
-      clientId,
-      orderId,
+      clientId: isOffPortal ? null : clientId,
+      orderId: orderId ?? null,
       isLocked: false,
+      currency,
       billingName: billingName || null,
       billingEmail: billingEmail || null,
       billingCompany: billingCompany || null,
       billingAddress,
-      notes: amount == null ? "Amount to be confirmed once quote is agreed." : null,
+      billingCountry: billingCountry || null,
+      notes: notes ?? (amount == null ? "Amount to be confirmed once quote is agreed." : null),
     },
   });
 

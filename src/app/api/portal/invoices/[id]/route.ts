@@ -96,8 +96,8 @@ export async function PATCH(
 
       // If fully paid, also post to thread
       if (action === "mark_paid" || (action === "record_payment" && updated.isPaid)) {
-        const thread = await prisma.thread.findFirst({ where: { clientId: invoice.clientId, name: "General" } })
-          ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId } });
+        const thread = await prisma.thread.findFirst({ where: { clientId: invoice.clientId || "", name: "General" } })
+          ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId || "" } });
         if (thread) {
           await prisma.message.create({
             data: {
@@ -111,14 +111,16 @@ export async function PATCH(
       } else if (action === "record_payment" && !updated.isPaid) {
         // Partial payment in-app notification
         const fmtAmt = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-        await notify({
-          userId: invoice.clientId,
-          type: "INVOICE_PAID",
-          title: `Partial Payment Recorded: ${invoice.invoiceNumber}`,
-          body: `A payment of ${fmtAmt(amount ?? 0)} has been recorded for Invoice ${invoice.invoiceNumber}.`,
-          link: `/portal/client/invoices/${invoice.id}`,
-          sendEmail: false, // email already sent via sendPaymentReceivedEmail
-        });
+        if (invoice.clientId) {
+          await notify({
+            userId: invoice.clientId,
+            type: "INVOICE_PAID",
+            title: `Partial Payment Recorded: ${invoice.invoiceNumber}`,
+            body: `A payment of ${fmtAmt(amount ?? 0)} has been recorded for Invoice ${invoice.invoiceNumber}.`,
+            link: `/portal/client/invoices/${invoice.id}`,
+            sendEmail: false, // email already sent via sendPaymentReceivedEmail
+          });
+        }
       }
     }
 
@@ -152,7 +154,7 @@ async function sendInvoiceReminderEmail(invoiceId: string) {
 
   await resend.emails.send({
     from: "ReachLogic <portal@reachlogic.net>",
-    to: invoice.client.email,
+    to: invoice.client?.email || "",
     subject: `Invoice ${invoice.invoiceNumber} — Payment Reminder`,
     html: `
       <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #111827;">

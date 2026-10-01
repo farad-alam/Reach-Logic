@@ -4,24 +4,29 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { getNextInvoiceNumber } from "@/lib/invoices";
-import { notifyInvoiceCreated } from "@/lib/notifications";
+import { notifyInvoiceCreated, sendNewInvoiceEmail } from "@/lib/notifications";
 
 const schema = z.object({
-  clientId: z.string().min(1),
-  orderId: z.string().optional(),
-  dueDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid due date" }),
-  notes: z.string().optional(),
-  lineItems: z.array(
-    z.object({
-      description: z.string().min(1),
-      quantity: z.number().positive(),
-      rate: z.number().min(0),
-    })
-  ).min(1),
-  billingName: z.string().optional(),
-  billingEmail: z.string().optional(),
+  // Client selection
+  clientId: z.string().optional(),         // empty = Off-Portal
+  isOffPortal: z.boolean().default(false),
+  threadId: z.string().optional(),          // required if portal client
+
+  // Billing info (always present)
+  billingName: z.string().min(1),
+  billingEmail: z.string().email(),
   billingCompany: z.string().optional(),
-  billingAddress: z.string().optional(),
+  billingCountry: z.string().min(1),
+  billingAddress: z.string().min(1),        // single field
+
+  // Invoice details
+  projectTitle: z.string().min(1).max(150),
+  projectDescription: z.string().min(1),
+  startDate: z.string(),
+  endDate: z.string(),                      // also = dueDate
+  amount: z.number().positive(),
+  currency: z.enum(["USD", "BDT"]).default("USD"),
+  notes: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,80 +39,102 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid data provided." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid data provided.", details: parsed.error.format() }, { status: 400 });
     }
 
-    const { clientId, orderId, dueDate, notes, lineItems, billingName, billingEmail, billingCompany, billingAddress } = parsed.data;
+    const { 
+      clientId, isOffPortal, threadId, 
+      billingName, billingEmail, billingCompany, billingCountry, billingAddress, 
+      projectTitle, projectDescription, startDate, endDate, amount, currency, notes 
+    } = parsed.data;
 
-    // Verify order belongs to client only when an order is linked
-    let orderStatus: string | null = null;
-    if (orderId) {
-      const order = await prisma.order.findFirst({
-        where: { id: orderId, clientId },
-      });
-      if (!order) {
-        return NextResponse.json({ error: "Invalid project selected." }, { status: 400 });
-      }
-      orderStatus = order.status;
+    if (!isOffPortal && !clientId) {
+      return NextResponse.json({ error: "Client is required for portal invoices." }, { status: 400 });
+    }
+    if (!isOffPortal && !threadId) {
+      return NextResponse.json({ error: "Thread is required for portal invoices." }, { status: 400 });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (end < start) {
+      return NextResponse.json({ error: "End date must be on or after start date." }, { status: 400 });
     }
 
     const invoiceNumber = await getNextInvoiceNumber();
 
-    // Create the invoice WITHOUT nested lineItems to avoid implicit transaction
+    // 1. Create Order
+    const order = await prisma.order.create({
+      data: {
+        serviceTitle: projectTitle,
+        description: projectDescription,
+        startDate: start,
+        endDate: end,
+        amount,
+        currency,
+        status: "PENDING",
+        clientId: isOffPortal ? null : (clientId as string),
+        threadId: isOffPortal ? null : threadId,
+        isOffPortal,
+        offPortalName: isOffPortal ? billingName : null,
+        offPortalEmail: isOffPortal ? billingEmail : null,
+        offPortalCompany: isOffPortal ? billingCompany : null,
+        offPortalAddress: isOffPortal ? billingAddress : null,
+        offPortalCountry: isOffPortal ? billingCountry : null,
+        createdById: session.user.id,
+      }
+    });
+
+    // 2. Create Invoice
     const invoice = await prisma.invoice.create({
       data: {
         invoiceNumber,
-        dueDate: new Date(dueDate),
-        notes: notes?.trim() || null,
-        clientId,
-        orderId: orderId ?? undefined,
-        isLocked: orderStatus === "COMPLETED" || orderStatus === "CANCELLED",
-        billingName: billingName || null,
-        billingEmail: billingEmail || null,
+        dueDate: end,
+        clientId: isOffPortal ? null : (clientId as string),
+        orderId: order.id,
+        currency,
+        billingName,
+        billingEmail,
         billingCompany: billingCompany || null,
-        billingAddress: billingAddress || null,
-      },
+        billingAddress,
+        billingCountry,
+        notes: notes || null,
+      }
     });
 
-    // Insert line items one by one (PrismaNeonHttp doesn't support nested writes / transactions)
-    for (const item of lineItems) {
-      await prisma.invoiceLineItem.create({
-        data: {
-          invoiceId: invoice.id,
-          description: item.description,
-          quantity: item.quantity,
-          rate: item.rate,
-          amount: item.quantity * item.rate,
-        },
-      });
-    }
+    // 3. Create Line Item
+    await prisma.invoiceLineItem.create({
+      data: {
+        invoiceId: invoice.id,
+        description: projectTitle,
+        quantity: 1,
+        rate: amount,
+        amount,
+      }
+    });
 
-    // Notify client
-    await notifyInvoiceCreated(invoice.id);
-
-    // Auto-post to thread — prefer order's thread, fallback to General
-    let orderThreadId: string | null = null;
-    if (orderId) {
-      const linkedOrder = await prisma.order.findUnique({ where: { id: orderId }, select: { threadId: true } });
-      orderThreadId = linkedOrder?.threadId ?? null;
-    }
-    const thread = orderThreadId
-      ? await prisma.thread.findUnique({ where: { id: orderThreadId } })
-      : await prisma.thread.findFirst({ where: { clientId, name: "General" } })
-        ?? await prisma.thread.findFirst({ where: { clientId } });
-
-    if (thread) {
+    // 4. Thread Post for Portal Client
+    if (!isOffPortal && threadId) {
+      const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(end);
       await prisma.message.create({
         data: {
-          threadId: thread.id,
-          body: `🧾 Invoice ${invoiceNumber} has been generated — check your email`,
+          threadId,
+          body: `🧾 New invoice created: ${projectTitle}, ${monthYear}`,
           type: "SYSTEM",
-          metadata: { invoiceId: invoice.id, orderId: orderId ?? null, event: "invoice_created" },
+          metadata: { invoiceId: invoice.id, orderId: order.id, event: "invoice_created" },
         }
       });
     }
 
-    return NextResponse.json({ ok: true, invoiceId: invoice.id });
+    // 5. Send Email
+    await sendNewInvoiceEmail(invoice.id);
+
+    // 6. In-app Notification for Portal Client
+    if (!isOffPortal && clientId) {
+      await notifyInvoiceCreated(invoice.id);
+    }
+
+    return NextResponse.json({ ok: true, invoiceId: invoice.id, orderId: order.id });
   } catch (error) {
     console.error("[invoices/create]", error);
     const msg = error instanceof Error ? error.message : "Failed to create invoice.";

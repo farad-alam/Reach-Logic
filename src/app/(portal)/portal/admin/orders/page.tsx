@@ -23,7 +23,8 @@ const statusLabels: Record<string, string> = {
   CANCELLED: "Cancelled",
 };
 
-function fmt(n: number) {
+function fmt(n: number, curr: string = "USD") {
+  if (curr === "BDT") return `৳${n.toFixed(2)}`;
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 }
 function fmtDate(d: Date) {
@@ -82,15 +83,26 @@ export default async function OrdersPage() {
                 <tr key={order.id}>
                   <td style={{ fontWeight: 500 }}>{order.serviceTitle}</td>
                   <td style={{ color: "var(--neutral-600)" }}>
-                    <Link href={`/portal/admin/clients/${order.clientId}`} style={{ color: "var(--brand-accent)", textDecoration: "none", fontWeight: 500 }}>
-                      {order.client.fullName ?? order.client.email}
-                    </Link>
+                    {order.isOffPortal ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontWeight: 500, color: "var(--neutral-900)" }}>
+                          {order.offPortalName || order.offPortalEmail || "Off-Portal"}
+                        </span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: "#92400e", background: "#fef3c7", padding: "2px 6px", borderRadius: 12 }}>
+                          Off-Portal
+                        </span>
+                      </div>
+                    ) : (
+                      <Link href={`/portal/admin/clients/${order.clientId}`} style={{ color: "var(--brand-accent)", textDecoration: "none", fontWeight: 500 }}>
+                        {order.client?.fullName ?? order.client?.email ?? "—"}
+                      </Link>
+                    )}
                   </td>
                   <td style={{ fontSize: 12, color: "var(--neutral-500)" }}>
                     {order.createdBy.role === "CLIENT" ? "Client" : "Admin"}
                   </td>
                   <td style={{ fontWeight: 500 }}>
-                    {order.amount ? fmt(Number(order.amount)) : <span style={{ color: "var(--neutral-400)" }}>Not quoted</span>}
+                    {order.amount ? fmt(Number(order.amount), order.currency) : <span style={{ color: "var(--neutral-400)" }}>Not quoted</span>}
                   </td>
                   <td><span className={statusColors[order.status]}>{statusLabels[order.status]}</span></td>
                   <td style={{ fontSize: 13, color: "var(--neutral-500)" }}>{fmtDate(order.createdAt)}</td>

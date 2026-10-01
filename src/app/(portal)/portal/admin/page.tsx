@@ -209,7 +209,7 @@ export default async function AdminDashboard() {
                       {order.serviceTitle}
                     </div>
                     <div style={{ fontSize: 12, color: "var(--neutral-500)", marginTop: 1 }}>
-                      {order.client.fullName ?? order.client.email}
+                      {order.client?.fullName ?? order.client?.email}
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
@@ -253,7 +253,7 @@ export default async function AdminDashboard() {
                       {inv.invoiceNumber}
                     </div>
                     <div style={{ fontSize: 12, color: "var(--neutral-500)", marginTop: 1 }}>
-                      {inv.client.fullName ?? inv.client.email} · Due {formatDate(inv.dueDate)}
+                      {inv.client?.fullName ?? inv.client?.email} · Due {formatDate(inv.dueDate)}
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>

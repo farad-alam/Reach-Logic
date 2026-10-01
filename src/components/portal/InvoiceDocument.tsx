@@ -27,9 +27,11 @@ interface InvoiceDocumentProps {
   paymentMethod?: string | null;
   transactionId?: string | null;
   amountPaid?: number;
+  currency?: string | null;
 }
 
-function fmt(n: number | string) {
+function fmt(n: number | string, curr: string = "USD") {
+  if (curr === "BDT") return `৳${Number(n).toFixed(2)}`;
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n));
 }
 
@@ -66,6 +68,7 @@ export default function InvoiceDocument({
   paymentMethod,
   transactionId,
   amountPaid = 0,
+  currency = "USD",
 }: InvoiceDocumentProps) {
   const total = lineItems.reduce((sum, item) => sum + Number(item.amount), 0);
   const actualAmountPaid = isPaid ? total : amountPaid;
@@ -175,8 +178,8 @@ export default function InvoiceDocument({
                   )}
                 </td>
                 <td style={{ color: "#0d0d0d" }}>{Number(item.quantity)}</td>
-                <td style={{ color: "#0d0d0d" }}>{fmt(item.rate)}</td>
-                <td style={{ fontWeight: 600, color: "#0d0d0d" }}>{fmt(item.amount)}</td>
+                <td style={{ color: "#0d0d0d" }}>{fmt(item.rate, currency || "USD")}</td>
+                <td style={{ fontWeight: 600, color: "#0d0d0d" }}>{fmt(item.amount, currency || "USD")}</td>
               </tr>
             ))}
           </tbody>
@@ -198,27 +201,27 @@ export default function InvoiceDocument({
               }}
             >
               <div style={{ display: "table-cell", verticalAlign: "middle", paddingLeft: "20px" }}>
-                Total (USD)
+                Total ({currency || "USD"})
               </div>
               <div 
                 className="invoice-total-amount" 
                 style={{ display: "table-cell", verticalAlign: "middle", textAlign: "right", paddingRight: "20px" }}
               >
-                {fmt(total)}
+                {fmt(total, currency || "USD")}
               </div>
             </div>
             
             {(actualAmountPaid > 0) && (
               <div className="invoice-totals-sub-row">
                 <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>Amount Paid</span>
-                <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>{fmt(actualAmountPaid)}</span>
+                <span className="invoice-totals-sub-paid" style={{ color: "#0a8c6a" }}>{fmt(actualAmountPaid, currency || "USD")}</span>
               </div>
             )}
             
             <div className="invoice-totals-sub-row" style={{ marginTop: 4 }}>
               <span className="invoice-totals-sub-due" style={{ color: "#2a2a2a" }}>Balance Due</span>
               <span style={{ fontWeight: balanceDue > 0 ? 600 : 400, color: "var(--neutral-900)" }}>
-                {isPaid || balanceDue === 0 ? "PAID" : fmt(balanceDue)}
+                {isPaid || balanceDue === 0 ? "PAID" : fmt(balanceDue, currency || "USD")}
               </span>
             </div>
           </div>

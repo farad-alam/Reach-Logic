@@ -115,13 +115,15 @@ export async function notifyOrderStatus(
     CANCELLED: "Cancelled",
   };
 
-  await notify({
-    userId: order.clientId,
-    type: "ORDER_STATUS_CHANGED",
-    title: `Order update: ${order.serviceTitle}`,
-    body: `Your order "${order.serviceTitle}" is now ${statusLabel[newStatus] ?? newStatus}.`,
-    link: `/portal/client/orders/${orderId}`,
-  });
+  if (order.clientId) {
+    await notify({
+      userId: order.clientId,
+      type: "ORDER_STATUS_CHANGED",
+      title: `Order update: ${order.serviceTitle}`,
+      body: `Your order "${order.serviceTitle}" is now ${statusLabel[newStatus] ?? newStatus}.`,
+      link: `/portal/client/orders/${orderId}`,
+    });
+  }
 }
 
 /** Notify client about a new invoice */
@@ -132,13 +134,15 @@ export async function notifyInvoiceCreated(invoiceId: string) {
   });
   if (!invoice) return;
 
-  await notify({
-    userId: invoice.clientId,
-    type: "INVOICE_CREATED",
-    title: `New invoice: ${invoice.invoiceNumber}`,
-    body: `A new invoice (${invoice.invoiceNumber}) has been created for you. Check your invoices for details.`,
-    link: `/portal/client/invoices/${invoiceId}`,
-  });
+  if (invoice.clientId) {
+    await notify({
+      userId: invoice.clientId,
+      type: "INVOICE_CREATED",
+      title: `New invoice: ${invoice.invoiceNumber}`,
+      body: `A new invoice (${invoice.invoiceNumber}) has been created for you. Check your invoices for details.`,
+      link: `/portal/client/invoices/${invoiceId}`,
+    });
+  }
 }
 
 /** Send a rich HTML email receipt when an invoice is marked as paid */
@@ -164,7 +168,7 @@ export async function sendPaidInvoiceEmail(invoiceId: string) {
   try {
     await prisma.notification.create({
       data: {
-        userId: invoice.clientId,
+        userId: (invoice.clientId || ""),
         type: "INVOICE_PAID",
         title: `Payment Recorded: ${invoice.invoiceNumber}`,
         body: `Your invoice ${invoice.invoiceNumber} has been marked as paid. Thank you!`,
@@ -174,7 +178,7 @@ export async function sendPaidInvoiceEmail(invoiceId: string) {
   } catch (_err) { /* non-critical */ }
 
   const actionUrl = `${BASE_URL}/portal/client/invoices/${invoice.id}`;
-  const billToName = invoice.billingName || invoice.client.fullName || invoice.client.email;
+  const billToName = invoice.billingName || invoice.client?.fullName || invoice.billingName || invoice.client?.email || "";
 
   // Line items rows
   const lineItemRows = invoice.lineItems.map((item) =>
@@ -246,7 +250,7 @@ export async function sendPaidInvoiceEmail(invoiceId: string) {
   try {
     await resend.emails.send({
       from: FROM,
-      to: invoice.client.email,
+      to: invoice.client?.email || "",
       subject: `Payment Receipt: Invoice ${invoice.invoiceNumber}`,
       html,
     });
@@ -280,7 +284,7 @@ export async function sendPaymentReceivedEmail(invoiceId: string, amountJustPaid
     new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(d);
 
   const actionUrl = `${BASE_URL}/portal/client/invoices/${invoice.id}`;
-  const clientName = invoice.billingName || invoice.client.fullName || invoice.client.email;
+  const clientName = invoice.billingName || invoice.client?.fullName || invoice.billingName || invoice.client?.email || "";
   const projectName = invoice.order?.serviceTitle ?? "Your Project";
   const isFullyPaid = balanceDue === 0;
 
@@ -338,7 +342,7 @@ export async function sendPaymentReceivedEmail(invoiceId: string, amountJustPaid
   try {
     await resend.emails.send({
       from: FROM,
-      to: invoice.client.email,
+      to: invoice.client?.email || "",
       subject: isFullyPaid
         ? `Invoice ${invoice.invoiceNumber} — Fully Paid ✓`
         : `Payment of ${fmt(amountJustPaid)} Received — Invoice ${invoice.invoiceNumber}`,
@@ -384,6 +388,111 @@ export async function notifyInviteAccepted(acceptedUserId: string) {
 }
 
 // ─── Email template ───────────────────────────────────────────────────────────
+export async function sendNewInvoiceEmail(invoiceId: string) {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: {
+      client: { select: { id: true, email: true, fullName: true } },
+      order: { select: { serviceTitle: true, description: true, startDate: true, endDate: true } },
+      lineItems: true,
+    },
+  });
+  if (!invoice) return;
+
+  const toEmail = invoice.billingEmail || invoice.client?.email || "";
+  if (!toEmail) return;
+
+  const currency = invoice.currency ?? "USD";
+  const total = invoice.lineItems.reduce((sum, item) => sum + Number(item.amount), 0);
+  
+  const fmt = (n: number) =>
+    currency === "BDT"
+      ? `৳${n.toFixed(2)}`
+      : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+      
+  const fmtDate = (d: Date) =>
+    new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(d);
+
+  const actionUrl = `${BASE_URL}/portal/client/invoices/${invoice.id}`;
+  const billToName = invoice.billingName || invoice.client?.fullName || invoice.billingName || toEmail;
+
+  // Build the email HTML
+  const lineItemRows = invoice.lineItems.map((item) =>
+    "<tr>" +
+    `<td style="padding:12px 0;border-bottom:1px solid #e5e5e5;font-size:14px;color:#0d0d0d;">${item.description}</td>` +
+    `<td style="padding:12px 0;border-bottom:1px solid #e5e5e5;font-size:14px;color:#6b6b6b;text-align:right;">${Number(item.quantity)}</td>` +
+    `<td style="padding:12px 0;border-bottom:1px solid #e5e5e5;font-size:14px;color:#6b6b6b;text-align:right;">${fmt(Number(item.rate))}</td>` +
+    `<td style="padding:12px 0;border-bottom:1px solid #e5e5e5;font-size:14px;color:#0d0d0d;font-weight:600;text-align:right;">${fmt(Number(item.amount))}</td>` +
+    "</tr>"
+  ).join("");
+
+  const billingLines = [
+    `<strong>${billToName}</strong><br/>`,
+    invoice.billingCompany ? invoice.billingCompany + "<br/>" : "",
+    invoice.billingEmail ? invoice.billingEmail + "<br/>" : "",
+    invoice.billingAddress ? invoice.billingAddress.split("\n").join("<br/>") : "",
+    invoice.billingCountry ? invoice.billingCountry + "<br/>" : "",
+  ].filter(Boolean).join("");
+
+  const html =
+    "<!DOCTYPE html><html>" +
+    `<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">` +
+    `<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 24px;">` +
+    `<table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e5e5;">` +
+    `<tr><td style="background:#042f28;padding:24px 32px;text-align:center;">` +
+    `<span style="font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.02em;">ReachLogic</span>` +
+    `<p style="color:#a3c5bf;margin:4px 0 0;font-size:14px;">New Invoice Generated</p>` +
+    `</td></tr>` +
+    `<tr><td style="padding:32px;">` +
+    `<h2 style="margin:0 0 16px;font-size:20px;font-weight:700;color:#0d0d0d;">Invoice #${invoice.invoiceNumber}</h2>` +
+    `<p style="margin:0 0 32px;font-size:15px;color:#4a4a4a;line-height:1.6;">` +
+    `We have created a new invoice for your project <strong>${invoice.order?.serviceTitle ?? "Project"}</strong>.` +
+    `</p>` +
+    `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;"><tr>` +
+    `<td width="50%" valign="top">` +
+    `<div style="font-size:12px;font-weight:600;color:#888;text-transform:uppercase;margin-bottom:8px;">Billed To:</div>` +
+    `<div style="font-size:14px;color:#0d0d0d;line-height:1.5;">${billingLines}</div>` +
+    `</td>` +
+    `<td width="50%" valign="top" align="right">` +
+    `<div style="font-size:14px;color:#6b6b6b;margin-bottom:4px;">Due Date: <strong style="color:#ea580c;">${fmtDate(invoice.dueDate)}</strong></div>` +
+    `<div style="font-size:14px;color:#6b6b6b;">Total Due: <strong style="color:#0d0d0d;">${fmt(total)}</strong></div>` +
+    `</td></tr></table>` +
+    `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">` +
+    `<thead><tr>` +
+    `<th style="padding-bottom:12px;border-bottom:2px solid #e5e5e5;text-align:left;font-size:12px;color:#888;text-transform:uppercase;">Description</th>` +
+    `<th style="padding-bottom:12px;border-bottom:2px solid #e5e5e5;text-align:right;font-size:12px;color:#888;text-transform:uppercase;">Qty</th>` +
+    `<th style="padding-bottom:12px;border-bottom:2px solid #e5e5e5;text-align:right;font-size:12px;color:#888;text-transform:uppercase;">Rate</th>` +
+    `<th style="padding-bottom:12px;border-bottom:2px solid #e5e5e5;text-align:right;font-size:12px;color:#888;text-transform:uppercase;">Amount</th>` +
+    `</tr></thead>` +
+    `<tbody>${lineItemRows}</tbody>` +
+    `<tfoot><tr>` +
+    `<td colspan="3" style="padding:16px 0;text-align:right;font-size:16px;font-weight:700;color:#0d0d0d;">Total Due</td>` +
+    `<td style="padding:16px 0;text-align:right;font-size:20px;font-weight:800;color:#042f28;">${fmt(total)}</td>` +
+    `</tr></tfoot>` +
+    `</table>` +
+    (invoice.notes ? `<div style="margin-bottom:32px;padding:16px;background:#f9fafb;border-radius:8px;font-size:14px;color:#4a4a4a;"><strong>Notes:</strong><br/>${invoice.notes}</div>` : '') +
+    `<div style="text-align:center;">` +
+    `<a href="${actionUrl}" style="display:inline-block;background:#042f28;color:#fff;padding:12px 24px;border-radius:8px;font-size:15px;font-weight:600;text-decoration:none;">View & Download PDF &rarr;</a>` +
+    `</div>` +
+    `</td></tr>` +
+    `<tr><td style="padding:24px 32px;background:#fafafa;border-top:1px solid #e5e5e5;text-align:center;">` +
+    `<p style="margin:0;font-size:12px;color:#a3a3a3;">ReachLogic &bull; hello@reachlogic.net &bull; www.reachlogic.net</p>` +
+    `</td></tr>` +
+    `</table></td></tr></table>` +
+    `</body></html>`;
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: toEmail,
+      subject: `Invoice #${invoice.invoiceNumber} from ReachLogic`,
+      html,
+    });
+  } catch (err) {
+    console.error("[sendNewInvoiceEmail] Error:", err);
+  }
+}
+
 function buildNotificationEmail({
   title,
   body,

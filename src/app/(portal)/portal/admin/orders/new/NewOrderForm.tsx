@@ -9,15 +9,19 @@ interface Client {
   email: string;
 }
 
+type ClientMode = "PORTAL" | "OFF_PORTAL" | null;
+
 export default function NewOrderForm({ clients }: { clients: Client[] }) {
   const router = useRouter();
-  const [clientId, setClientId] = useState("");
+  const [clientMode, setClientMode] = useState<ClientMode>(null);
+  const [selectedClientId, setSelectedClientId] = useState("");
   const [threadId, setThreadId] = useState("");
   const [serviceTitle, setServiceTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState<"USD" | "BDT">("USD");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -30,6 +34,13 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
   const [newThreadName, setNewThreadName] = useState("");
   const [creatingThread, setCreatingThread] = useState(false);
 
+  // Billing (Off-Portal)
+  const [billingName, setBillingName] = useState("");
+  const [billingEmail, setBillingEmail] = useState("");
+  const [billingCompany, setBillingCompany] = useState("");
+  const [billingCountry, setBillingCountry] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -40,22 +51,21 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  async function fetchThreads(selectedClientId: string, autoSelectNewId?: string) {
-    if (!selectedClientId) {
+  async function fetchThreads(clientId: string, autoSelectNewId?: string) {
+    if (!clientId) {
       setThreads([]);
       setThreadId("");
       return;
     }
     setThreadsLoading(true);
     try {
-      const res = await fetch(`/api/portal/threads?clientId=${selectedClientId}`);
+      const res = await fetch(`/api/portal/threads?clientId=${clientId}`);
       const data = await res.json();
       if (data.threads) {
         setThreads(data.threads);
         if (autoSelectNewId) {
           setThreadId(autoSelectNewId);
         } else {
-          // Select General or first
           const general = data.threads.find((t: any) => t.name === "General");
           if (general) setThreadId(general.id);
           else if (data.threads.length > 0) setThreadId(data.threads[0].id);
@@ -68,9 +78,24 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
     }
   }
 
-  useEffect(() => {
-    fetchThreads(clientId);
-  }, [clientId]);
+  const handleClientChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === "") {
+      setClientMode(null);
+      setSelectedClientId("");
+      setThreads([]);
+      setThreadId("");
+    } else if (val === "OFF_PORTAL") {
+      setClientMode("OFF_PORTAL");
+      setSelectedClientId("");
+      setThreads([]);
+      setThreadId("");
+    } else {
+      setClientMode("PORTAL");
+      setSelectedClientId(val);
+      fetchThreads(val);
+    }
+  };
 
   function handleCreateNewThread() {
     setIsCreateThreadModalOpen(true);
@@ -85,11 +110,11 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
       const res = await fetch("/api/portal/threads/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId, name: newThreadName.trim() }),
+        body: JSON.stringify({ clientId: selectedClientId, name: newThreadName.trim() }),
       });
       const data = await res.json();
       if (res.ok && data.thread) {
-        await fetchThreads(clientId, data.thread.id);
+        await fetchThreads(selectedClientId, data.thread.id);
         setIsCreateThreadModalOpen(false);
         setNewThreadName("");
       } else {
@@ -105,7 +130,8 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!clientId) { setError("Please select a client."); return; }
+    if (!clientMode) { setError("Please select a client."); return; }
+    if (clientMode === "PORTAL" && !threadId) { setError("Please select a message thread."); return; }
     if (endDate && startDate && endDate < startDate) {
       setError("End date must be on or after start date.");
       return;
@@ -113,10 +139,24 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
     setLoading(true);
     setError("");
     try {
+      const payload = { 
+        clientId: clientMode === "PORTAL" ? selectedClientId : undefined, 
+        isOffPortal: clientMode === "OFF_PORTAL",
+        threadId: clientMode === "PORTAL" ? threadId : undefined, 
+        serviceTitle, description, startDate, endDate, amount, currency,
+        ...(clientMode === "OFF_PORTAL" ? {
+          offPortalName: billingName,
+          offPortalEmail: billingEmail,
+          offPortalCompany: billingCompany,
+          offPortalCountry: billingCountry,
+          offPortalAddress: billingAddress,
+        } : {})
+      };
+      
       const res = await fetch("/api/portal/orders/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId, threadId, serviceTitle, description, startDate, endDate, amount }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Failed to create order."); return; }
@@ -129,7 +169,7 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
   }
 
   const selectedThread = threads.find(t => t.id === threadId);
-  const selectedClient = clients.find(c => c.id === clientId);
+  const selectedClient = clients.find(c => c.id === selectedClientId);
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", paddingBottom: 40 }}>
@@ -144,14 +184,17 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
             <select
               id="order-client"
               className="form-select"
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
+              value={clientMode === "OFF_PORTAL" ? "OFF_PORTAL" : selectedClientId}
+              onChange={handleClientChange}
               required
             >
               <option value="">Select a client…</option>
               {clients.map((c) => (
                 <option key={c.id} value={c.id}>{c.fullName ?? c.email}</option>
               ))}
+              <optgroup label="─────────────────">
+                <option value="OFF_PORTAL">Off-Portal Client</option>
+              </optgroup>
             </select>
           </div>
 
@@ -160,23 +203,25 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
             <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Message Thread <span style={{ color: "var(--brand-accent)" }}>*</span></label>
             <div style={{ position: "relative" }} ref={dropdownRef}>
               <div 
-                onClick={() => clientId && setIsThreadDropdownOpen(!isThreadDropdownOpen)}
+                onClick={() => clientMode === "PORTAL" && setIsThreadDropdownOpen(!isThreadDropdownOpen)}
                 className="form-input" 
                 style={{ 
                   display: "flex", alignItems: "center", justifyContent: "space-between", 
-                  cursor: clientId ? "pointer" : "not-allowed", 
-                  background: clientId ? "#fff" : "var(--neutral-50)",
+                  cursor: clientMode === "PORTAL" ? "pointer" : "not-allowed", 
+                  background: clientMode === "PORTAL" ? "#fff" : "var(--neutral-50)",
                   borderColor: isThreadDropdownOpen ? "var(--brand-accent)" : "var(--neutral-200)"
                 }}
               >
-                {threadsLoading ? (
+                {clientMode === "OFF_PORTAL" ? (
+                  <span style={{ color: "var(--neutral-400)" }}>Not needed for Off-Portal Client</span>
+                ) : threadsLoading ? (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--neutral-500)" }}>
                     <Loader2 size={16} className="animate-spin" /> Loading...
                   </div>
                 ) : selectedThread ? (
                   <span style={{ color: "var(--neutral-900)" }}>{selectedThread.name}</span>
                 ) : (
-                  <span style={{ color: "var(--neutral-400)" }}>{clientId ? "Select thread..." : "Select client first"}</span>
+                  <span style={{ color: "var(--neutral-400)" }}>{selectedClientId ? "Select thread..." : "Select client first"}</span>
                 )}
                 <ChevronDown size={16} color="var(--neutral-500)" />
               </div>
@@ -241,6 +286,42 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
           </div>
         </div>
 
+        {clientMode === "OFF_PORTAL" && (
+          <div style={{ padding: "24px", background: "#fff", border: "1px solid var(--neutral-200)", borderRadius: 12, marginBottom: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--neutral-900)" }}>Billing Information</h3>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#9a3412", background: "#ffedd5", padding: "4px 10px", borderRadius: 12 }}>Off-Portal Client</span>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Full Name <span style={{ color: "var(--brand-accent)" }}>*</span></label>
+                <input type="text" className="form-input" value={billingName} onChange={e => setBillingName(e.target.value)} required />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Email Address <span style={{ color: "var(--brand-accent)" }}>*</span></label>
+                <input type="email" className="form-input" value={billingEmail} onChange={e => setBillingEmail(e.target.value)} required />
+              </div>
+            </div>
+            
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Company (Optional)</label>
+                <input type="text" className="form-input" value={billingCompany} onChange={e => setBillingCompany(e.target.value)} />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Country <span style={{ color: "var(--brand-accent)" }}>*</span></label>
+                <input type="text" className="form-input" value={billingCountry} onChange={e => setBillingCountry(e.target.value)} required />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Billing Address <span style={{ color: "var(--brand-accent)" }}>*</span></label>
+              <textarea className="form-textarea" rows={2} value={billingAddress} onChange={e => setBillingAddress(e.target.value)} required placeholder="Street, City, State/Province, Postal Code" />
+            </div>
+          </div>
+        )}
+
         <div className="form-group">
           <label className="form-label" htmlFor="order-title" style={{ fontSize: 13, fontWeight: 600 }}>Project Title <span style={{ color: "var(--brand-accent)" }}>*</span></label>
           <input
@@ -293,9 +374,12 @@ export default function NewOrderForm({ clients }: { clients: Client[] }) {
             />
           </div>
           <div className="form-group">
-            <label className="form-label" htmlFor="amount" style={{ fontSize: 13, fontWeight: 600 }}>Amount (USD) <span style={{ color: "var(--brand-accent)" }}>*</span></label>
+            <label className="form-label" htmlFor="amount" style={{ fontSize: 13, fontWeight: 600 }}>Amount <span style={{ color: "var(--brand-accent)" }}>*</span></label>
             <div style={{ display: "flex", border: "1px solid var(--neutral-200)", borderRadius: 6, overflow: "hidden" }}>
-              <div style={{ background: "var(--neutral-50)", padding: "10px 16px", borderRight: "1px solid var(--neutral-200)", color: "var(--neutral-600)", fontWeight: 600 }}>$</div>
+              <select className="form-select" style={{ border: "none", borderRadius: 0, width: "70px", background: "var(--neutral-50)", borderRight: "1px solid var(--neutral-200)", padding: "10px 8px" }} value={currency} onChange={e => setCurrency(e.target.value as "USD" | "BDT")}>
+                <option value="USD">$ USD</option>
+                <option value="BDT">৳ BDT</option>
+              </select>
               <input 
                 id="amount" 
                 type="number"

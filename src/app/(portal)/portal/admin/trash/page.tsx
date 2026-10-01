@@ -115,7 +115,7 @@ export default async function AdminTrashPage() {
                     {deletedOrders.map((order) => (
                       <tr key={order.id}>
                         <td style={{ fontWeight: 500 }}>{order.serviceTitle}</td>
-                        <td style={{ color: "var(--neutral-600)" }}>{order.client.fullName || order.client.email}</td>
+                        <td style={{ color: "var(--neutral-600)" }}>{order.client?.fullName || order.client?.email}</td>
                         <td style={{ color: "var(--neutral-500)" }}>{fmtDate(order.deletedAt!)}</td>
                         <td style={{ color: "var(--warning)", fontWeight: 500 }}>{getDaysRemaining(order.deletedAt!)} days</td>
                         <td style={{ textAlign: "right" }}>
@@ -148,7 +148,7 @@ export default async function AdminTrashPage() {
                     {deletedInvoices.map((inv) => (
                       <tr key={inv.id}>
                         <td style={{ fontWeight: 500 }}>{inv.invoiceNumber}</td>
-                        <td style={{ color: "var(--neutral-600)" }}>{inv.client.fullName || inv.client.email}</td>
+                        <td style={{ color: "var(--neutral-600)" }}>{inv.client?.fullName || inv.client?.email}</td>
                         <td style={{ color: "var(--neutral-500)" }}>{fmtDate(inv.deletedAt!)}</td>
                         <td style={{ color: "var(--warning)", fontWeight: 500 }}>{getDaysRemaining(inv.deletedAt!)} days</td>
                         <td style={{ textAlign: "right" }}>

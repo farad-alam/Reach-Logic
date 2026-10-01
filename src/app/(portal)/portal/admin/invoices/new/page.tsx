@@ -6,16 +6,10 @@ import NewInvoiceForm from "./NewInvoiceForm";
 
 export const metadata = { title: "Create Invoice" };
 
-export default async function NewInvoicePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ orderId?: string }>;
-}) {
+export default async function NewInvoicePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/portal/login");
-  const params = await searchParams;
 
-  // We need a list of clients and their active orders to select from
   const clients = await prisma.user.findMany({
     where: { role: "CLIENT", isActive: true },
     select: {
@@ -24,20 +18,9 @@ export default async function NewInvoicePage({
       email: true,
       company: true,
       address: true,
-      clientOrders: {
-        where: { status: { notIn: ["AWAITING_QUOTE", "CANCELLED"] } },
-        select: { id: true, serviceTitle: true, amount: true },
-      },
+      country: true,
     },
   });
-
-  const clientsWithNumberAmount = clients.map(c => ({
-    ...c,
-    clientOrders: c.clientOrders.map(o => ({
-      ...o,
-      amount: o.amount ? Number(o.amount) : null,
-    })),
-  }));
 
   return (
     <div className="portal-page" style={{ maxWidth: 800 }}>
@@ -48,7 +31,7 @@ export default async function NewInvoicePage({
         </div>
       </div>
       <div className="card">
-        <NewInvoiceForm clients={clientsWithNumberAmount} initialOrderId={params.orderId} />
+        <NewInvoiceForm clients={clients} />
       </div>
     </div>
   );

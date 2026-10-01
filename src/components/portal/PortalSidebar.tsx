@@ -491,21 +491,28 @@ export default function PortalSidebar({
           onClick={() => signOut({ callbackUrl: "/portal/login" })}
           title="Sign out"
           style={{
-            background: "transparent",
-            border: "none",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
             cursor: "pointer",
-            color: "rgba(255,255,255,0.4)",
-            padding: "4px",
-            borderRadius: "4px",
+            color: "rgba(255,255,255,0.8)",
+            padding: "6px 10px",
+            borderRadius: "6px",
             display: "flex",
-            transition: "color 0.15s",
+            alignItems: "center",
+            gap: "6px",
+            transition: "all 0.15s",
+            fontSize: "12px",
+            fontWeight: 500,
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.4)")}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.8)"; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
         >
-          <LogOut size={15} />
+          <LogOut size={14} />
+          <span>Logout</span>
         </button>
       </div>
+      {/* Extra padding for mobile bottom safe area */}
+      <div style={{ height: "env(safe-area-inset-bottom, 20px)" }} className="mobile-safe-area"></div>
     </aside>
   );
 }

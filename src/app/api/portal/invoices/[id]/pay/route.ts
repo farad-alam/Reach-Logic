@@ -41,20 +41,22 @@ export async function POST(
     });
 
     // Notify client
-    await notify({
-      userId: invoice.clientId,
-      type: "INVOICE_PAID",
-      title: `Payment Received: Invoice ${invoice.invoiceNumber}`,
-      body: `We have received your payment for Invoice ${invoice.invoiceNumber}${invoice.order ? ` (${invoice.order.serviceTitle})` : ""}. Thank you!`,
-      link: `/portal/client/invoices/${invoice.id}`,
-    });
+    if (invoice.clientId) {
+      await notify({
+        userId: invoice.clientId,
+        type: "INVOICE_PAID",
+        title: `Payment Received: Invoice ${invoice.invoiceNumber}`,
+        body: `We have received your payment for Invoice ${invoice.invoiceNumber}${invoice.order ? ` (${invoice.order.serviceTitle})` : ""}. Thank you!`,
+        link: `/portal/client/invoices/${invoice.id}`,
+      });
+    }
 
     // Auto-post to thread linked to invoice's order or General fallback
     const orderThreadId = invoice.order ? (await prisma.order.findUnique({ where: { id: invoice.order.id }, select: { threadId: true } }))?.threadId : null;
     const thread = orderThreadId
       ? await prisma.thread.findUnique({ where: { id: orderThreadId } })
-      : await prisma.thread.findFirst({ where: { clientId: invoice.clientId, name: "General" } })
-        ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId } });
+      : await prisma.thread.findFirst({ where: { clientId: invoice.clientId || "", name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId: invoice.clientId || "" } });
 
     if (thread) {
       await prisma.message.create({

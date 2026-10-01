@@ -44,19 +44,21 @@ export async function POST(
     });
 
     // Notify client
-    await notify({
-      userId: order.clientId,
-      type: "ORDER_STATUS_CHANGED",
-      title: `Quote Ready: ${order.serviceTitle}`,
-      body: `Your project "${order.serviceTitle}" has been quoted for $${body.amount.toFixed(2)}. It is now Pending Start.`,
-      link: `/portal/client/orders/${order.id}`,
-    });
+    if (order.clientId) {
+      await notify({
+        userId: order.clientId,
+        type: "ORDER_STATUS_CHANGED",
+        title: `Quote Ready: ${order.serviceTitle}`,
+        body: `Your project "${order.serviceTitle}" has been quoted for $${body.amount.toFixed(2)}. It is now Pending Start.`,
+        link: `/portal/client/orders/${order.id}`,
+      });
+    }
 
     // Auto-post to thread linked to order or General fallback
     const thread = order.threadId
       ? await prisma.thread.findUnique({ where: { id: order.threadId } })
-      : await prisma.thread.findFirst({ where: { clientId: order.clientId, name: "General" } })
-        ?? await prisma.thread.findFirst({ where: { clientId: order.clientId } });
+      : await prisma.thread.findFirst({ where: { clientId: order.clientId || "", name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId: order.clientId || "" } });
 
     if (thread) {
       await prisma.message.create({

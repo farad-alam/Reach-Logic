@@ -48,8 +48,8 @@ export async function PATCH(
     // Auto-post to thread linked to order (or General fallback)
     const thread = order.threadId
       ? await prisma.thread.findUnique({ where: { id: order.threadId } })
-      : await prisma.thread.findFirst({ where: { clientId: order.clientId, name: "General" } })
-        ?? await prisma.thread.findFirst({ where: { clientId: order.clientId } });
+      : await prisma.thread.findFirst({ where: { clientId: order.clientId || undefined, name: "General" } })
+        ?? await prisma.thread.findFirst({ where: { clientId: order.clientId || undefined } });
 
     if (thread) {
       const statusMessages: Record<string, string> = {

@@ -89,7 +89,7 @@ export default async function AdminInvoicesPage() {
                 return (
                   <tr key={inv.id} style={{ borderBottom: "1px solid #f3f4f6", fontSize: 13 }}>
                     <td style={{ ...tdStyle, fontWeight: 700, color: "#111827" }}>{inv.invoiceNumber}</td>
-                    <td style={{ ...tdStyle, color: "#4b5563" }}>{inv.client.fullName ?? inv.client.email}</td>
+                    <td style={{ ...tdStyle, color: "#4b5563" }}>{inv.client?.fullName ?? inv.client?.email}</td>
                     <td style={{ ...tdStyle, color: "#4b5563" }}>{inv.order?.serviceTitle ?? "—"}</td>
                     <td style={{ ...tdStyle, fontWeight: 700, color: "#111827" }}>{fmt(inv.total)}</td>
                     <td style={{ ...tdStyle, color: "#6b7280" }}>{fmtDate(inv.dueDate)}</td>
