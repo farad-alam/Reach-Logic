@@ -14,6 +14,7 @@ interface Props {
 
 export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, invoiceNumber, amountPaid }: Props) {
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState<{ top: number, right: number } | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [showRecordPayment, setShowRecordPayment] = useState(false);
@@ -22,16 +23,33 @@ export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, inv
   const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
+  // Close on outside click and calculate coords
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
+    
+    function onScroll() {
+      if (open) setOpen(false);
+    }
+
+    if (open && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setCoords({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+      
+      window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+      window.addEventListener("resize", onScroll);
+    }
+    
     document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      window.removeEventListener("scroll", onScroll, { capture: true });
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [open]);
 
   async function doAction(action: string, extra?: Record<string, unknown>) {
     setLoading(action);
@@ -119,9 +137,9 @@ export default function InvoiceManageDropdown({ invoiceId, isPaid, isLocked, inv
       </button>
 
       {/* Dropdown */}
-      {open && (
+      {open && coords && (
         <div style={{
-          position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 100,
+          position: "fixed", right: coords.right, top: coords.top, zIndex: 9999,
           background: "#fff", borderRadius: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.14), 0 1px 4px rgba(0,0,0,0.06)",
           border: "1px solid var(--neutral-100)", minWidth: 240, overflow: "hidden",
         }}>
