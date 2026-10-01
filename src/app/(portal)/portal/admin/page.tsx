@@ -61,26 +61,28 @@ export default async function AdminDashboard() {
     recentInvoices,
   ] = await Promise.all([
     prisma.user.count({ where: { role: "CLIENT", isActive: true } }),
-    prisma.order.count(),
+    prisma.order.count({ where: { deletedAt: null } }),
     prisma.order.findMany({
-      where: { amount: { not: null } },
+      where: { deletedAt: null, amount: { not: null } },
       select: { amount: true },
     }),
     prisma.invoice.findMany({
-      where: { isPaid: true },
+      where: { isPaid: true, deletedAt: null, invoiceStatus: { in: ["ACTIVE", "PARTIALLY_REFUNDED"] } },
       include: { lineItems: { select: { amount: true } } },
     }),
     prisma.invoice.findMany({
-      where: { isPaid: false, isLocked: false },
+      where: { isPaid: false, isLocked: false, deletedAt: null, invoiceStatus: { in: ["ACTIVE", "PARTIALLY_REFUNDED"] } },
       include: { lineItems: { select: { amount: true } } },
     }),
     prisma.order.findMany({
       take: 6,
+      where: { deletedAt: null },
       orderBy: { createdAt: "desc" },
       include: { client: { select: { fullName: true, email: true } } },
     }),
     prisma.invoice.findMany({
       take: 5,
+      where: { deletedAt: null, invoiceStatus: { in: ["ACTIVE", "PARTIALLY_REFUNDED"] } },
       orderBy: { createdAt: "desc" },
       include: {
         client: { select: { fullName: true, email: true } },
