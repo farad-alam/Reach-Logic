@@ -55,6 +55,7 @@ const adminNav: NavItem[] = [
   { href: "/portal/admin/clients", label: "Clients", icon: <Users size={16} /> },
   { href: "/portal/admin/orders", label: "Orders", icon: <ShoppingBag size={16} /> },
   { href: "/portal/admin/invoices", label: "Invoices", icon: <FileText size={16} /> },
+  { href: "/portal/admin/statement", label: "Statement", icon: <FileText size={16} /> },
   { href: "/portal/admin/messages", label: "Messages", icon: <MessageSquare size={16} /> },
   { href: "/portal/admin/team", label: "Team", icon: <UserCog size={16} /> },
   { href: "/portal/admin/notifications", label: "Notifications", icon: <Bell size={16} /> },

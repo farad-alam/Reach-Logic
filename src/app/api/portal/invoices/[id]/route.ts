@@ -16,6 +16,8 @@ const schema = z.object({
   reason: z.string().optional(),
   actionDate: z.string().optional(),
   emailClient: z.boolean().optional(),
+  notes: z.string().optional(),
+  method: z.string().optional(),
 });
 
 export async function PATCH(
@@ -65,8 +67,20 @@ export async function PATCH(
         updateData = {
           amountPaid: newPaid,
           isPaid: fullyPaid,
-          paidAt: fullyPaid ? new Date() : invoice.paidAt,
+          paidAt: fullyPaid ? (paidAt ? new Date(paidAt) : new Date()) : invoice.paidAt,
         };
+        // Create statement entry
+        await prisma.invoicePayment.create({
+          data: {
+            invoiceId: id,
+            amount: amount,
+            currency: invoice.currency ?? "USD",
+            method: parsed.data.method ?? null,
+            paidAt: paidAt ? new Date(paidAt) : new Date(),
+            notes: parsed.data.notes ?? null,
+            isRefund: false,
+          },
+        });
         break;
       }
       case "delete_payment":
@@ -106,6 +120,19 @@ export async function PATCH(
           actionDate: refDate,
           actionBy: session.user.id,
         };
+        
+        // Create refund statement entry
+        await prisma.invoicePayment.create({
+          data: {
+            invoiceId: id,
+            amount: -refAmount, // negative for statement display
+            currency: invoice.currency ?? "USD",
+            method: refundMethod ?? null,
+            paidAt: refDate,
+            notes: `Refund: ${reason}`,
+            isRefund: true,
+          },
+        });
         break;
       }
       case "void": {

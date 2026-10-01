@@ -253,6 +253,7 @@ model Invoice {
 
   lineItems InvoiceLineItem[]
   auditLogs InvoiceAuditLog[]
+  payments  InvoicePayment[]
 
   @@map("invoices")
 }
@@ -276,6 +277,24 @@ model InvoiceCounter {
   lastNum Int @default(0)
 
   @@map("invoice_counter")
+}
+
+model InvoicePayment {
+  id        String   @id @default(cuid())
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount    Decimal  @db.Decimal(10, 2) // negative for refund rows
+  currency  String   @default("USD")
+  method    String?
+  paidAt    DateTime @default(now())
+  notes     String?
+  isRefund  Boolean  @default(false)
+  refundFor String?  // id of the original InvoicePayment this reverses
+  createdAt DateTime @default(now())
+
+  @@index([invoiceId])
+  @@index([paidAt])
+  @@map("invoice_payments")
 }
 
 model InvoiceAuditLog {

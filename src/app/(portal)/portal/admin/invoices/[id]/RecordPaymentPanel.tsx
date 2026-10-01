@@ -22,6 +22,7 @@ export default function RecordPaymentPanel({
   const router = useRouter();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("");
+  const [paidAt, setPaidAt] = useState(new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -49,7 +50,7 @@ export default function RecordPaymentPanel({
       const res = await fetch(`/api/portal/invoices/${invoiceId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "record_payment", amount: numAmount }),
+        body: JSON.stringify({ action: "record_payment", amount: numAmount, method, paidAt, notes }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -223,17 +224,31 @@ export default function RecordPaymentPanel({
                 />
               </div>
             </div>
-            <div className="form-group" style={{ marginBottom: 16 }}>
-              <label className="form-label" style={{ fontSize: 12 }}>Notes <span style={{ color: "var(--neutral-400)", fontWeight: 400 }}>(optional)</span></label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Any internal notes about this payment"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ fontSize: 12 }}>
+                  Payment Date <span style={{ color: "var(--brand-accent)" }}>*</span>
+                </label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={paidAt}
+                  onChange={(e) => setPaidAt(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ fontSize: 12 }}>Notes <span style={{ color: "var(--neutral-400)", fontWeight: 400 }}>(optional)</span></label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Any internal notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 16 }}>
               <button
                 type="submit"
                 className="btn btn-primary"
