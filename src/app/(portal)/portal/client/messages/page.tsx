@@ -15,7 +15,7 @@ export default async function ClientMessagesPage() {
     where: { clientId: session.user.id },
     include: {
       members: { include: { user: { select: { id: true, fullName: true, email: true, avatarUrl: true, role: true } } } },
-      messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
+      messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true, body: true } },
     },
     orderBy: { createdAt: "asc" },
   });
@@ -32,24 +32,22 @@ export default async function ClientMessagesPage() {
       where: { clientId: session.user.id },
       include: {
         members: { include: { user: { select: { id: true, fullName: true, email: true, avatarUrl: true, role: true } } } },
-        messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
+        messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true, body: true } },
       },
       orderBy: { createdAt: "asc" },
     });
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", flex: 1 }}>
-      <ClientChatPage
-        threads={threads.map((t) => ({
-          id: t.id,
-          name: t.name,
-          clientId: t.clientId,
-          members: t.members.map((m) => ({ user: m.user })),
-          messages: t.messages.map((m) => ({ createdAt: m.createdAt.toISOString() })),
-        }))}
-        currentUserId={session.user.id}
-      />
-    </div>
+    <ClientChatPage
+      threads={threads.map((t) => ({
+        id: t.id,
+        name: t.name,
+        clientId: t.clientId,
+        members: t.members.map((m) => ({ user: m.user })),
+        messages: t.messages.map((m) => ({ createdAt: m.createdAt.toISOString(), body: m.body })),
+      }))}
+      currentUserId={session.user.id}
+    />
   );
 }

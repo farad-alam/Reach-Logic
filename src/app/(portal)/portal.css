@@ -500,18 +500,132 @@
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ─── Mobile Topbar (hamburger row) ─── */
+.mobile-topbar {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--brand-dark);
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  flex-shrink: 0;
+}
+
+.mobile-topbar-logo {
+  height: 26px;
+  object-fit: contain;
+  object-position: left;
+  filter: brightness(10);
+  flex: 1;
+}
+
+.hamburger-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.hamburger-btn:hover { background: rgba(255,255,255,0.18); }
+
+/* Mobile unread badge on hamburger */
+.hamburger-badge {
+  position: relative;
+}
+.hamburger-badge-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid var(--brand-dark);
+}
+
+/* ─── Sidebar Backdrop ─── */
+.sidebar-backdrop {
+  display: none;
+}
+
+/* ─── Main mobile media query ─── */
 @media (max-width: 768px) {
+  /* Show the mobile topbar */
+  .mobile-topbar { display: flex; }
+
+  /* Sidebar slides in from left */
   .portal-sidebar {
     transform: translateX(-100%);
+    z-index: 55;
+    box-shadow: 4px 0 32px rgba(0,0,0,0.35);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
   }
   .portal-sidebar.open {
     transform: translateX(0);
   }
+
+  /* Main area fills full width */
   .portal-main {
-    margin-left: 0;
+    margin-left: 0 !important;
+    display: flex;
+    flex-direction: column;
   }
+
+  /* Backdrop overlay */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 50;
+    animation: backdropFadeIn 0.2s ease;
+  }
+
+  @keyframes backdropFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Grid stacking */
   .grid-2, .grid-3, .grid-4 {
     grid-template-columns: 1fr;
+  }
+
+  /* Portal page padding */
+  .portal-page {
+    padding: 16px;
+  }
+
+  /* Page header stacks */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  /* Tables scroll horizontally */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Auth card padding on mobile */
+  .auth-card {
+    padding: 28px 20px;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+  .grid-4, .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1831,4 +1945,456 @@
   font-size: 13px;
   color: var(--neutral-500);
   margin-bottom: 24px;
+}
+
+/* ═══════════════════════════════════════════════════
+   WHATSAPP-STYLE CLIENT CHAT
+   ═══════════════════════════════════════════════════ */
+
+/* Client chat shell — 2 panels on desktop, stacked on mobile */
+.client-chat-shell {
+  display: flex;
+  height: calc(100vh - 1px);
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Thread list panel */
+.client-thread-panel {
+  width: 320px;
+  min-width: 320px;
+  border-right: 1px solid var(--neutral-200);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.client-thread-panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  background: var(--brand-dark);
+}
+
+.client-thread-panel-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.client-thread-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* WhatsApp-style thread row */
+.wa-thread-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--neutral-100);
+  transition: background 0.15s;
+}
+.wa-thread-row:hover { background: var(--neutral-50); }
+.wa-thread-row.active { background: rgba(10,140,106,0.07); }
+
+.wa-thread-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--brand-mid);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+
+.wa-thread-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-thread-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.wa-thread-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--neutral-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wa-thread-time {
+  font-size: 11px;
+  color: var(--neutral-400);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.wa-thread-preview {
+  font-size: 13px;
+  color: var(--neutral-500);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wa-unread-badge {
+  background: var(--brand-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  flex-shrink: 0;
+}
+
+/* Chat panel */
+.client-chat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f0f2f5;
+}
+
+/* WhatsApp-style topbar */
+.wa-chat-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--brand-dark);
+  color: #fff;
+  min-height: 56px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.wa-back-btn {
+  display: none;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.wa-back-btn:hover { background: rgba(255,255,255,0.2); }
+
+.wa-chat-contact {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-contact-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-mid);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.wa-contact-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wa-contact-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wa-chat-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.wa-action-btn {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.wa-action-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+/* WhatsApp message background */
+.wa-messages-bg {
+  background: #e5ddd5;
+}
+
+/* WhatsApp bubble colours on mobile (overrides in media query below) */
+/* Info panel slide-up wrapper for mobile */
+.client-info-overlay {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN CHAT MOBILE
+   ═══════════════════════════════════════════════════ */
+
+/* Mobile info sidebar bottom sheet */
+.thread-info-sheet-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 120;
+  animation: backdropFadeIn 0.2s ease;
+}
+
+.thread-info-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70vh;
+  background: var(--neutral-50);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.25);
+  overflow-y: auto;
+  animation: slideUp 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.thread-info-sheet-handle {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 4px;
+}
+
+.thread-info-sheet-handle-bar {
+  width: 40px;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--neutral-300);
+}
+
+/* Show info btn in chat topbar — desktop always hidden, mobile shows */
+.chat-info-mobile-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--neutral-500);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.chat-info-mobile-btn:hover { background: var(--neutral-100); color: var(--neutral-800); }
+
+/* ═══════════════════════════════════════════════════
+   MOBILE MESSAGE THREAD STYLES
+   ═══════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* ── Client Chat ── */
+  .client-chat-shell {
+    height: calc(100vh - 53px);
+  }
+
+  .client-thread-panel {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    flex: 1;
+  }
+
+  .client-chat-panel {
+    width: 100%;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    flex-direction: column;
+  }
+
+  /* Show/hide panels based on mobile-view state */
+  .client-thread-panel.mobile-hidden { display: none; }
+  .client-chat-panel.mobile-hidden   { display: none; }
+  .client-thread-panel.mobile-visible { display: flex; }
+  .client-chat-panel.mobile-visible  { display: flex; }
+
+  /* Show back button */
+  .wa-back-btn { display: flex; }
+
+  /* ── WhatsApp message styles ── */
+  .thread-messages {
+    padding: 12px 8px;
+    background: #e5ddd5;
+  }
+
+  .message-bubble {
+    max-width: 88%;
+  }
+
+  .message-content {
+    font-size: 15px;
+    border-radius: 16px;
+    line-height: 1.55;
+  }
+
+  /* Own messages: WhatsApp green */
+  .message-bubble.own .message-content {
+    background: #dcf8c6;
+    color: #111827;
+    border-color: #c8f0ad;
+  }
+
+  /* Composer bar — sticky + WhatsApp style */
+  .thread-composer {
+    padding: 8px 10px;
+    background: #f0f2f5;
+    gap: 8px;
+    border-top: none;
+    position: sticky;
+    bottom: 0;
+  }
+
+  .thread-composer textarea {
+    font-size: 16px; /* prevents iOS zoom on focus */
+    border-radius: 22px;
+    padding: 9px 16px;
+    background: #fff;
+    border: 1px solid var(--neutral-200);
+    max-height: 100px;
+  }
+
+  .send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--brand-accent) !important;
+    color: #fff !important;
+    transition: transform 0.15s, background 0.15s;
+  }
+
+  .attach-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--neutral-200);
+  }
+
+  /* ── Admin Chat ── */
+  .admin-chat-shell {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 53px);
+  }
+
+  /* Hide right thread-info sidebar inline; use bottom sheet instead */
+  .thread-info-sidebar {
+    display: none;
+  }
+
+  /* Show the info button in admin topbar */
+  .chat-info-mobile-btn { display: flex; }
+
+  /* Show info sheet overlay */
+  .thread-info-sheet-overlay.open { display: block; }
+
+  /* Chat topbar wraps on mobile */
+  .chat-topbar {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px;
+    min-height: unset;
+  }
+
+  .chat-topbar-breadcrumb {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .chat-topbar > div:last-child {
+    width: 100%;
+    overflow-x: auto;
+    display: flex;
+    gap: 6px;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .chat-topbar > div:last-child::-webkit-scrollbar { display: none; }
+
+  /* Message bubble images responsive */
+  .message-content img {
+    max-width: 100%;
+  }
+
+  /* Admin open thread: hide right sidebar, expand center */
+  .admin-chat-shell {
+    grid-template-columns: 1fr;
+  }
+
+  /* Mobile portal topbar height reference */
+  :root {
+    --mobile-topbar-height: 53px;
+  }
 }

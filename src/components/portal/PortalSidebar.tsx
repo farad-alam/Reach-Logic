@@ -32,6 +32,8 @@ interface SidebarProps {
   avatarUrl?: string | null;
   unreadCount?: number;
   isCollapsed?: boolean;
+  sidebarOpen?: boolean;
+  onClose?: () => void;
 }
 
 interface ThreadClient {
@@ -221,6 +223,8 @@ export default function PortalSidebar({
   avatarUrl,
   unreadCount = 0,
   isCollapsed = false,
+  sidebarOpen = false,
+  onClose,
 }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -298,7 +302,7 @@ export default function PortalSidebar({
   }
 
   return (
-    <aside className={`portal-sidebar ${isCollapsed ? "collapsed" : ""}`}>
+    <aside className={`portal-sidebar ${isCollapsed ? "collapsed" : ""} ${sidebarOpen ? "open" : ""}`}>
       {/* Logo */}
       <div style={{ padding: "20px 20px 0 20px", marginBottom: "30px", display: "flex", flexDirection: "column" }}>
         <Link href={`/portal/${role.toLowerCase()}`} style={{ display: "block" }}>
@@ -341,6 +345,7 @@ export default function PortalSidebar({
                   onClick={() => {
                     setMessagesExpanded((v) => !v);
                     if (!pathname.startsWith(messagesBaseRoute)) {
+                      onClose?.();
                       router.push(messagesBaseRoute);
                     }
                   }}
@@ -454,6 +459,7 @@ export default function PortalSidebar({
               key={item.href}
               href={item.href}
               className={`portal-nav-link ${isActive ? "active" : ""}`}
+              onClick={() => onClose?.()}
             >
               {item.icon}
               {item.label}

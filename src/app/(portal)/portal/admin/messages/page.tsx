@@ -44,13 +44,11 @@ export default async function AdminMessagesPage({
   }));
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", flex: 1 }}>
-      <AdminChatPage
-        clients={clientsWithUnread}
-        currentUserId={session.user.id}
-        initialClientId={clientId}
-        initialThreadId={threadId}
-      />
-    </div>
+    <AdminChatPage
+      clients={clientsWithUnread}
+      currentUserId={session.user.id}
+      initialClientId={clientId}
+      initialThreadId={threadId}
+    />
   );
 }

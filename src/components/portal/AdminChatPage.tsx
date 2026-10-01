@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, PenLine, Users, X, MessageSquare, Trash2 } from "lucide-react";
+import { Plus, PenLine, Users, X, MessageSquare, Trash2, Info } from "lucide-react";
 import MessageThread from "@/components/portal/MessageThread";
 import ThreadInfoSidebar from "@/components/portal/ThreadInfoSidebar";
 
@@ -69,6 +69,7 @@ export default function AdminChatPage({
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [newThreadName, setNewThreadName] = useState("");
   const [renameValue, setRenameValue] = useState("");
   const [modalLoading, setModalLoading] = useState(false);
@@ -192,7 +193,7 @@ export default function AdminChatPage({
           </div>
 
           {selectedClientId && (
-            <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
               <button className="btn btn-outline btn-sm" onClick={() => { setShowCreateModal(true); }} disabled={!selectedClientId}>
                 <Plus size={14} /> New Thread
               </button>
@@ -206,6 +207,15 @@ export default function AdminChatPage({
                   </button>
                   <button className="btn btn-outline btn-sm" title="Delete thread" onClick={() => setShowDeleteModal(true)} style={{ color: "#ef4444" }}>
                     <Trash2 size={14} />
+                  </button>
+                  {/* Info button — hidden on desktop, visible on mobile via CSS */}
+                  <button
+                    className="btn btn-outline btn-sm chat-info-mobile-btn"
+                    title="Thread info"
+                    onClick={() => setShowInfoSheet(true)}
+                    id="admin-thread-info-btn"
+                  >
+                    <Info size={14} /> Info
                   </button>
                 </>
               )}
@@ -233,9 +243,33 @@ export default function AdminChatPage({
         </div>
       </div>
 
-      {/* Right: Info sidebar */}
+      {/* Right: Info sidebar (desktop) — hidden on mobile, replaced by bottom sheet */}
       {selectedThreadId && (
         <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} userRole="SUPER_ADMIN" />
+      )}
+
+      {/* Mobile: Thread info bottom sheet */}
+      {showInfoSheet && selectedThreadId && (
+        <div
+          className="thread-info-sheet-overlay open"
+          onClick={() => setShowInfoSheet(false)}
+        >
+          <div className="thread-info-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="thread-info-sheet-handle">
+              <div className="thread-info-sheet-handle-bar" />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 16px 12px" }}>
+              <span style={{ fontSize: 15, fontWeight: 700, color: "var(--neutral-900)" }}>Thread Info</span>
+              <button
+                onClick={() => setShowInfoSheet(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--neutral-400)", display: "flex" }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} userRole="SUPER_ADMIN" />
+          </div>
+        </div>
       )}
 
       {/* Create Thread Modal */}
