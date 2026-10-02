@@ -3,6 +3,27 @@
 import { useState, useEffect, useRef, FormEvent } from "react";
 import { Send, Loader2, Paperclip, X, FileText, Image as ImageIcon, Download } from "lucide-react";
 
+// Converts plain-text URLs in a string into clickable <a> elements
+function linkify(text: string): React.ReactNode[] {
+  const URL_REGEX = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/gi;
+  const parts = text.split(URL_REGEX);
+  return parts.map((part, i) =>
+    URL_REGEX.test(part) ? (
+      <a
+        key={i}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: "var(--brand-accent)", wordBreak: "break-all", textDecoration: "underline" }}
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    )
+  );
+}
+
 interface Attachment {
   id?: string;
   fileName: string;
@@ -242,7 +263,7 @@ export default function MessageThread({
                       </div>
                     )}
                     <div className="message-content">
-                      {msg.body !== "📎 Attachment" && msg.body}
+                      {msg.body !== "📎 Attachment" && msg.body && linkify(msg.body)}
                       {/* Attachments */}
                       {msg.attachments && msg.attachments.length > 0 && (
                         <div style={{ marginTop: msg.body !== "📎 Attachment" ? 8 : 0, display: "flex", flexDirection: "column", gap: 6 }}>
