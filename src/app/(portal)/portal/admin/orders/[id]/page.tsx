@@ -74,13 +74,13 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </div>
         </div>
         <div className="card">
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Target Start</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Start Date</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--neutral-900)", fontWeight: 500 }}>
             <Calendar size={16} color="var(--neutral-400)" /> {fmtDate(order.startDate)}
           </div>
         </div>
         <div className="card">
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Target Completion</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>End Date</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, color: "var(--neutral-900)", fontWeight: 500 }}>
             <Calendar size={16} color="var(--neutral-400)" /> {fmtDate(order.endDate)}
           </div>
@@ -95,7 +95,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             </div>
           ) : (
             <div className="card">
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Quoted Amount</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-500)", textTransform: "uppercase", marginBottom: 8 }}>Amount (USD)</div>
               <div style={{ fontSize: 28, fontWeight: 700, color: "var(--neutral-900)" }}>
                 {fmt(Number(order.amount))}
               </div>
@@ -107,7 +107,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </div>
 
           <div className="card">
-            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--neutral-900)", marginBottom: 16 }}>Project Requirements</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--neutral-900)", marginBottom: 16 }}>Project Description</div>
             <div style={{ fontSize: 14, color: "var(--neutral-700)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
               {order.description}
             </div>
