@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { notifyNewMessage } from "@/lib/notifications";
+import { canAccessThread } from "@/lib/thread-access";
 import { z } from "zod";
 
 const schema = z.object({
@@ -35,20 +36,9 @@ export async function POST(req: NextRequest) {
 
     const { threadId, body, attachments } = parsed.data;
 
-    // Verify access
+    // Verify access (Super Admin, Client, Team Member, or Client Colleague who is a thread member)
     const role = (session.user as { role?: string }).role;
-    let hasAccess = false;
-    if (role === "SUPER_ADMIN") {
-      hasAccess = true;
-    } else if (role === "CLIENT") {
-      const thread = await prisma.thread.findUnique({ where: { id: threadId } });
-      hasAccess = thread?.clientId === session.user.id;
-    } else if (role === "TEAM_MEMBER") {
-      const membership = await prisma.threadMember.findUnique({
-        where: { threadId_userId: { threadId, userId: session.user.id } },
-      });
-      hasAccess = !!membership;
-    }
+    const hasAccess = await canAccessThread(session.user.id, role, threadId);
 
     if (!hasAccess) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });

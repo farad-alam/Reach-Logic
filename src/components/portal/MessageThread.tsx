@@ -87,10 +87,7 @@ function fmtDateSep(d: string) {
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";
   if (diffDays > 1 && diffDays < 7) return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
-  if (date.getFullYear() === now.getFullYear()) {
-    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
-  }
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(date);
 }
 function fmtSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -403,7 +400,9 @@ export default function MessageThread({
                   {showDate && <div className="chat-date-sep">{fmtDateSep(msg.createdAt)}</div>}
                   <div className="message-system">
                     {msg.body}
-                    <span className="message-system-time" title={fmtFull(msg.createdAt)}>{fmt(msg.createdAt)}</span>
+                    <span className="message-system-time" title={fmtFull(msg.createdAt)}>
+                      &middot; {fmt(msg.createdAt)}
+                    </span>
                   </div>
                 </div>
               );
@@ -431,12 +430,15 @@ export default function MessageThread({
                   )}
                   <div style={{ display: "flex", flexDirection: "column", maxWidth: "100%", gap: 4 }}>
                     {!isOwn && (
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", paddingLeft: 4 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", paddingLeft: 4, display: "flex", alignItems: "center" }}>
                         {msg.sender?.fullName?.split(" ")[0] ?? msg.sender?.email}
                         <span style={{ fontWeight: 400, color: "var(--neutral-400)", marginLeft: 6 }}>
                           {msg.sender?.designation ? msg.sender.designation : 
                             ((msg.sender?.role === "SUPER_ADMIN" || msg.sender?.role === "TEAM_MEMBER") ? "" : 
                             (msg.sender?.role === "CLIENT" ? "Client" : "Client Colleague"))}
+                        </span>
+                        <span style={{ fontWeight: 400, color: "var(--neutral-400)", marginLeft: 6 }} title={fmtFull(msg.createdAt)}>
+                          &middot; {fmt(msg.createdAt)}
                         </span>
                       </div>
                     )}
@@ -479,11 +481,13 @@ export default function MessageThread({
                           )}
                         </>
                       )}
-                      {/* WhatsApp-style footer: "Edited" + time */}
-                      <span className="message-footer" title={fmtFull(msg.createdAt)}>
-                        {!isDeleted && msg.editedAt && <span className="message-edited">Edited</span>}
-                        <span className="message-time">{fmt(msg.createdAt)}</span>
-                      </span>
+                      {/* WhatsApp-style footer: "Edited" + time (Only for own messages or if edited) */}
+                      {(isOwn || (!isDeleted && msg.editedAt)) && (
+                        <span className="message-footer" title={fmtFull(msg.createdAt)}>
+                          {!isDeleted && msg.editedAt && <span className="message-edited">Edited</span>}
+                          {isOwn && <span className="message-time">{fmt(msg.createdAt)}</span>}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

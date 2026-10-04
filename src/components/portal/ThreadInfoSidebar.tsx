@@ -88,10 +88,12 @@ export default function ThreadInfoSidebar({
   threadId,
   currentUserId,
   userRole = "CLIENT",
+  canInviteColleagues = true,
 }: {
   threadId: string;
   currentUserId: string;
   userRole?: "SUPER_ADMIN" | "TEAM_MEMBER" | "CLIENT";
+  canInviteColleagues?: boolean;
 }) {
   const isSuperAdmin = userRole === "SUPER_ADMIN";
   const isTeamMember = userRole === "TEAM_MEMBER";
@@ -348,7 +350,7 @@ export default function ThreadInfoSidebar({
           })}
 
           {/* Add Colleague Button for Client View */}
-          {isClient && (
+          {isClient && canInviteColleagues && (
             <div style={{ marginTop: 8 }}>
               {!inviteOpen ? (
                 <button

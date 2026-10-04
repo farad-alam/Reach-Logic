@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { canAccessThread } from "@/lib/thread-access";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -18,22 +19,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Basic auth check: verify user has access to thread
-    // Super Admins have access to all. Clients have access to theirs. Team Members to assigned.
+    // Access: Super Admin → all; Client → own threads; Team Member / Client Colleague → thread members.
     const role = (session.user as { role?: string }).role;
-    
-    let hasAccess = false;
-    if (role === "SUPER_ADMIN") {
-      hasAccess = true;
-    } else if (role === "CLIENT") {
-      const thread = await prisma.thread.findUnique({ where: { id: threadId } });
-      hasAccess = thread?.clientId === session.user.id;
-    } else if (role === "TEAM_MEMBER") {
-      const membership = await prisma.threadMember.findUnique({
-        where: { threadId_userId: { threadId, userId: session.user.id } }
-      });
-      hasAccess = !!membership;
-    }
+    const hasAccess = await canAccessThread(session.user.id, role, threadId);
 
     if (!hasAccess) {
        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });

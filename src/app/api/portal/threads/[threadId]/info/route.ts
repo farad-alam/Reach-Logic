@@ -32,7 +32,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ thr
     if (role === "CLIENT" && thread.clientId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
-    if (role === "TEAM_MEMBER") {
+    if (role === "TEAM_MEMBER" || role === "CLIENT_COLLEAGUE") {
       const isMember = thread.members.some((m) => m.userId === session.user?.id);
       if (!isMember) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }

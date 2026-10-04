@@ -40,9 +40,11 @@ function Initials({ name, email, size = 36 }: { name: string | null; email: stri
 export default function ClientChatPage({
   threads: initialThreads,
   currentUserId,
+  isColleague = false,
 }: {
   threads: Thread[];
   currentUserId: string;
+  isColleague?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -141,13 +143,15 @@ export default function ClientChatPage({
               >
                 <FolderOpen size={14} /> + New Project
               </a>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowNewThread(true)}
-                style={{ display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}
-              >
-                <Plus size={14} /> New Thread
-              </button>
+              {!isColleague && (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowNewThread(true)}
+                  style={{ display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}
+                >
+                  <Plus size={14} /> New Thread
+                </button>
+              )}
 
               {/* Info button — shown only on mobile via CSS */}
               {selectedThread && (
@@ -186,6 +190,7 @@ export default function ClientChatPage({
             threadId={selectedThreadId}
             currentUserId={currentUserId}
             userRole="CLIENT"
+            canInviteColleagues={!isColleague}
           />
         )}
       </div>
@@ -211,7 +216,7 @@ export default function ClientChatPage({
             </div>
             {/* Scrollable content inside sheet */}
             <div style={{ overflowY: "auto", flex: 1, height: "calc(70vh - 80px)" }}>
-              <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} userRole="CLIENT" />
+              <ThreadInfoSidebar threadId={selectedThreadId} currentUserId={currentUserId} userRole="CLIENT" canInviteColleagues={!isColleague} />
             </div>
           </div>
         </div>
