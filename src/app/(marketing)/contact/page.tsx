@@ -3,7 +3,7 @@ import InnerPageHero from "@/components/InnerPageHero";
 import FAQ from "@/components/FAQ";
 import { ContactJsonLd } from "@/components/JsonLd";
 import ContactForm from "@/components/ContactForm";
-
+import { Mail, MessageCircle, MapPin } from "lucide-react";
 export const metadata: Metadata = {
   title: "Contact Us — Book a Free Strategy Call",
   description:
@@ -38,15 +38,21 @@ export default function ContactPage() {
           </p>
           <div className="space-y-6">
             <div>
-              <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">Email</div>
+              <div className="flex items-center gap-2 text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">
+                <Mail size={14} /> Email
+              </div>
               <a href="mailto:hello@reachlogic.net" className="text-base text-white/80 hover:text-[#0aad92] transition-colors">hello@reachlogic.net</a>
             </div>
             <div>
-              <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">WhatsApp</div>
+              <div className="flex items-center gap-2 text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">
+                <MessageCircle size={14} /> WhatsApp
+              </div>
               <a href="https://wa.me/8801975646536" target="_blank" rel="noopener noreferrer" className="text-base text-white/80 hover:text-[#0aad92] transition-colors">+8801975646536</a>
             </div>
             <div>
-              <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">Location</div>
+              <div className="flex items-center gap-2 text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">
+                <MapPin size={14} /> Location
+              </div>
               <div className="space-y-4">
                 <address className="text-base text-white/80 not-italic">
                   <strong className="block text-white/60 text-sm mb-1">Head Office:</strong>
