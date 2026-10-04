@@ -42,6 +42,10 @@ export default function ContactPage() {
               <a href="mailto:hello@reachlogic.net" className="text-base text-white/80 hover:text-[#0aad92] transition-colors">hello@reachlogic.net</a>
             </div>
             <div>
+              <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">WhatsApp</div>
+              <a href="https://wa.me/8801975646536" target="_blank" rel="noopener noreferrer" className="text-base text-white/80 hover:text-[#0aad92] transition-colors">+8801975646536</a>
+            </div>
+            <div>
               <div className="text-xs text-[#0aad92] font-semibold uppercase tracking-widest mb-2">Location</div>
               <div className="space-y-4">
                 <address className="text-base text-white/80 not-italic">
