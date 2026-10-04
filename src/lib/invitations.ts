@@ -4,8 +4,9 @@ import { Resend } from "resend";
 import crypto from "crypto";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = "ReachLogic <portal@reachlogic.net>";
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
+const FROM_LLC  = "Reach Logic LLC <notifications@reachlogic.net>";
+const REPLY_TO  = "hello@reachlogic.net";
+const BASE_URL  = process.env.NEXT_PUBLIC_BASE_URL ?? "https://reachlogic.net";
 
 /** Generate a secure random token */
 function generateToken() {
@@ -43,10 +44,11 @@ export async function sendClientInvitation(
   const link = `${BASE_URL}/portal/invite/${token}`;
 
   await resend.emails.send({
-    from: FROM,
+    from: FROM_LLC,
+    replyTo: REPLY_TO,
     to: email,
     subject: "You're invited to the ReachLogic Client Portal",
-    html: buildInviteEmail({ link, role: "client", expiryDays: 7 }),
+    html: buildClientInviteEmail({ link, expiresAt }),
   });
 
   return { ok: true };
@@ -81,10 +83,11 @@ export async function sendTeamInvitation(
   const link = `${BASE_URL}/portal/invite/${token}`;
 
   await resend.emails.send({
-    from: FROM,
+    from: FROM_LLC,
+    replyTo: REPLY_TO,
     to: email,
     subject: "You're invited to join the ReachLogic team",
-    html: buildInviteEmail({ link, role: "team member", expiryDays: 7 }),
+    html: buildTeamInviteEmail({ link, expiresAt }),
   });
 
   return { ok: true };
@@ -100,10 +103,11 @@ export async function sendColleagueInvitation(
   const link = `${BASE_URL}/portal/login`;
 
   await resend.emails.send({
-    from: FROM,
+    from: FROM_LLC,
+    replyTo: REPLY_TO,
     to: email,
-    subject: `You've been added to a thread by ${clientName}`,
-    html: buildColleagueInviteEmail({ email, link, tempPassword, threadName, clientName }),
+    subject: `You've been added to a thread: ${threadName}`,
+    html: buildColleagueInviteEmail({ email, link, tempPassword, threadName }),
   });
 
   return { ok: true };
@@ -186,48 +190,37 @@ export async function acceptInvitation(
   return { ok: true, userId: user.id, role: invitation.role };
 }
 
-// ─── Email template ───────────────────────────────────────────────────────────
-function buildInviteEmail({
-  link,
-  role,
-  expiryDays,
-}: {
-  link: string;
-  role: string;
-  expiryDays: number;
-}) {
+// ─── Email templates ──────────────────────────────────────────────────────────
+
+function fmtFullDate(d: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  }).format(d);
+}
+
+function sharedEmailWrapper(bodyContent: string, previewText: string) {
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#042f28;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="min-height:100vh;background:#042f28;">
-    <tr><td align="center" style="padding:48px 24px;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:14px;overflow:hidden;">
-        <!-- Header -->
-        <tr><td style="background:#042f28;padding:28px 36px;text-align:center;">
-          <span style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.03em;">ReachLogic</span>
-          <span style="display:inline-block;margin-left:8px;background:rgba(18,196,148,0.15);color:#12c494;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase;">Portal</span>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ReachLogic</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+  <div style="display:none;max-height:0;overflow:hidden;">${previewText}&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;&nbsp;&#847;</div>
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e0e0e0;">
+        <tr><td style="background:#042f28;padding:22px 32px;text-align:center;">
+          <span style="font-size:21px;font-weight:700;color:#fff;letter-spacing:-0.02em;">ReachLogic</span>
         </td></tr>
-        <!-- Body -->
-        <tr><td style="padding:40px 36px;">
-          <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#0d0d0d;letter-spacing:-0.02em;">You're invited!</h1>
-          <p style="margin:0 0 24px;font-size:15px;color:#6b6b6b;line-height:1.6;">
-            You've been invited to join the <strong>ReachLogic portal</strong> as a ${role}.
-            Click the button below to set up your account.
-          </p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
-            <tr><td style="background:#042f28;border-radius:8px;">
-              <a href="${link}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:-0.01em;">
-                Accept Invitation →
-              </a>
-            </td></tr>
-          </table>
-          <p style="margin:0 0 8px;font-size:13px;color:#9a9a9a;">Or copy this link into your browser:</p>
-          <p style="margin:0 0 28px;font-size:12px;color:#0a8c6a;word-break:break-all;">${link}</p>
-          <hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 20px;">
-          <p style="margin:0;font-size:12px;color:#c4c4c4;line-height:1.5;">
-            This invitation expires in ${expiryDays} days. If you didn't expect this email, you can safely ignore it.
-          </p>
+        <tr><td style="padding:36px 32px 28px;">
+          ${bodyContent}
+          <p style="margin:28px 0 0;font-size:14px;color:#6b6b6b;line-height:1.6;">Thanks,<br><strong style="color:#0d0d0d;">The ReachLogic Team</strong></p>
+        </td></tr>
+        <tr><td style="padding:18px 32px;background:#fafafa;border-top:1px solid #e5e5e5;text-align:center;">
+          <p style="margin:0 0 4px;font-size:12px;color:#a3a3a3;">Reach Logic LLC &bull; 30 N Gould St Ste R &bull; Sheridan, WY 82801, USA &bull; <a href="https://reachlogic.net" style="color:#a3a3a3;text-decoration:none;">reachlogic.net</a></p>
+          <p style="margin:0;font-size:11px;color:#c4c4c4;">You're receiving this because you have an account on the ReachLogic portal.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -236,57 +229,70 @@ function buildInviteEmail({
 </html>`;
 }
 
+function buildClientInviteEmail({ link, expiresAt }: { link: string; expiresAt: Date }) {
+  const expiryDate = fmtFullDate(expiresAt);
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#0d0d0d;font-weight:500;">Hello,</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#4a4a4a;line-height:1.65;">You've been invited to join the <strong>ReachLogic Client Portal</strong>.</p>
+    <p style="margin:0 0 8px;font-size:14px;color:#6b6b6b;font-weight:600;">In the portal you can:</p>
+    <ul style="margin:0 0 24px;padding-left:20px;font-size:14px;color:#4a4a4a;line-height:2;">
+      <li>Chat directly with your team</li>
+      <li>Track your projects and their status</li>
+      <li>View and download your invoices</li>
+    </ul>
+    <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+      <tr><td style="background:#042f28;border-radius:8px;">
+        <a href="${link}" style="display:inline-block;padding:13px 26px;font-size:14px;font-weight:600;color:#fff;text-decoration:none;">Accept Invitation</a>
+      </td></tr>
+    </table>
+    <p style="margin:0 0 6px;font-size:13px;color:#9a9a9a;">Or copy this link into your browser:</p>
+    <p style="margin:0 0 20px;font-size:12px;color:#0a8c6a;word-break:break-all;">${link}</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#9a9a9a;">This invitation expires on <strong style="color:#6b6b6b;">${expiryDate}</strong>.</p>
+    <p style="margin:0;font-size:13px;color:#c4c4c4;">If you weren't expecting this invitation, you can safely ignore this email.</p>`;
+  return sharedEmailWrapper(body, "Accept your invitation to get started.");
+}
+
+function buildTeamInviteEmail({ link, expiresAt }: { link: string; expiresAt: Date }) {
+  const expiryDate = fmtFullDate(expiresAt);
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#0d0d0d;font-weight:500;">Hello,</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#4a4a4a;line-height:1.65;">You've been invited to join the <strong>ReachLogic team portal</strong>.</p>
+    <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+      <tr><td style="background:#042f28;border-radius:8px;">
+        <a href="${link}" style="display:inline-block;padding:13px 26px;font-size:14px;font-weight:600;color:#fff;text-decoration:none;">Accept Invitation</a>
+      </td></tr>
+    </table>
+    <p style="margin:0 0 6px;font-size:13px;color:#9a9a9a;">Or copy this link into your browser:</p>
+    <p style="margin:0 0 20px;font-size:12px;color:#0a8c6a;word-break:break-all;">${link}</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#9a9a9a;">This invitation expires on <strong style="color:#6b6b6b;">${expiryDate}</strong>.</p>
+    <p style="margin:0;font-size:13px;color:#c4c4c4;">If you weren't expecting this invitation, you can safely ignore this email.</p>`;
+  return sharedEmailWrapper(body, "Accept your invitation to get started.");
+}
+
 function buildColleagueInviteEmail({
   email,
   link,
   tempPassword,
   threadName,
-  clientName,
 }: {
   email: string;
   link: string;
   tempPassword: string;
   threadName: string;
-  clientName: string;
 }) {
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#042f28;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="min-height:100vh;background:#042f28;">
-    <tr><td align="center" style="padding:48px 24px;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:14px;overflow:hidden;">
-        <!-- Header -->
-        <tr><td style="background:#042f28;padding:28px 36px;text-align:center;">
-          <span style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.03em;">ReachLogic</span>
-          <span style="display:inline-block;margin-left:8px;background:rgba(18,196,148,0.15);color:#12c494;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:0.04em;text-transform:uppercase;">Portal</span>
-        </td></tr>
-        <!-- Body -->
-        <tr><td style="padding:40px 36px;">
-          <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#0d0d0d;letter-spacing:-0.02em;">You're invited!</h1>
-          <p style="margin:0 0 24px;font-size:15px;color:#6b6b6b;line-height:1.6;">
-            <strong>${clientName}</strong> has added you to the <strong>"${threadName}"</strong> thread on the ReachLogic portal.
-            You can log in to view the thread and communicate with our team.
-          </p>
-          <div style="background:#f9fafb;border-radius:8px;padding:20px;margin-bottom:24px;">
-            <p style="margin:0 0 8px;font-size:13px;color:#6b6b6b;">Your login credentials:</p>
-            <p style="margin:0 0 8px;font-size:15px;color:#0d0d0d;"><strong>Email:</strong> ${email}</p>
-            <p style="margin:0;font-size:15px;color:#0d0d0d;"><strong>Password:</strong> ${tempPassword}</p>
-          </div>
-          <p style="margin:0 0 24px;font-size:14px;color:#d97706;">
-            <em>Note: Please change your password from your profile settings after your first login.</em>
-          </p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
-            <tr><td style="background:#042f28;border-radius:8px;">
-              <a href="${link}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:-0.01em;">
-                Log In Now →
-              </a>
-            </td></tr>
-          </table>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#0d0d0d;font-weight:500;">Hello,</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#4a4a4a;line-height:1.65;">You've been added to the <strong>"${threadName}"</strong> thread on the ReachLogic portal. You can log in to view messages and communicate with the team.</p>
+    <div style="background:#f9fafb;border-radius:8px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;font-size:13px;color:#6b6b6b;">Your login credentials:</p>
+      <p style="margin:0 0 8px;font-size:15px;color:#0d0d0d;"><strong>Email:</strong> ${email}</p>
+      <p style="margin:0;font-size:15px;color:#0d0d0d;"><strong>Temporary password:</strong> ${tempPassword}</p>
+    </div>
+    <p style="margin:0 0 20px;font-size:13px;color:#d97706;"><em>Please change your password from your profile settings after your first login.</em></p>
+    <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+      <tr><td style="background:#042f28;border-radius:8px;">
+        <a href="${link}" style="display:inline-block;padding:13px 26px;font-size:14px;font-weight:600;color:#fff;text-decoration:none;">Log In Now</a>
+      </td></tr>
+    </table>`;
+  return sharedEmailWrapper(body, `You've been added to the "${threadName}" thread.`);
 }

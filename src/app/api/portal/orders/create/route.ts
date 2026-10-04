@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { notify } from "@/lib/notifications";
+import { notify, sendProjectRequestEmail, sendProjectCreatedEmail } from "@/lib/notifications";
 import { createAutoInvoice } from "@/lib/invoices";
 import { notifyInvoiceCreated } from "@/lib/notifications";
 
@@ -197,11 +197,24 @@ export async function POST(req: NextRequest) {
       await prisma.message.create({
         data: {
           threadId: thread.id,
-          body: `📋 New order requested: "${order.serviceTitle}"`,
+          body: `New order requested: "${order.serviceTitle}"`,
           type: "SYSTEM",
           metadata: { orderId: order.id, event: "order_created" },
         }
       });
+    }
+
+    // Send client-facing email (non-blocking)
+    if (!isOffPortal && order.clientId) {
+      if (role === "CLIENT" || role === "CLIENT_COLLEAGUE") {
+        sendProjectRequestEmail(order.id).catch((err) =>
+          console.error("[orders/create] sendProjectRequestEmail failed:", err)
+        );
+      } else if (role === "SUPER_ADMIN") {
+        sendProjectCreatedEmail(order.id).catch((err) =>
+          console.error("[orders/create] sendProjectCreatedEmail failed:", err)
+        );
+      }
     }
 
     return NextResponse.json({ ok: true, orderId: order.id });

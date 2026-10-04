@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { notifyOrderStatus } from "@/lib/notifications";
+import { notifyOrderStatus, sendProjectInProgressEmail, sendProjectCompletedEmail, sendProjectCancelledEmail } from "@/lib/notifications";
 import { lockOrderInvoices } from "@/lib/invoices";
 
 export async function PATCH(
@@ -69,6 +69,17 @@ export async function PATCH(
     // Lock invoices if completed or cancelled
     if (status === "COMPLETED" || status === "CANCELLED") {
       await lockOrderInvoices(order.id);
+    }
+
+    // Send status-specific client email (non-blocking)
+    if (order.clientId) {
+      if (status === "IN_PROGRESS") {
+        sendProjectInProgressEmail(order.id).catch(console.error);
+      } else if (status === "COMPLETED") {
+        sendProjectCompletedEmail(order.id).catch(console.error);
+      } else if (status === "CANCELLED") {
+        sendProjectCancelledEmail(order.id).catch(console.error);
+      }
     }
 
     return NextResponse.json({ ok: true, order: updatedOrder });

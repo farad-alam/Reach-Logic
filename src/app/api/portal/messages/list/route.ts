@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canAccessThread } from "@/lib/thread-access";
+import { clearMessageEmailQueue } from "@/lib/notifications";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -25,6 +26,12 @@ export async function GET(req: NextRequest) {
 
     if (!hasAccess) {
        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    // When a client or colleague opens the thread, reset the email suppression queue
+    // so the next message will trigger a fresh notification email.
+    if (role === "CLIENT" || role === "CLIENT_COLLEAGUE") {
+      clearMessageEmailQueue(threadId, session.user.id).catch(() => {});
     }
 
     // Fetch messages. When polling (`since`), also return messages that were

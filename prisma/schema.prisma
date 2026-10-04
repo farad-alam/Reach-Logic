@@ -414,3 +414,20 @@ model Notification {
 
   @@map("notifications")
 }
+
+// ─────────────────────────────────────────────
+// MESSAGE EMAIL QUEUE (smart grouping / suppression)
+// ─────────────────────────────────────────────
+
+model MessageEmailQueue {
+  id           String   @id @default(cuid())
+  threadId     String
+  recipientId  String
+  lastSentAt   DateTime @default(now())
+  pendingCount Int      @default(1)
+  senderNames  String[] // names of senders in the pending group
+  lastPreview  String   @default("") // preview of the most recent message
+
+  @@unique([threadId, recipientId])
+  @@map("message_email_queue")
+}
