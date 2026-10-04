@@ -257,8 +257,8 @@ export default function MessageThread({
                         {msg.sender?.fullName?.split(" ")[0] ?? msg.sender?.email}
                         <span style={{ fontWeight: 400, color: "var(--neutral-400)", marginLeft: 6 }}>
                           {msg.sender?.designation ? msg.sender.designation : 
-                            ((msg.sender?.role === "SUPER_ADMIN" || msg.sender?.role === "TEAM_MEMBER") ? "ReachLogic Team" : 
-                            (msg.sender?.role === "CLIENT" ? "Client" : "Colleague"))}
+                            ((msg.sender?.role === "SUPER_ADMIN" || msg.sender?.role === "TEAM_MEMBER") ? "" : 
+                            (msg.sender?.role === "CLIENT" ? "Client" : "Client Colleague"))}
                         </span>
                       </div>
                     )}

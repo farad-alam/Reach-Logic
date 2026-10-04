@@ -324,11 +324,11 @@ export default function ThreadInfoSidebar({
             let roleSubtitle = "";
             
             if (member.role === "SUPER_ADMIN" || member.role === "TEAM_MEMBER") {
-              roleSubtitle = member.designation ? member.designation : (member.role === "SUPER_ADMIN" ? "ReachLogic Team" : "ReachLogic Team");
+              roleSubtitle = member.designation ? member.designation : "";
             } else if (member.role === "CLIENT") {
               roleSubtitle = "Client";
             } else if (member.role === "CLIENT_COLLEAGUE") {
-              roleSubtitle = "Colleague";
+              roleSubtitle = "Client Colleague";
             }
 
             return (

@@ -20,7 +20,7 @@ export default async function TeamPage() {
   if (!session?.user?.id) redirect("/portal/login");
 
   const team = await prisma.user.findMany({
-    where: { role: "TEAM_MEMBER" },
+    where: { role: { in: ["SUPER_ADMIN", "TEAM_MEMBER"] } },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -30,6 +30,7 @@ export default async function TeamPage() {
       avatarUrl: true,
       createdAt: true,
       designation: true,
+      role: true,
       threadMemberships: { select: { id: true } },
     },
   });
@@ -136,7 +137,9 @@ export default async function TeamPage() {
 
               {/* Deactivate / Reactivate */}
               <div style={{ width: 120, display: "flex", justifyContent: "flex-end", flexShrink: 0 }}>
-                {member.isActive ? (
+                {member.role === "SUPER_ADMIN" ? (
+                  <span style={{ fontSize: 12, color: "var(--neutral-400)", fontWeight: 500 }}>Owner</span>
+                ) : member.isActive ? (
                   <DeactivateButton userId={member.id} />
                 ) : (
                   <ReactivateButton userId={member.id} />
