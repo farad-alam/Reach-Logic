@@ -108,8 +108,8 @@ export async function notifyOrderStatus(
   if (!order) return;
 
   const statusLabel: Record<string, string> = {
-    AWAITING_QUOTE: "Awaiting Quote",
-    PENDING: "Confirmed – Pending Start",
+    AWAITING_QUOTE: "Awaiting Payment",
+    PENDING: "Awaiting Payment",
     IN_PROGRESS: "In Progress",
     COMPLETED: "Completed",
     CANCELLED: "Cancelled",

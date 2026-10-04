@@ -171,7 +171,7 @@ export default function ClientTable({
               const client = item.data as ClientData;
               const totalValue = client.orders.reduce((s, o) => s + Number(o.amount ?? 0), 0);
               const activeOrders = client.orders.filter(
-                (o) => o.status === "IN_PROGRESS" || o.status === "PENDING"
+                (o) => o.status === "IN_PROGRESS" || o.status === "PENDING" || o.status === "AWAITING_QUOTE"
               ).length;
               
               let paid = 0;

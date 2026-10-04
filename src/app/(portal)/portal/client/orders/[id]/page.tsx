@@ -8,8 +8,8 @@ import { ArrowLeft, Calendar, MessageSquare, Check } from "lucide-react";
 export const metadata = { title: "Project Details" };
 
 const statusLabels: Record<string, string> = {
-  AWAITING_QUOTE: "Awaiting Approval",
-  PENDING: "Awaiting Approval",
+  AWAITING_QUOTE: "Awaiting Payment",
+  PENDING: "Awaiting Payment",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",

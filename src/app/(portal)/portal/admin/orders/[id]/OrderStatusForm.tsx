@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 const statuses = [
-  { value: "PENDING", label: "Pending Start" },
+  { value: "AWAITING_QUOTE", label: "Awaiting Payment" },
   { value: "IN_PROGRESS", label: "In Progress" },
   { value: "COMPLETED", label: "Completed" },
   { value: "CANCELLED", label: "Cancelled" },
@@ -61,18 +61,12 @@ export default function OrderStatusForm({ orderId, currentStatus }: { orderId: s
         className="form-select" 
         value={status} 
         onChange={(e) => setStatus(e.target.value)}
-        disabled={currentStatus === "AWAITING_QUOTE" || loading}
+        disabled={loading}
       >
-        {currentStatus === "AWAITING_QUOTE" && <option value="AWAITING_QUOTE">Awaiting Quote</option>}
         {statuses.map(s => (
           <option key={s.value} value={s.value}>{s.label}</option>
         ))}
       </select>
-      {currentStatus === "AWAITING_QUOTE" && (
-        <p style={{ fontSize: 12, color: "var(--neutral-500)", marginTop: 6 }}>
-          Status cannot be changed until a quote is set.
-        </p>
-      )}
     </form>
   );
 }

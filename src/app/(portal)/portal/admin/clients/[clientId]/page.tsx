@@ -22,8 +22,8 @@ const statusColors: Record<string, string> = {
   CANCELLED: "badge badge-cancelled",
 };
 const statusLabels: Record<string, string> = {
-  AWAITING_QUOTE: "Awaiting Quote",
-  PENDING: "Pending",
+  AWAITING_QUOTE: "Awaiting Payment",
+  PENDING: "Awaiting Payment",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",
@@ -188,7 +188,7 @@ export default async function ClientDetailPage({
         <div className="stat-card">
           <div className="stat-card-label">Active Orders</div>
           <div className="stat-card-value">
-            {client.clientOrders.filter((o) => o.status === "IN_PROGRESS" || o.status === "PENDING").length}
+            {client.clientOrders.filter((o) => o.status === "IN_PROGRESS" || o.status === "PENDING" || o.status === "AWAITING_QUOTE").length}
           </div>
         </div>
         <div className="stat-card">

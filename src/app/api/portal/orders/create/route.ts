@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
         billingZip: billingZip?.trim() || null,
         billingCountry: billingCountry?.trim() || null,
         createdById: session.user.id,
-        status: (amount && role === "SUPER_ADMIN") ? "PENDING" : "AWAITING_QUOTE",
+        status: "AWAITING_QUOTE",
         amount: amount ? Number(amount) : null,
         threadId: threadId || null,
         currency,

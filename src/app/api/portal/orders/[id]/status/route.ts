@@ -19,7 +19,7 @@ export async function PATCH(
     const body = await req.json();
     const { status } = body;
     
-    if (!["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"].includes(status)) {
+    if (!["AWAITING_QUOTE", "PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"].includes(status)) {
       return NextResponse.json({ error: "Invalid status." }, { status: 400 });
     }
 
@@ -32,9 +32,6 @@ export async function PATCH(
       return NextResponse.json({ error: "Order not found." }, { status: 404 });
     }
 
-    if (order.status === "AWAITING_QUOTE") {
-       return NextResponse.json({ error: "Cannot change status until quote is set." }, { status: 400 });
-    }
 
     // Update order
     const updatedOrder = await prisma.order.update({
@@ -53,7 +50,8 @@ export async function PATCH(
 
     if (thread) {
       const statusMessages: Record<string, string> = {
-        PENDING: `📌 "${order.serviceTitle}" is now Pending`,
+        AWAITING_QUOTE: `📌 "${order.serviceTitle}" is now Awaiting Payment`,
+        PENDING: `📌 "${order.serviceTitle}" is now Awaiting Payment`,
         IN_PROGRESS: `🚀 "${order.serviceTitle}" is now In Progress`,
         COMPLETED: `✅ "${order.serviceTitle}" has been Completed`,
         CANCELLED: `❌ "${order.serviceTitle}" has been Cancelled`,

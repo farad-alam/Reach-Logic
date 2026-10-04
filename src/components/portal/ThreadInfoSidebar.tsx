@@ -47,14 +47,14 @@ interface ThreadInfo {
 
 const STATUS_COLORS: Record<string, string> = {
   AWAITING_QUOTE: "#f59e0b",
-  PENDING: "#6366f1",
+  PENDING: "#f59e0b",
   IN_PROGRESS: "#0ea5e9",
   COMPLETED: "#22c55e",
   CANCELLED: "#ef4444",
 };
 const STATUS_LABELS: Record<string, string> = {
-  AWAITING_QUOTE: "Awaiting Quote",
-  PENDING: "Pending",
+  AWAITING_QUOTE: "Awaiting Payment",
+  PENDING: "Awaiting Payment",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",

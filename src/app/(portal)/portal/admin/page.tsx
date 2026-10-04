@@ -32,15 +32,15 @@ function formatDate(d: Date) {
 
 const statusColors: Record<string, string> = {
   AWAITING_QUOTE: "badge badge-awaiting",
-  PENDING: "badge badge-pending",
+  PENDING: "badge badge-awaiting",
   IN_PROGRESS: "badge badge-progress",
   COMPLETED: "badge badge-completed",
   CANCELLED: "badge badge-cancelled",
 };
 
 const statusLabels: Record<string, string> = {
-  AWAITING_QUOTE: "Awaiting Quote",
-  PENDING: "Pending",
+  AWAITING_QUOTE: "Awaiting Payment",
+  PENDING: "Awaiting Payment",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",

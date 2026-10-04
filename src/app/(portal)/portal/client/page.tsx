@@ -16,8 +16,8 @@ const statusColors: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  AWAITING_QUOTE: "Awaiting Quote",
-  PENDING: "Pending Start",
+  AWAITING_QUOTE: "Awaiting Payment",
+  PENDING: "Awaiting Payment",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",
@@ -52,7 +52,7 @@ export default async function ClientDashboard() {
   ]);
 
   const activeOrders = await prisma.order.count({
-    where: { clientId: session.user.id, status: { in: ["PENDING", "IN_PROGRESS"] } },
+    where: { clientId: session.user.id, status: { in: ["AWAITING_QUOTE", "PENDING", "IN_PROGRESS"] } },
   });
 
   const unpaidInvoices = await prisma.invoice.count({

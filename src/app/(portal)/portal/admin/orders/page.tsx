@@ -16,8 +16,8 @@ const statusColors: Record<string, string> = {
   CANCELLED: "badge badge-cancelled",
 };
 const statusLabels: Record<string, string> = {
-  AWAITING_QUOTE: "Awaiting Quote",
-  PENDING: "Pending",
+  AWAITING_QUOTE: "Awaiting Payment",
+  PENDING: "Awaiting Payment",
   IN_PROGRESS: "In Progress",
   COMPLETED: "Completed",
   CANCELLED: "Cancelled",

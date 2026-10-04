@@ -39,7 +39,6 @@ export async function POST(
       where: { id },
       data: {
         amount: body.amount,
-        status: "PENDING",
       }
     });
 
@@ -49,7 +48,7 @@ export async function POST(
         userId: order.clientId,
         type: "ORDER_STATUS_CHANGED",
         title: `Quote Ready: ${order.serviceTitle}`,
-        body: `Your project "${order.serviceTitle}" has been quoted for $${body.amount.toFixed(2)}. It is now Pending Start.`,
+        body: `Your project "${order.serviceTitle}" has been quoted for $${body.amount.toFixed(2)}. It is now awaiting payment.`,
         link: `/portal/client/orders/${order.id}`,
       });
     }
@@ -64,7 +63,7 @@ export async function POST(
       await prisma.message.create({
         data: {
           threadId: thread.id,
-          body: `📋 "${order.serviceTitle}" has been quoted and is now Pending Start`,
+          body: `📋 "${order.serviceTitle}" has been quoted and is awaiting payment.`,
           type: "SYSTEM",
           metadata: { orderId: order.id, event: "order_quoted" },
         }
