@@ -39,13 +39,19 @@ export async function GET(req: NextRequest) {
        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    // Fetch messages
+    // Fetch messages. When polling (`since`), also return messages that were
+    // edited or deleted after that moment so changes sync to other users.
     const whereClause: any = { threadId };
     if (since) {
-      whereClause.createdAt = { gt: new Date(since) };
+      const sinceDate = new Date(since);
+      whereClause.OR = [
+        { createdAt: { gt: sinceDate } },
+        { editedAt: { gt: sinceDate } },
+        { deletedAt: { gt: sinceDate } },
+      ];
     }
 
-    const messages = await prisma.message.findMany({
+    const rawMessages = await prisma.message.findMany({
       where: whereClause,
       orderBy: { createdAt: "asc" },
       include: {
@@ -53,6 +59,11 @@ export async function GET(req: NextRequest) {
         attachments: true,
       },
     });
+
+    // Redact soft-deleted messages: the original text/files never reach the browser.
+    const messages = rawMessages.map((m) =>
+      m.deletedAt ? { ...m, body: "", attachments: [], metadata: null } : m
+    );
 
     // Mark notifications as read for this thread if there are any
     if (messages.length > 0 && !since) {
@@ -67,7 +78,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ ok: true, messages });
+    return NextResponse.json({ ok: true, messages, viewerRole: role ?? null });
   } catch (error) {
     console.error("[messages/list]", error);
     return NextResponse.json({ error: "Failed to fetch messages." }, { status: 500 });

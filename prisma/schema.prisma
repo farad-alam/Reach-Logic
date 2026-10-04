@@ -357,6 +357,11 @@ model Message {
   metadata  Json? // { orderId?, invoiceId?, event? } for system messages
   createdAt DateTime    @default(now())
 
+  // WhatsApp-style edit / soft delete (all nullable → additive, no data loss)
+  editedAt    DateTime?
+  deletedAt   DateTime? // soft delete — the row is never removed
+  deletedById String?
+
   threadId String
   thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 

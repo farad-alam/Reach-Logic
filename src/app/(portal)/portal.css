@@ -696,6 +696,8 @@
 }
 
 .message-content {
+  position: relative;
+  display: flow-root; /* contains the floated time footer */
   background: #fff;
   border: 1px solid var(--neutral-200);
   border-radius: 12px;
@@ -703,6 +705,7 @@
   font-size: 14px;
   color: var(--neutral-800);
   line-height: 1.5;
+  min-width: 72px;
 }
 
 .message-bubble.own .message-content {
@@ -727,6 +730,232 @@
   color: var(--neutral-400);
   margin-top: 4px;
   padding: 0 4px;
+}
+
+/* ─── WhatsApp-style message extras: time, edited, actions, tombstone ─── */
+.message-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message-footer {
+  float: right;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 8px 0 -3px 12px;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--neutral-400);
+  user-select: none;
+}
+
+.message-edited { font-style: italic; }
+.message-time { font-variant-numeric: tabular-nums; }
+
+.message-bubble.own .message-footer { color: rgba(255, 255, 255, 0.7); }
+
+.message-system-time {
+  margin-left: 8px;
+  font-size: 10.5px;
+  opacity: 0.75;
+}
+
+.message-content.deleted {
+  background: var(--neutral-100);
+  border-style: dashed;
+}
+.message-bubble.own .message-content.deleted {
+  background: rgba(15, 23, 42, 0.06);
+  border-color: var(--neutral-300, #cbd5e1);
+  color: var(--neutral-500);
+}
+.message-bubble.own .message-content.deleted .message-footer { color: var(--neutral-400); }
+.message-deleted-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-style: italic;
+  color: var(--neutral-500);
+  font-size: 13.5px;
+}
+
+.message-bubble.editing .message-content {
+  box-shadow: 0 0 0 2px rgba(10, 140, 106, 0.35);
+}
+
+/* Chevron + dropdown */
+.message-actions {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 5;
+}
+.message-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--neutral-600);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.message-bubble:hover .message-menu-btn,
+.message-actions.open .message-menu-btn,
+.message-menu-btn:focus-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+.message-menu-btn:hover { background: #fff; color: var(--neutral-900); }
+
+.message-menu {
+  position: absolute;
+  top: 28px;
+  min-width: 150px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+  animation: message-menu-in 0.12s ease-out;
+}
+.message-menu.align-right { right: 0; }
+.message-menu.align-left { left: 0; }
+.message-menu.up { top: auto; bottom: 28px; }
+@keyframes message-menu-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.message-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--neutral-800);
+  font-size: 13.5px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.message-menu-item:hover { background: var(--neutral-100); }
+.message-menu-item.danger { color: var(--danger, #dc2626); }
+.message-menu-item.danger:hover { background: rgba(220, 38, 38, 0.08); }
+
+/* Editing banner above composer */
+.composer-edit-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: #f0f7f4;
+  border-top: 1px solid var(--neutral-200);
+  border-left: 4px solid var(--brand-accent);
+}
+.composer-edit-icon { color: var(--brand-accent); flex-shrink: 0; }
+.composer-edit-text { flex: 1; min-width: 0; }
+.composer-edit-title { font-size: 12px; font-weight: 600; color: var(--brand-accent); }
+.composer-edit-original {
+  font-size: 13px;
+  color: var(--neutral-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.composer-edit-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--neutral-500);
+  cursor: pointer;
+}
+.composer-edit-cancel:hover { background: rgba(0, 0, 0, 0.06); color: var(--neutral-800); }
+
+/* Error toast */
+.chat-action-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 20px 8px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* Delete confirmation modal */
+.chat-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+.chat-confirm-modal {
+  width: 100%;
+  max-width: 360px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.3);
+  text-align: center;
+  animation: message-menu-in 0.15s ease-out;
+}
+.chat-confirm-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+.chat-confirm-modal h3 { margin: 0 0 6px; font-size: 17px; color: var(--neutral-900); }
+.chat-confirm-modal p { margin: 0 0 20px; font-size: 14px; color: var(--neutral-500); line-height: 1.5; }
+.chat-confirm-actions { display: flex; gap: 10px; }
+.chat-confirm-actions button {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+.chat-confirm-actions button:disabled { opacity: 0.6; cursor: not-allowed; }
+.chat-confirm-cancel { border: 1px solid var(--neutral-200); background: #fff; color: var(--neutral-700); }
+.chat-confirm-cancel:hover:not(:disabled) { background: var(--neutral-100); }
+.chat-confirm-delete { border: none; background: #dc2626; color: #fff; }
+.chat-confirm-delete:hover:not(:disabled) { background: #b91c1c; }
+
+/* Touch devices: no hover, keep the chevron faintly visible */
+@media (hover: none) {
+  .message-menu-btn { opacity: 0.85; transform: scale(1); background: rgba(255, 255, 255, 0.7); }
 }
 
 .thread-composer {
@@ -2307,6 +2536,9 @@
     color: #111827;
     border-color: #c8f0ad;
   }
+  .message-bubble.own .message-footer { color: rgba(17, 24, 39, 0.55); }
+  .composer-edit-banner { padding: 8px 12px; }
+  .chat-action-error { margin: 0 10px 8px; }
 
   /* Composer bar — sticky + WhatsApp style */
   .thread-composer {
