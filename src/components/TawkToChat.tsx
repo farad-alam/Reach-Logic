@@ -10,15 +10,15 @@ export default function TawkToChat() {
   // 3. Copy the Direct Chat Link or Widget Code to find your Property ID and Widget ID
   // Example src: 'https://embed.tawk.to/65e5f.../1h...'
 
-  const propertyId = process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID;
-  const widgetId = process.env.NEXT_PUBLIC_TAWK_WIDGET_ID;
+  // These are public embed IDs (visible in page source anyway). The fallback
+  // ensures the widget still loads if NEXT_PUBLIC_* vars aren't set on the host.
+  const propertyId =
+    process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID || "6a22548fe03c841c2d221241";
+  const widgetId = process.env.NEXT_PUBLIC_TAWK_WIDGET_ID || "1jqb1klfs";
 
   if (!propertyId || !widgetId || propertyId === "YOUR_PROPERTY_ID") {
-    console.warn("Tawk.to is missing propertyId or widgetId. Check your .env.local file and restart your dev server!");
     return null;
   }
-  
-  console.log("Tawk.to widget is loading with Property ID:", propertyId);
 
   return (
     <Script
