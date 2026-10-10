@@ -112,8 +112,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[invite-colleague]", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: err?.message ?? "Internal server error" }, { status: 500 });
   }
 }
