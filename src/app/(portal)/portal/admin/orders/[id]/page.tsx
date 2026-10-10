@@ -56,10 +56,8 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               endDate: order.endDate,
               amount: order.amount ? order.amount.toString() : null,
               status: order.status,
-              billingStreet: order.billingStreet,
               billingCity: order.billingCity,
               billingState: order.billingState,
-              billingZip: order.billingZip,
               billingCountry: order.billingCountry,
             }}
           />
