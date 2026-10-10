@@ -132,6 +132,8 @@ export async function acceptInvitation(
   token: string,
   fullName: string,
   passwordHash: string,
+  city?: string,
+  state?: string,
   timezone?: string,
   country?: string
 ): Promise<{ ok: boolean; userId?: string; role?: string; error?: string }> {
@@ -145,6 +147,8 @@ export async function acceptInvitation(
     data: {
       email: invitation.email,
       fullName: fullName.trim(),
+      city: city ? city.trim() : null,
+      state: state ? state.trim() : null,
       timezone: timezone ? timezone.trim() : null,
       country: country ? country.trim() : null,
       passwordHash,

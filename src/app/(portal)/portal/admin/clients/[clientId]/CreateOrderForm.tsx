@@ -7,7 +7,7 @@ interface Props {
   clientId: string;
   clientName: string;
   clientProfile?: {
-    address: string | null;
+    city: string | null;
     state: string | null;
     country: string | null;
   };
@@ -22,11 +22,9 @@ export default function CreateOrderForm({ clientId, clientName, clientProfile }:
     description: "",
     startDate: "",
     endDate: "",
-    billingStreet: clientProfile?.address || "",
-    billingCity: "",
+    billingCity: clientProfile?.city || "",
     billingState: clientProfile?.state || "",
-    billingZip: "",
-    billingCountry: clientProfile?.country || "",
+    billingCountry: clientProfile?.country || "United States",
   });
 
   function set(field: keyof typeof form) {
@@ -126,23 +124,11 @@ export default function CreateOrderForm({ clientId, clientName, clientProfile }:
         <div className="auth-error" style={{ marginBottom: 12 }}>{error}</div>
       )}
 
-      {/* Billing Address Section */}
+      {/* Billing Location Section */}
       <div style={{ marginTop: 24, marginBottom: 20 }}>
         <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--neutral-900)", marginBottom: 12, borderBottom: "1px solid var(--neutral-100)", paddingBottom: 8 }}>
-          Billing Address
+          Billing Location
         </h3>
-        <div className="form-group">
-          <label className="form-label" htmlFor="billingStreet">Street Address</label>
-          <input
-            id="billingStreet"
-            type="text"
-            className="form-input"
-            value={form.billingStreet}
-            onChange={set("billingStreet")}
-            placeholder="123 Main St"
-            required
-          />
-        </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div className="form-group">
             <label className="form-label" htmlFor="billingCity">City</label>
@@ -153,7 +139,6 @@ export default function CreateOrderForm({ clientId, clientName, clientProfile }:
               value={form.billingCity}
               onChange={set("billingCity")}
               placeholder="New York"
-              required
             />
           </div>
           <div className="form-group">
@@ -165,35 +150,19 @@ export default function CreateOrderForm({ clientId, clientName, clientProfile }:
               value={form.billingState}
               onChange={set("billingState")}
               placeholder="NY"
-              required
             />
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="billingZip">ZIP / Postal Code</label>
-            <input
-              id="billingZip"
-              type="text"
-              className="form-input"
-              value={form.billingZip}
-              onChange={set("billingZip")}
-              placeholder="10001"
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label" htmlFor="billingCountry">Country</label>
-            <input
-              id="billingCountry"
-              type="text"
-              className="form-input"
-              value={form.billingCountry}
-              onChange={set("billingCountry")}
-              placeholder="United States"
-              required
-            />
-          </div>
+        <div className="form-group">
+          <label className="form-label" htmlFor="billingCountry">Country</label>
+          <input
+            id="billingCountry"
+            type="text"
+            className="form-input"
+            value={form.billingCountry}
+            onChange={set("billingCountry")}
+            placeholder="United States"
+          />
         </div>
       </div>
 

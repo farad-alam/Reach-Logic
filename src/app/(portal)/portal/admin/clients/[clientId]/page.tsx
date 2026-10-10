@@ -301,7 +301,7 @@ export default async function ClientDetailPage({
               clientId={client.id}
               clientName={client.fullName ?? client.email}
               clientProfile={{
-                address: client.address,
+                city: client.city,
                 state: client.state,
                 country: client.country,
               }}

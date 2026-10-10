@@ -8,6 +8,8 @@ import { z } from "zod";
 const schema = z.object({
   token: z.string().min(1),
   fullName: z.string().min(2).max(80),
+  city: z.string().min(1).optional(),
+  state: z.string().min(1).optional(),
   timezone: z.string().optional(),
   country: z.string().optional(),
   password: z.string().min(8).max(128),
@@ -25,10 +27,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { token, fullName, password, timezone, country } = parsed.data;
+    const { token, fullName, password, city, state, timezone, country } = parsed.data;
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const result = await acceptInvitation(token, fullName, passwordHash, timezone, country);
+    const result = await acceptInvitation(token, fullName, passwordHash, city, state, timezone, country);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 400 });

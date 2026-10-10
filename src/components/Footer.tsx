@@ -83,7 +83,7 @@ export default function Footer() {
             <div className="text-xs font-bold tracking-[0.1em] uppercase mb-3" style={{ color: "#0aad92" }}>
               CLIENT REVIEWS
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white max-w-sm leading-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-white max-w-sm leading-tight">
               Rated by the brands we grow
             </h2>
           </div>
@@ -105,7 +105,7 @@ export default function Footer() {
                   <div className="flex text-[#FABC05] text-sm">★★★★★</div>
                   <div className="text-white font-bold text-sm">4.9/5</div>
                 </div>
-                <div className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>Based on 45 verified reviews</div>
+                <div className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>Based on 25 verified reviews</div>
               </div>
               <a href="#" className="text-xs font-semibold hover:underline mt-2 sm:mt-0 whitespace-nowrap self-center sm:self-start" style={{ color: "#0aad92" }}>Read reviews ↗</a>
             </div>
@@ -124,7 +124,7 @@ export default function Footer() {
                   <div className="flex text-[#00b67a] text-sm">★★★★★</div>
                   <div className="text-white font-bold text-sm">4.9/5</div>
                 </div>
-                <div className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>Based on 82 verified reviews</div>
+                <div className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>Based on 22 verified reviews</div>
               </div>
               <a href="#" className="text-xs font-semibold hover:underline mt-2 sm:mt-0 whitespace-nowrap self-center sm:self-start" style={{ color: "#0aad92" }}>Read reviews ↗</a>
             </div>

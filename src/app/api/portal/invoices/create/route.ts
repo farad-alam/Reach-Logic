@@ -17,7 +17,8 @@ const schema = z.object({
   billingEmail: z.string().email(),
   billingCompany: z.string().optional(),
   billingCountry: z.string().min(1),
-  billingAddress: z.string().min(1),        // single field
+  billingCity: z.string().optional(),
+  billingState: z.string().optional(),
 
   // Invoice details
   projectTitle: z.string().min(1).max(150),
@@ -44,9 +45,11 @@ export async function POST(req: NextRequest) {
 
     const { 
       clientId, isOffPortal, threadId, 
-      billingName, billingEmail, billingCompany, billingCountry, billingAddress, 
+      billingName, billingEmail, billingCompany, billingCountry, billingCity, billingState, 
       projectTitle, projectDescription, startDate, endDate, amount, currency, notes 
     } = parsed.data;
+
+    const billingAddress = [billingCity, billingState, billingCountry].filter(Boolean).join(", ");
 
     if (!isOffPortal && !clientId) {
       return NextResponse.json({ error: "Client is required for portal invoices." }, { status: 400 });

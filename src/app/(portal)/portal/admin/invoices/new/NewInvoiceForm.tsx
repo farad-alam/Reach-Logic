@@ -8,7 +8,8 @@ interface ClientData {
   fullName: string | null;
   email: string;
   company: string | null;
-  address: string | null;
+  city: string | null;
+  state: string | null;
   country: string | null;
 }
 
@@ -29,7 +30,8 @@ export default function NewInvoiceForm({ clients }: { clients: ClientData[] }) {
   const [billingEmail, setBillingEmail] = useState("");
   const [billingCompany, setBillingCompany] = useState("");
   const [billingCountry, setBillingCountry] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
+  const [billingCity, setBillingCity] = useState("");
+  const [billingState, setBillingState] = useState("");
   
   // Invoice Details
   const [projectTitle, setProjectTitle] = useState("");
@@ -85,7 +87,8 @@ export default function NewInvoiceForm({ clients }: { clients: ClientData[] }) {
       setBillingEmail("");
       setBillingCompany("");
       setBillingCountry("");
-      setBillingAddress("");
+      setBillingCity("");
+      setBillingState("");
       setThreads([]);
       setSelectedThreadId("");
     } else if (val === "OFF_PORTAL") {
@@ -95,7 +98,8 @@ export default function NewInvoiceForm({ clients }: { clients: ClientData[] }) {
       setBillingEmail("");
       setBillingCompany("");
       setBillingCountry("");
-      setBillingAddress("");
+      setBillingCity("");
+      setBillingState("");
       setThreads([]);
       setSelectedThreadId("");
     } else {
@@ -107,7 +111,8 @@ export default function NewInvoiceForm({ clients }: { clients: ClientData[] }) {
         setBillingEmail(c.email);
         setBillingCompany(c.company || "");
         setBillingCountry(c.country || "");
-        setBillingAddress(c.address || "");
+        setBillingCity(c.city || "");
+        setBillingState(c.state || "");
       }
       fetchThreads(val);
     }
@@ -131,7 +136,7 @@ export default function NewInvoiceForm({ clients }: { clients: ClientData[] }) {
           clientId: clientMode === "PORTAL" ? selectedClientId : undefined,
           isOffPortal: clientMode === "OFF_PORTAL",
           threadId: clientMode === "PORTAL" ? selectedThreadId : undefined,
-          billingName, billingEmail, billingCompany, billingCountry, billingAddress,
+          billingName, billingEmail, billingCompany, billingCountry, billingCity, billingState,
           projectTitle, projectDescription, startDate, endDate,
           amount: parseFloat(amount),
           currency, notes,
@@ -276,9 +281,15 @@ export default function NewInvoiceForm({ clients }: { clients: ClientData[] }) {
           </div>
         </div>
 
-        <div className="form-group" style={{ marginBottom: 0 }}>
-          <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Billing Address <span style={{ color: "var(--brand-accent)" }}>*</span></label>
-          <textarea className="form-textarea" rows={2} value={billingAddress} onChange={e => setBillingAddress(e.target.value)} required placeholder="Street, City, State/Province, Postal Code" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>City <span style={{ color: "var(--brand-accent)" }}>*</span></label>
+            <input type="text" className="form-input" value={billingCity} onChange={e => setBillingCity(e.target.value)} required />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>State/Province <span style={{ color: "var(--brand-accent)" }}>*</span></label>
+            <input type="text" className="form-input" value={billingState} onChange={e => setBillingState(e.target.value)} required />
+          </div>
         </div>
       </div>
 

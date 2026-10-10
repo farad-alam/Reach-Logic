@@ -12,10 +12,8 @@ interface Props {
     endDate: Date;
     amount: string | null;
     status: string;
-    billingStreet: string | null;
     billingCity: string | null;
     billingState: string | null;
-    billingZip: string | null;
     billingCountry: string | null;
   };
 }
@@ -29,10 +27,8 @@ export default function EditOrderForm({ orderId, initialData }: Props) {
     endDate: initialData.endDate.toISOString().split("T")[0],
     amount: initialData.amount || "",
     status: initialData.status,
-    billingStreet: initialData.billingStreet || "",
     billingCity: initialData.billingCity || "",
     billingState: initialData.billingState || "",
-    billingZip: initialData.billingZip || "",
     billingCountry: initialData.billingCountry || "",
   });
   const [loading, setLoading] = useState(false);
@@ -112,10 +108,6 @@ export default function EditOrderForm({ orderId, initialData }: Props) {
 
       <div style={{ marginTop: 24, marginBottom: 16, fontWeight: 600, fontSize: 14 }}>Billing Details</div>
       <div className="grid-2">
-        <div className="form-group" style={{ gridColumn: "1 / -1" }}>
-          <label className="form-label">Street</label>
-          <input type="text" className="form-input" value={formData.billingStreet} onChange={(e) => setFormData({...formData, billingStreet: e.target.value})} />
-        </div>
         <div className="form-group">
           <label className="form-label">City</label>
           <input type="text" className="form-input" value={formData.billingCity} onChange={(e) => setFormData({...formData, billingCity: e.target.value})} />
@@ -124,11 +116,7 @@ export default function EditOrderForm({ orderId, initialData }: Props) {
           <label className="form-label">State / Region</label>
           <input type="text" className="form-input" value={formData.billingState} onChange={(e) => setFormData({...formData, billingState: e.target.value})} />
         </div>
-        <div className="form-group">
-          <label className="form-label">Postal Code</label>
-          <input type="text" className="form-input" value={formData.billingZip} onChange={(e) => setFormData({...formData, billingZip: e.target.value})} />
-        </div>
-        <div className="form-group">
+        <div className="form-group" style={{ gridColumn: "1 / -1" }}>
           <label className="form-label">Country</label>
           <input type="text" className="form-input" value={formData.billingCountry} onChange={(e) => setFormData({...formData, billingCountry: e.target.value})} />
         </div>

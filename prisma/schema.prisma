@@ -66,6 +66,7 @@ model User {
   company      String?
   phone        String?
   address      String?
+  city         String?
   state        String?
   country      String?
   timezone     String?

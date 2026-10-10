@@ -15,6 +15,8 @@ export default function AcceptInviteForm({ token, email, role, inviterName }: Pr
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [country, setCountry] = useState("");
   const [timezone, setTimezone] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +49,7 @@ export default function AcceptInviteForm({ token, email, role, inviterName }: Pr
       const res = await fetch("/api/portal/invite/accept", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, fullName, timezone: timezone.trim(), country: country.trim(), password }),
+        body: JSON.stringify({ token, fullName, city: city.trim(), state: state.trim(), timezone: timezone.trim(), country: country.trim(), password }),
       });
 
       const data = await res.json();
@@ -108,6 +110,21 @@ export default function AcceptInviteForm({ token, email, role, inviterName }: Pr
         </div>
 
         {/* Location Grid */}
+        <div className="form-group-grid" style={{ marginBottom: 20 }}>
+          <div>
+            <label className="form-label" htmlFor="city">City <span style={{color: 'var(--danger)'}}>*</span></label>
+            <input id="city" type="text" className="form-input"
+              value={city} onChange={e => setCity(e.target.value)}
+              placeholder="e.g. Brooklyn" required />
+          </div>
+          <div>
+            <label className="form-label" htmlFor="state">State/Province <span style={{color: 'var(--danger)'}}>*</span></label>
+            <input id="state" type="text" className="form-input"
+              value={state} onChange={e => setState(e.target.value)}
+              placeholder="e.g. New York" required />
+          </div>
+        </div>
+
         <div className="form-group-grid" style={{ marginBottom: 20 }}>
           <div>
             <label className="form-label" htmlFor="country">Country <span style={{color: 'var(--danger)'}}>*</span></label>

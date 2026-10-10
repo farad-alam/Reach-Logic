@@ -12,10 +12,8 @@ const schema = z.object({
   description: z.string().min(1, "Description is required").max(3000),
   startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
-  billingStreet: z.string().optional(),
   billingCity: z.string().optional(),
   billingState: z.string().optional(),
-  billingZip: z.string().optional(),
   billingCountry: z.string().optional(),
   clientId: z.string().min(1).optional(), // only used by SUPER_ADMIN
   threadId: z.string().optional(),
@@ -53,10 +51,8 @@ export async function POST(req: NextRequest) {
       description,
       startDate,
       endDate,
-      billingStreet,
       billingCity,
       billingState,
-      billingZip,
       billingCountry,
       clientId: bodyClientId,
       threadId,
@@ -72,10 +68,8 @@ export async function POST(req: NextRequest) {
 
     // For clients, require billing address
     if (role === "CLIENT") {
-      if (!billingStreet?.trim()) return NextResponse.json({ error: "Street address is required." }, { status: 400 });
       if (!billingCity?.trim()) return NextResponse.json({ error: "City is required." }, { status: 400 });
       if (!billingState?.trim()) return NextResponse.json({ error: "State is required." }, { status: 400 });
-      if (!billingZip?.trim()) return NextResponse.json({ error: "Zip code is required." }, { status: 400 });
       if (!billingCountry?.trim()) return NextResponse.json({ error: "Country is required." }, { status: 400 });
     }
 
@@ -116,10 +110,10 @@ export async function POST(req: NextRequest) {
         description: description.trim(),
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        billingStreet: billingStreet?.trim() || null,
+        billingStreet: null,
         billingCity: billingCity?.trim() || null,
         billingState: billingState?.trim() || null,
-        billingZip: billingZip?.trim() || null,
+        billingZip: null,
         billingCountry: billingCountry?.trim() || null,
         createdById: session.user.id,
         status: "AWAITING_QUOTE",

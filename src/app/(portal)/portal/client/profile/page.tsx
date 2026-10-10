@@ -19,6 +19,9 @@ export default async function ClientProfilePage() {
       company: true,
       phone: true,
       address: true,
+      city: true,
+      state: true,
+      country: true,
       createdAt: true,
     },
   });
@@ -38,7 +41,9 @@ export default async function ClientProfilePage() {
         initialAvatar={user.avatarUrl}
         initialCompany={user.company ?? ""}
         initialPhone={user.phone ?? ""}
-        initialAddress={user.address ?? ""}
+        initialCity={user.city ?? ""}
+        initialState={user.state ?? ""}
+        initialCountry={user.country ?? ""}
       />
     </div>
   );

@@ -17,7 +17,8 @@ export default async function NewInvoicePage() {
       fullName: true,
       email: true,
       company: true,
-      address: true,
+      city: true,
+      state: true,
       country: true,
     },
   });

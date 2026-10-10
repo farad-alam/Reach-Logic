@@ -86,9 +86,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
         },
       });
 
-      // Send email if new user
+      // Send email if new user (non-blocking — email failure should not fail the invite)
       if (tempPassword) {
-        await sendColleagueInvitation(email, tempPassword, thread.name, thread.client.fullName || thread.client.email);
+        sendColleagueInvitation(email, tempPassword, thread.name, thread.client.fullName || thread.client.email)
+          .catch((err) => console.error("[invite-colleague] email failed (non-fatal):", err));
       } else {
         // Send regular notification if existing user
         await notify({

@@ -136,7 +136,8 @@ export default function ThreadInfoSidebar({
         setInviteOpen(false);
         fetchInfo();
       } else {
-        alert("Failed to invite colleague.");
+        const data = await res.json().catch(() => null);
+        alert(data?.error || "Failed to invite colleague.");
       }
     } finally {
       setInviting(false);

@@ -25,10 +25,8 @@ export async function PATCH(
         endDate: data.endDate ? new Date(data.endDate) : undefined,
         amount: data.amount ? parseFloat(data.amount) : null,
         status: data.status as OrderStatus,
-        billingStreet: data.billingStreet,
         billingCity: data.billingCity,
         billingState: data.billingState,
-        billingZip: data.billingZip,
         billingCountry: data.billingCountry,
       },
     });

@@ -10,6 +10,9 @@ interface InvoiceDocumentProps {
   billingEmail: string | null;
   billingCompany: string | null;
   billingAddress: string | null;
+  billingCity?: string | null;
+  billingState?: string | null;
+  billingCountry?: string | null;
   clientFullName: string | null;
   clientEmail: string;
   orderServiceTitle: string | null;
@@ -58,6 +61,9 @@ export default function InvoiceDocument({
   billingEmail,
   billingCompany,
   billingAddress,
+  billingCity,
+  billingState,
+  billingCountry,
   clientFullName,
   clientEmail,
   orderServiceTitle,
@@ -77,6 +83,8 @@ export default function InvoiceDocument({
   const balanceDue = Math.max(0, total - actualAmountPaid);
   const billToName = billingName || clientFullName || clientEmail;
   const displayEmail = billingEmail || clientEmail;
+
+  const locationLine = [billingCity, billingState, billingCountry].filter(Boolean).join(", ");
 
   // Render stamp
   let stampLabel = "";
@@ -146,14 +154,11 @@ export default function InvoiceDocument({
             <div className="invoice-bill-name" style={{ color: "#0d0d0d" }}>{billToName}</div>
             <div className="invoice-bill-detail" style={{ color: "#6b6b6b" }}>
               {billingCompany && <div>{billingCompany}</div>}
-              {billingAddress
-                ? billingAddress.split("\n").map((line, i) => <div key={i}>{line}</div>)
-                : (
-                  <>
-                    <div>[Street address]</div>
-                    <div>[City, State ZIP], United States</div>
-                  </>
-                )}
+              {locationLine ? (
+                <div>{locationLine}</div>
+              ) : billingAddress ? (
+                billingAddress.split("\n").map((line, i) => <div key={i}>{line}</div>)
+              ) : null}
               <div>{displayEmail}</div>
             </div>
           </div>

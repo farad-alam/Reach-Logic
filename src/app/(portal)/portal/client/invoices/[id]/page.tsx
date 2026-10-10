@@ -24,7 +24,7 @@ export default async function ClientInvoiceDetailPage({ params }: { params: Prom
   const invoice = await prisma.invoice.findUnique({
     where: { id },
     include: {
-      client: { select: { fullName: true, email: true } },
+      client: { select: { fullName: true, email: true, city: true, state: true, country: true } },
       order: { select: { id: true, serviceTitle: true, startDate: true, endDate: true } },
       lineItems: true,
     },
@@ -64,6 +64,9 @@ export default async function ClientInvoiceDetailPage({ params }: { params: Prom
         billingEmail={invoice.billingEmail}
         billingCompany={invoice.billingCompany}
         billingAddress={invoice.billingAddress}
+        billingCity={invoice.client?.city}
+        billingState={invoice.client?.state}
+        billingCountry={invoice.client?.country || invoice.billingCountry}
         clientFullName={invoice.client?.fullName ?? invoice.billingName ?? null}
         clientEmail={invoice.client?.email ?? invoice.billingEmail ?? ""}
         orderServiceTitle={invoice.order?.serviceTitle ?? null}

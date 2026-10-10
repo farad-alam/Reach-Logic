@@ -8,7 +8,9 @@ interface Props {
   initialAvatar?: string | null;
   initialCompany?: string;
   initialPhone?: string;
-  initialAddress?: string;
+  initialCity?: string;
+  initialState?: string;
+  initialCountry?: string;
 }
 
 export default function ProfileForm({
@@ -17,13 +19,17 @@ export default function ProfileForm({
   initialAvatar,
   initialCompany = "",
   initialPhone = "",
-  initialAddress = "",
+  initialCity = "",
+  initialState = "",
+  initialCountry = "",
 }: Props) {
   const [fullName, setFullName] = useState(initialName);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatar ?? "");
   const [company, setCompany] = useState(initialCompany);
   const [phone, setPhone] = useState(initialPhone);
-  const [address, setAddress] = useState(initialAddress);
+  const [city, setCity] = useState(initialCity);
+  const [state, setState] = useState(initialState);
+  const [country, setCountry] = useState(initialCountry);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -47,7 +53,9 @@ export default function ProfileForm({
           avatarUrl: avatarUrl || null,
           company: company || null,
           phone: phone || null,
-          address: address || null,
+          city: city || null,
+          state: state || null,
+          country: country || null,
         }),
       });
       const data = await res.json();
@@ -199,18 +207,48 @@ export default function ProfileForm({
             </div>
           </div>
 
+          <div className="grid-2">
+            <div className="form-group">
+              <label className="form-label" htmlFor="city">City</label>
+              <input
+                id="city"
+                type="text"
+                className="form-input"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="e.g. Brooklyn"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="state">State/Province</label>
+              <input
+                id="state"
+                type="text"
+                className="form-input"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                placeholder="e.g. New York"
+              />
+            </div>
+          </div>
           <div className="form-group">
-            <label className="form-label" htmlFor="address">Full Billing Address</label>
-            <textarea
-              id="address"
-              className="form-textarea"
-              rows={3}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder={"123 Main Street\nNew York, NY 10001\nUnited States"}
-            />
+            <label className="form-label" htmlFor="country">Country</label>
+            <select
+              id="country"
+              className="form-input"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+            >
+              <option value="" disabled>Select country</option>
+              <option value="United States">United States</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="Bangladesh">Bangladesh</option>
+              <option value="Other">Other</option>
+            </select>
             <div style={{ fontSize: 12, color: "var(--neutral-400)", marginTop: 6 }}>
-              This address will be automatically added to any new invoices created for your account.
+              These details will be automatically added to any new invoices created for your account.
             </div>
           </div>
 

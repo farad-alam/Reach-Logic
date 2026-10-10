@@ -3,7 +3,17 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
-export default function NewOrderForm() {
+interface Props {
+  initialCity?: string;
+  initialState?: string;
+  initialCountry?: string;
+}
+
+export default function NewOrderForm({
+  initialCity = "",
+  initialState = "",
+  initialCountry = "",
+}: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -14,11 +24,9 @@ export default function NewOrderForm() {
   const [endDate, setEndDate] = useState("");
   const [amount, setAmount] = useState("");
 
-  const [billingStreet, setBillingStreet] = useState("");
-  const [billingCity, setBillingCity] = useState("");
-  const [billingState, setBillingState] = useState("");
-  const [billingZip, setBillingZip] = useState("");
-  const [billingCountry, setBillingCountry] = useState("United States");
+  const [billingCity, setBillingCity] = useState(initialCity);
+  const [billingState, setBillingState] = useState(initialState);
+  const [billingCountry, setBillingCountry] = useState(initialCountry || "United States");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -35,10 +43,8 @@ export default function NewOrderForm() {
           startDate,
           endDate,
           amount,
-          billingStreet,
           billingCity,
           billingState,
-          billingZip,
           billingCountry,
         }),
       });
@@ -144,26 +150,14 @@ export default function NewOrderForm() {
           </div>
         </div>
 
-        {/* Billing Address Mandatory Section */}
+        {/* Billing Address Section */}
         <div style={{ marginTop: 32, padding: 24, background: "#fafafa", borderRadius: 8, border: "1px solid var(--neutral-200)" }}>
           <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--neutral-900)", marginBottom: 20 }}>
-            Billing Address <span style={{ color: "var(--danger)" }}>*</span>
+            Billing Location <span style={{ color: "var(--danger)" }}>*</span>
           </h3>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Street Address <span style={{ color: "var(--danger)" }}>*</span></label>
-              <input
-                type="text"
-                className="form-input"
-                value={billingStreet}
-                onChange={(e) => setBillingStreet(e.target.value)}
-                placeholder="e.g. 123 Main Street, Apt 4B"
-                required
-              />
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div>
                 <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>City <span style={{ color: "var(--danger)" }}>*</span></label>
                 <input
@@ -186,45 +180,24 @@ export default function NewOrderForm() {
                   required
                 />
               </div>
-              <div>
-                <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Zip Code <span style={{ color: "var(--danger)" }}>*</span></label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={billingZip}
-                  onChange={(e) => setBillingZip(e.target.value)}
-                  placeholder="e.g. 11201"
-                  required
-                />
-              </div>
             </div>
 
             <div>
-              <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Country</label>
-              <div style={{ position: "relative" }}>
-                <input
-                  type="text"
-                  className="form-input"
-                  value="United States"
-                  disabled
-                  style={{ backgroundColor: "#f0f0f0", color: "var(--neutral-600)", paddingRight: 40 }}
-                />
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "var(--neutral-500)" }}>
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 4 }}>
-              <input 
-                type="checkbox" 
-                id="saveDefault" 
-                style={{ width: 16, height: 16, cursor: "pointer", accentColor: "var(--brand-dark)" }} 
-              />
-              <label htmlFor="saveDefault" style={{ fontSize: 13, color: "var(--neutral-600)", cursor: "pointer" }}>
-                Save as my default billing address
-              </label>
+              <label className="form-label" style={{ fontSize: 13, fontWeight: 600 }}>Country <span style={{ color: "var(--danger)" }}>*</span></label>
+              <select
+                className="form-input"
+                value={billingCountry}
+                onChange={(e) => setBillingCountry(e.target.value)}
+                required
+              >
+                <option value="" disabled>Select country</option>
+                <option value="United States">United States</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Canada">Canada</option>
+                <option value="Australia">Australia</option>
+                <option value="Bangladesh">Bangladesh</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
         </div>

@@ -156,7 +156,6 @@ export default function ClientTable({
           <tr>
             <th>CLIENT</th>
             <th>COUNTRY</th>
-            <th>STATE</th>
             <th>TIME ZONE</th>
             <th>ORDERS</th>
             <th>COLLEAGUES</th>
@@ -217,7 +216,6 @@ export default function ClientTable({
                       </div>
                     </td>
                     <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.country || "—"}</td>
-                    <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>{client.state || "—"}</td>
                     <td>
                       {client.timezone ? (
                         <div>
@@ -308,7 +306,7 @@ export default function ClientTable({
                   
                   {isExpanded && (
                     <tr>
-                      <td colSpan={9} style={{ padding: "0 20px 20px 20px", background: "#f8fafc", borderBottom: "1px solid var(--neutral-200)" }}>
+                      <td colSpan={8} style={{ padding: "0 20px 20px 20px", background: "#f8fafc", borderBottom: "1px solid var(--neutral-200)" }}>
                         <div style={{ background: "#fff", borderRadius: 8, border: "1px solid var(--neutral-200)", overflow: "hidden" }}>
                           <div style={{ padding: "12px 16px", background: "#f8fafc", borderBottom: "1px solid var(--neutral-200)", fontSize: 13, fontWeight: 600, color: "var(--brand-dark)", display: "flex", alignItems: "center", gap: 8 }}>
                             <Users size={14} /> Colleagues added by {client.fullName ?? "client"} ({client.colleagues.length})
@@ -409,7 +407,6 @@ export default function ClientTable({
                       </div>
                     </div>
                   </td>
-                  <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>—</td>
                   <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>—</td>
                   <td style={{ color: "var(--neutral-600)", fontSize: 14 }}>—</td>
                   <td>
