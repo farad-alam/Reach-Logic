@@ -29,7 +29,7 @@ export default auth((req) => {
     const role = (session.user as { role?: string })?.role;
 
     // Admin trying to access client/team routes
-    if (pathname.startsWith("/portal/client") && role !== "CLIENT") {
+    if (pathname.startsWith("/portal/client") && role !== "CLIENT" && role !== "CLIENT_COLLEAGUE") {
       return NextResponse.redirect(new URL("/portal/admin", req.url));
     }
     if (pathname.startsWith("/portal/team") && role !== "TEAM_MEMBER") {
@@ -37,6 +37,7 @@ export default auth((req) => {
     }
     if (pathname.startsWith("/portal/admin") && role !== "SUPER_ADMIN") {
       if (role === "CLIENT") return NextResponse.redirect(new URL("/portal/client", req.url));
+      if (role === "CLIENT_COLLEAGUE") return NextResponse.redirect(new URL("/portal/client/messages", req.url));
       if (role === "TEAM_MEMBER") return NextResponse.redirect(new URL("/portal/team/messages", req.url));
     }
   }
