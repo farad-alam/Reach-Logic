@@ -12,6 +12,7 @@ export default async function PortalRootPage() {
   if (role === "SUPER_ADMIN") redirect("/portal/admin");
   if (role === "CLIENT") redirect("/portal/client");
   if (role === "TEAM_MEMBER") redirect("/portal/team/messages");
+  if (role === "CLIENT_COLLEAGUE") redirect("/portal/client/messages");
 
   redirect("/portal/login");
 }

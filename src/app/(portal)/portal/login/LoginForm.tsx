@@ -40,7 +40,8 @@ export default function LoginForm() {
       const role = session?.user?.role;
 
       if (role === "SUPER_ADMIN") router.push("/portal/admin");
-      else if (role === "CLIENT" || role === "CLIENT_COLLEAGUE") router.push("/portal/client");
+      else if (role === "CLIENT") router.push("/portal/client");
+      else if (role === "CLIENT_COLLEAGUE") router.push("/portal/client/messages");
       else if (role === "TEAM_MEMBER") router.push("/portal/team/messages");
       else router.push("/portal/login");
     } finally {
