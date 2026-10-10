@@ -36,12 +36,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
       return NextResponse.json({ error: "Maximum of 2 colleagues allowed" }, { status: 400 });
     }
 
-    // Find or create user
-    let user = await prisma.user.findUnique({ where: { email } });
+    // Find or create the colleague user
+    let user = await prisma.user.findUnique({
+      where: { email },
+      include: { sessions: { take: 1 } }, // check if they've ever logged in
+    });
     let tempPassword = "";
+    let isNewUser = false;
 
     if (!user) {
-      tempPassword = crypto.randomBytes(4).toString("hex"); // 8 chars
+      // Brand new user — create account with temp password
+      isNewUser = true;
+      tempPassword = crypto.randomBytes(4).toString("hex"); // 8-char hex
       const passwordHash = await bcrypt.hash(tempPassword, 10);
       user = await prisma.user.create({
         data: {
@@ -51,10 +57,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
           passwordHash,
           isActive: true,
         },
+        include: { sessions: { take: 1 } },
       });
     } else {
       if (user.role !== "CLIENT_COLLEAGUE") {
         return NextResponse.json({ error: "Cannot invite this user" }, { status: 400 });
+      }
+
+      // Existing CLIENT_COLLEAGUE who has never logged in (account was created but email was never received)
+      // Generate a fresh temp password and re-send credentials
+      const hasEverLoggedIn = user.sessions.length > 0;
+      if (!hasEverLoggedIn) {
+        tempPassword = crypto.randomBytes(4).toString("hex");
+        const passwordHash = await bcrypt.hash(tempPassword, 10);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { passwordHash },
+        });
       }
     }
 
@@ -80,7 +99,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
       });
     }
 
-    // Check if already in thread
+    // Add to thread if not already a member
     const alreadyIn = thread.members.find((m) => m.userId === user.id);
     if (!alreadyIn) {
       await prisma.threadMember.create({
@@ -90,28 +109,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
         },
       });
 
-      // Send email if new user (non-blocking — email failure should not fail the invite)
-      if (tempPassword) {
-        sendColleagueInvitation(email, tempPassword, thread.name, thread.client.fullName || thread.client.email)
-          .catch((err) => console.error("[invite-colleague] email failed (non-fatal):", err));
-      } else {
-        // Send regular notification if existing user
-        await notify({
-          userId: user.id,
-          type: "NEW_MESSAGE",
-          title: "Added to conversation on ReachLogic",
-          body: `${thread.client.fullName || thread.client.email} has added you to a conversation thread ("${thread.name}") on the ReachLogic Portal.`,
-          link: "/portal/login",
-        });
-      }
-
-      // Create a system message
+      // System message
       await prisma.message.create({
         data: {
           threadId: thread.id,
           type: "SYSTEM",
           body: `${thread.client.fullName || thread.client.email} added ${email} to the thread.`,
         },
+      });
+    }
+
+    // Send credentials email if they need one (new user OR existing but never logged in)
+    // Non-blocking so email failure doesn't fail the invite
+    if (tempPassword) {
+      sendColleagueInvitation(email, tempPassword, thread.name, thread.client.fullName || thread.client.email)
+        .catch((err) => console.error("[invite-colleague] email failed (non-fatal):", err));
+    } else if (!isNewUser) {
+      // Existing user who has already logged in — just send an in-app notification
+      await notify({
+        userId: user.id,
+        type: "NEW_MESSAGE",
+        title: "Added to a conversation on ReachLogic",
+        body: `${thread.client.fullName || thread.client.email} has added you to the "${thread.name}" thread on the ReachLogic Portal.`,
+        link: `/portal/client/messages`,
       });
     }
 
