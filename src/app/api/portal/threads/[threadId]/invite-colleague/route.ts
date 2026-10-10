@@ -58,8 +58,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
       }
     }
 
-    // Upsert ClientColleague link
-    await prisma.clientColleague.upsert({
+    // Create ClientColleague link if it doesn't already exist
+    // (avoid upsert — Neon HTTP/pooler mode doesn't support implicit transactions)
+    const existingLink = await prisma.clientColleague.findUnique({
       where: {
         clientId_colleagueId_threadId: {
           clientId: session.user.id,
@@ -67,14 +68,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
           threadId: thread.id,
         },
       },
-      update: {}, // Do nothing if it exists
-      create: {
-        clientId: session.user.id,
-        colleagueId: user.id,
-        threadId: thread.id,
-        status: tempPassword ? "INVITED" : "ACTIVE", // Active if they already had an account
-      },
     });
+    if (!existingLink) {
+      await prisma.clientColleague.create({
+        data: {
+          clientId: session.user.id,
+          colleagueId: user.id,
+          threadId: thread.id,
+          status: tempPassword ? "INVITED" : "ACTIVE",
+        },
+      });
+    }
 
     // Check if already in thread
     const alreadyIn = thread.members.find((m) => m.userId === user.id);

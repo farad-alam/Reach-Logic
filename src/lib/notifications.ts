@@ -364,24 +364,32 @@ async function sendOrQueueMessageEmail({
     return;
   }
 
-  // Upsert queue entry
-  await prisma.messageEmailQueue.upsert({
+  // Update or create queue entry (avoid upsert — Neon HTTP/pooler mode doesn't support implicit transactions)
+  const existingQueue = await prisma.messageEmailQueue.findUnique({
     where: { threadId_recipientId: { threadId, recipientId: recipient.id } },
-    update: {
-      lastSentAt: now,
-      pendingCount: 1,
-      senderNames: [senderFirstName],
-      lastPreview: previewTrunc,
-    },
-    create: {
-      threadId,
-      recipientId: recipient.id,
-      lastSentAt: now,
-      pendingCount: 1,
-      senderNames: [senderFirstName],
-      lastPreview: previewTrunc,
-    },
   });
+  if (existingQueue) {
+    await prisma.messageEmailQueue.update({
+      where: { id: existingQueue.id },
+      data: {
+        lastSentAt: now,
+        pendingCount: 1,
+        senderNames: [senderFirstName],
+        lastPreview: previewTrunc,
+      },
+    });
+  } else {
+    await prisma.messageEmailQueue.create({
+      data: {
+        threadId,
+        recipientId: recipient.id,
+        lastSentAt: now,
+        pendingCount: 1,
+        senderNames: [senderFirstName],
+        lastPreview: previewTrunc,
+      },
+    });
+  }
 }
 
 /**
