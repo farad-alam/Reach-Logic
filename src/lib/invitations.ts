@@ -175,9 +175,12 @@ export async function acceptInvitation(
       select: { id: true },
     });
 
-    await prisma.threadMember.createMany({
-      data: admins.map((a) => ({ threadId: thread.id, userId: a.id })),
-    });
+    // NOTE: avoid createMany — use individual creates to stay compatible with Neon HTTP/pooler mode
+    for (const admin of admins) {
+      await prisma.threadMember.create({
+        data: { threadId: thread.id, userId: admin.id },
+      });
+    }
 
     // System welcome message
     await prisma.message.create({

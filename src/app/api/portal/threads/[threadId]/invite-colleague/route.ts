@@ -46,10 +46,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
 
     if (!user) {
       // Brand new user — create account with temp password
+      // New users always have 0 sessions, so no need to check
       isNewUser = true;
       tempPassword = crypto.randomBytes(4).toString("hex"); // 8-char hex
       const passwordHash = await bcrypt.hash(tempPassword, 10);
-      user = await prisma.user.create({
+      // NOTE: do NOT use include on create — Neon HTTP mode doesn't support implicit transactions
+      const newUser = await prisma.user.create({
         data: {
           email,
           fullName: name || email.split("@")[0],
@@ -57,8 +59,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ thr
           passwordHash,
           isActive: true,
         },
-        include: { sessions: { take: 1 } },
       });
+      user = { ...newUser, sessions: [] };
     } else {
       if (user.role !== "CLIENT_COLLEAGUE") {
         return NextResponse.json({ error: "Cannot invite this user" }, { status: 400 });
